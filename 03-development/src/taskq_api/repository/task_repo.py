@@ -27,7 +27,6 @@ Citations:
 """
 from __future__ import annotations
 
-import builtins
 from dataclasses import dataclass, replace
 from threading import RLock
 from typing import Callable, Optional, TypeVar

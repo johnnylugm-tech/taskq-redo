@@ -21,7 +21,6 @@ any api-layer change.
 Citations: SPEC.md §3 FR-01, FR-02, FR-06.
 """
 from __future__ import annotations
-import asyncio
 import uuid
 from dataclasses import asdict as _row_to_dict
 from typing import Optional
