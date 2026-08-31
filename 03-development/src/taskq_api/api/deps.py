@@ -7,15 +7,21 @@
     enforces the hierarchical scope `read < write < admin` (FR-04).
     Insufficient → 403 problem+json (with no resource-existence leak).
 
+[FR-03] `require_api_key` declares the X-API-Key header as *optional*
+(`Header(None, ...)`) so that a missing/empty header does NOT trip
+FastAPI's automatic 422 validation. We surface the missing-header
+case as 401 problem+json ourselves, which is the FR-10-mandated
+response shape for unauthorised requests (AC-3.1).
+
 These dependencies are the *single* place where authn/authz is
 performed; SPEC.md §3 FR-04 forbids scattering scope checks across
 handlers.
 Citations:
-  SPEC.md §3 FR-03 (X-API-Key authn)
+  SPEC.md §3 FR-03 (X-API-Key authn) [FR-03]
   SPEC.md §3 FR-04 (per-token scope, hierarchical)
   NFR-02 (no detail leakage in 403)
 """
-from typing import Callable
+from typing import Callable, Optional
 
 from fastapi import Depends, Header, Request
 
@@ -41,12 +47,17 @@ def get_task_service(request: Request) -> TaskService:
 
 
 def require_api_key(
-    x_api_key: str = Header(..., alias="X-API-Key"),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
     repo: ApiKeyRepo = Depends(get_key_repo),
 ) -> str:
-    """Return the scope string for the X-API-Key header (FR-03).
+    """Return the scope string for the X-API-Key header (FR-03 / AC-3.1).
 
-    Raises 401 problem+json when the header is missing or invalid.
+    The header is declared as optional so that FastAPI's automatic
+    422 validation does not fire for missing values. A missing/empty
+    header (or an unknown key) is converted to a 401 problem+json
+    response via `UnauthorizedError`, satisfying both the missing
+    header case (AC-3.1) and the unknown-key case (AC-3.2) without
+    leaking which one occurred.
     """
     if not x_api_key:
         raise UnauthorizedError(detail="missing X-API-Key header")

@@ -31,6 +31,7 @@ Citations:
 """
 from fastapi import FastAPI
 
+from taskq_api.api.health import router as health_router
 from taskq_api.api.tasks import router as tasks_router
 from taskq_api.config import API_KEY_SEEDS
 from taskq_api.errors import install_error_handlers
@@ -69,6 +70,11 @@ def create_app() -> FastAPI:
     app.state.task_service = TaskService(
         task_repo=task_repo, task_runner=task_runner
     )
+
+    # FR-03 / FR-09: health endpoints mounted at the app root — NOT
+    # under `/v1` and NOT behind `require_api_key`, so orchestrators
+    # can probe liveness/readiness without an API key (AC-3.7).
+    app.include_router(health_router)
 
     # Mount FR-01 + FR-02 router. Subsequent FRs will add their own
     # routers (e.g. metrics under FR-09) without touching this line.
