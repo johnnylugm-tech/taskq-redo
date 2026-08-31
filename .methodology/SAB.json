@@ -15,7 +15,8 @@
         },
         {
           "name": "taskq_api.api.health"
-        }
+        },
+        "taskq_api.api"
       ],
       "allowed_dependencies": [
         "service",
@@ -39,7 +40,8 @@
         },
         {
           "name": "taskq_api.service.health"
-        }
+        },
+        "taskq_api.service"
       ],
       "allowed_dependencies": [
         "repository",
@@ -60,7 +62,8 @@
         },
         {
           "name": "taskq_api.repository.rate_repo"
-        }
+        },
+        "taskq_api.repository"
       ],
       "allowed_dependencies": [
         "models",
@@ -75,7 +78,8 @@
         },
         {
           "name": "taskq_api.models.schemas"
-        }
+        },
+        "taskq_api.models"
       ],
       "allowed_dependencies": []
     },
@@ -93,7 +97,9 @@
       "modules": [
         {
           "name": "taskq_api.config"
-        }
+        },
+        "taskq_api",
+        "taskq_api.app"
       ],
       "allowed_dependencies": []
     }
