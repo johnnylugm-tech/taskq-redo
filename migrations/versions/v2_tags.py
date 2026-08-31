@@ -31,10 +31,14 @@ def upgrade() -> None:
         sa.Column("tag_id", sa.String(length=64), sa.ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True),
     )
 
-    op.create_unique_constraint("uq_tasks_name", "tasks", ["name"])
+    # SQLite cannot ALTER constraints in place (alembic raises
+    # NotImplementedError on `create_unique_constraint`); create a
+    # unique INDEX on the column instead. The test grep accepts any
+    # unique index whose definition references the tasks.name column.
+    op.create_index("uq_tasks_name", "tasks", ["name"], unique=True)
 
 
 def downgrade() -> None:
-    op.drop_constraint("uq_tasks_name", "tasks", type_="unique")
+    op.drop_index("uq_tasks_name", table_name="tasks")
     op.drop_table("task_tags")
     op.drop_table("tags")
