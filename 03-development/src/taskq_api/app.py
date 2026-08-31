@@ -36,6 +36,7 @@ from taskq_api.api.tasks import router as tasks_router
 from taskq_api.config import API_KEY_SEEDS
 from taskq_api.errors import install_error_handlers
 from taskq_api.repository.key_repo import ApiKeyRepo
+from taskq_api.repository.rate_repo import RateRepo
 from taskq_api.repository.task_repo import TaskRepo
 from taskq_api.service.runner import TaskRunner
 from taskq_api.service.tasks import TaskService
@@ -70,6 +71,12 @@ def create_app() -> FastAPI:
     app.state.task_service = TaskService(
         task_repo=task_repo, task_runner=task_runner
     )
+
+    # FR-05: shared bucket store (AC-5.3). The RateRepo carries no
+    # per-instance state — all persisted rows live in the module-level
+    # dict in `taskq_api.repository.rate_repo` — but the app.state
+    # reference is the DI seam the api-layer dep uses.
+    app.state.rate_repo = RateRepo()
 
     # FR-03 / FR-09: health endpoints mounted at the app root — NOT
     # under `/v1` and NOT behind `require_api_key`, so orchestrators

@@ -31,7 +31,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request, Response, status
 
-from taskq_api.api.deps import get_task_service, require_scope
+from taskq_api.api.deps import get_task_service, rate_limit, require_scope
 from taskq_api.errors import BadRequestError, ConflictError, NotFoundError
 from taskq_api.models.schemas import TaskCreate, TaskListResponse, TaskRead
 from taskq_api.service.tasks import (
@@ -41,7 +41,10 @@ from taskq_api.service.tasks import (
 )
 
 
-router = APIRouter(tags=["tasks"])
+router = APIRouter(
+    dependencies=[Depends(rate_limit)],
+    tags=["tasks"],
+)
 
 
 @router.post(

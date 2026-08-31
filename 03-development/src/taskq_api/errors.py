@@ -6,11 +6,16 @@ per SPEC.md §3 FR-10 and §7 status map. The handlers registered here cover:
   * FastAPI's RequestValidationError (422) — re-rendered so the content-type
     matches FR-10 instead of the framework default of application/json.
 
+[FR-05] `TooManyRequestsError` carries the integer `Retry-After` second
+count required by SPEC.md §3 FR-05 paragraph 1. The handler reads it
+off the exception and copies it into the response headers so the
+client can back off appropriately.
+
 NFR-02 requires error bodies NOT to leak internal detail; every handler
 here emits a fixed-shape envelope with only the user-safe `detail` text.
 Citations: SPEC.md §3 FR-10, SPEC.md §7 status map, NFR-02.
 """
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -63,6 +68,27 @@ class BadRequestError(ProblemException):
     type_uri = "about:blank"
 
 
+# [FR-05] 429 — the body is the FR-10 problem+json envelope, the
+# `Retry-After` header carries the integer second count.
+class TooManyRequestsError(ProblemException):
+    """[FR-05] Bucket exhausted — surfaces as 429 + problem+json + Retry-After."""
+
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
+    title = "Too Many Requests"
+    type_uri = "about:blank"
+
+    def __init__(
+        self,
+        detail: str = "",
+        retry_after_seconds: int = 1,
+    ) -> None:
+        super().__init__(detail)
+        # Always >= 1 — a 0-second Retry-After would be a "retry now"
+        # hint and trigger an immediate retry storm against the same
+        # exhausted bucket (SPEC.md §3 FR-05 paragraph 1).
+        self.retry_after_seconds: int = max(1, int(retry_after_seconds))
+
+
 _DEFAULT_DETAIL: dict[int, str] = {
     400: "bad request",
     401: "missing or invalid api key",
@@ -70,6 +96,7 @@ _DEFAULT_DETAIL: dict[int, str] = {
     404: "resource not found",
     409: "resource conflict",
     422: "request failed validation",
+    429: "rate limit exceeded",
 }
 
 
@@ -99,12 +126,20 @@ def install_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(ProblemException)
     async def _problem_handler(_request: Request, exc: ProblemException) -> JSONResponse:
-        return _problem_response(
+        resp = _problem_response(
             status_code=exc.status_code,
             title=exc.title,
             detail=exc.detail,
             type_uri=exc.type_uri,
         )
+        # [FR-05] Copy Retry-After off the exception if present. The
+        # attribute only exists on `TooManyRequestsError`; the
+        # `getattr(..., None)` default keeps the base handler usable
+        # for every other `ProblemException` subclass.
+        retry_after: Optional[int] = getattr(exc, "retry_after_seconds", None)
+        if retry_after is not None:
+            resp.headers["Retry-After"] = str(retry_after)
+        return resp
 
     @app.exception_handler(RequestValidationError)
     async def _validation_handler(_request: Request, _exc: RequestValidationError) -> JSONResponse:
