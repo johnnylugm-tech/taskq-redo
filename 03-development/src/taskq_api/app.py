@@ -4,12 +4,19 @@
 boots the server; `fastapi.testclient.TestClient(app)` (used by the
 test suite) builds a sync client around the same instance.
 
+[FR-02] Adds the `TaskRunner` wiring so the FR-02 `POST
+/v1/tasks/{id}/run` endpoint can schedule background subprocess
+execution. The runner shares the same `TaskRepo` as the service so
+the state machine and `task_results` writes are observed by the
+read endpoints in real time.
+
 The factory wires:
   * the FR-10 problem+json exception handlers (`install_error_handlers`),
   * an `ApiKeyRepo` seeded with the dev/test keys declared in
     `taskq_api.config.API_KEY_SEEDS`,
-  * a `TaskRepo` + `TaskService` pair,
-  * the FR-01 router mounted under `/v1`.
+  * a `TaskRepo` + `TaskService` pair (FR-01),
+  * a `TaskRunner` injected into the service (FR-02),
+  * the FR-01/FR-02 router mounted under `/v1`.
 
 The module-level `app = create_app()` is a top-level constant — there
 is no `if __name__ == "__main__":` guard here. Per the implementation
@@ -20,6 +27,7 @@ Citations:
   SPEC.md §2 ("`uvicorn taskq_api.app:app`")
   SPEC.md §3 FR-10 (problem+json handlers)
   SPEC.md §3 FR-03 (X-API-Key authn)
+  SPEC.md §3 FR-02 (task execution runner)
 """
 from fastapi import FastAPI
 
@@ -28,6 +36,7 @@ from taskq_api.config import API_KEY_SEEDS
 from taskq_api.errors import install_error_handlers
 from taskq_api.repository.key_repo import ApiKeyRepo
 from taskq_api.repository.task_repo import TaskRepo
+from taskq_api.service.runner import TaskRunner
 from taskq_api.service.tasks import TaskService
 
 
@@ -50,10 +59,19 @@ def create_app() -> FastAPI:
     # FR-01: in-memory task store + service.
     task_repo = TaskRepo()
     app.state.task_repo = task_repo
-    app.state.task_service = TaskService(task_repo=task_repo)
 
-    # Mount FR-01 router. Subsequent FRs will add their own routers
-    # (e.g. task_runs under FR-02, metrics under FR-09).
+    # FR-02: build the runner against the same repo so the state
+    # machine and task_results writes are immediately observable
+    # through the read endpoints.
+    task_runner = TaskRunner(task_repo=task_repo)
+    app.state.task_runner = task_runner
+
+    app.state.task_service = TaskService(
+        task_repo=task_repo, task_runner=task_runner
+    )
+
+    # Mount FR-01 + FR-02 router. Subsequent FRs will add their own
+    # routers (e.g. metrics under FR-09) without touching this line.
     app.include_router(tasks_router, prefix="/v1")
 
     return app

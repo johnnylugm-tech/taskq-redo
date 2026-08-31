@@ -1,4 +1,4 @@
-"""FR-01 Task CRUD router (SPEC.md §3 FR-01).
+"""FR-01 + FR-02 Task CRUD and execution router (SPEC.md §3 FR-01/02).
 
 [FR-01] Four endpoints, all mounted under `/v1`:
 
@@ -6,6 +6,11 @@
   GET    /v1/tasks/{id}    — scope=read   → 200 / 404 (AC-1.3) / 422
   GET    /v1/tasks         — scope=read   → 200 (AC-1.6) / 422 (AC-1.5)
   DELETE /v1/tasks/{id}    — scope=admin  → 204 (AC-1.7) / 404
+
+[FR-02] Two endpoints added on the same router:
+
+  POST   /v1/tasks/{id}/run — scope=write → 202 with `run_id` (AC-2.1)
+  GET    /v1/tasks/{id}/runs — scope=read → 200, history newest first (AC-2.6)
 
 Validation:
   * Pydantic `TaskCreate` enforces command non-empty / ≤1000 / blacklist
@@ -17,7 +22,8 @@ Validation:
 
 Citations:
   SPEC.md §3 FR-01 (whole section)
-  SPEC.md §7 HTTP status map (201/204/404/409/422)
+  SPEC.md §3 FR-02 (whole section)
+  SPEC.md §7 HTTP status map (201/202/204/404/409/422)
   SPEC.md §3 FR-10 (problem+json envelope)
   NFR-06 (architectural enforcement of pagination contract)
 """
@@ -127,3 +133,56 @@ def delete_task(
     except TaskNotFoundError as exc:
         raise NotFoundError(detail="task not found") from exc
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# ---------------------------------------------------------------------------
+# FR-02 — Task execution and run history
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/tasks/{task_id}/run",
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def run_task(
+    task_id: str,
+    service: TaskService = Depends(get_task_service),
+    _scope: str = Depends(require_scope("write")),
+) -> dict:
+    """AC-2.1 — Schedule a task for execution (scope: write).
+
+    Returns 202 Accepted with a `run_id` in the body. The actual
+    subprocess execution is scheduled as a background asyncio task
+    inside the service; the state machine
+    (`pending → running → done | failed | timeout`) is observed
+    through subsequent `GET /v1/tasks/{id}` reads.
+    """
+    try:
+        run_id = await service.schedule_run(task_id)
+    except TaskNotFoundError as exc:
+        raise NotFoundError(detail="task not found") from exc
+    return {"run_id": run_id}
+
+
+@router.get("/tasks/{task_id}/runs")
+def list_runs(
+    task_id: str,
+    limit: int = Query(50, ge=1, le=200),
+    cursor: Optional[str] = Query(None),
+    service: TaskService = Depends(get_task_service),
+    _scope: str = Depends(require_scope("read")),
+) -> dict:
+    """AC-2.6 — Run history for a task, newest first (scope: read).
+
+    Rows are ordered by `finished_at DESC` at the repository layer
+    (NFR-06 layering); the service hands the ordered list to the
+    api unchanged. `limit` is bounded [1, 200] just like the
+    task-list endpoint (AC-1.5 contract).
+    """
+    try:
+        items, next_cursor = service.list_runs(
+            task_id, limit=limit, cursor=cursor
+        )
+    except TaskNotFoundError as exc:
+        raise NotFoundError(detail="task not found") from exc
+    return {"items": items, "next_cursor": next_cursor}

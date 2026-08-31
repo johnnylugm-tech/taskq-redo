@@ -1,5 +1,5 @@
 """Task repository — storage for `tasks` rows and their `task_results`
-cascade (SPEC.md §3 FR-01 row 4 + FR-07 v3 schema).
+cascade (SPEC.md §3 FR-01 row 4 + FR-07 v3 schema + FR-02 run history).
 
 [FR-01] Single-process in-memory implementation. The class is the
 implementation contract declared in TEST_SPEC.md FR-01 case 7: a
@@ -9,11 +9,26 @@ guarded by a single `RLock`, the delete path is atomic by
 construction; the future SQLAlchemy implementation will express the
 same guarantee via a single `DELETE … FROM tasks WHERE id=:id`
 statement within an explicit transaction.
+
+[FR-02] Adds the result-row contract declared in SPEC.md §3 FR-02:
+  * `set_status(id, status)`  — drives the
+    `pending → running → done | failed | timeout` state machine.
+  * `add_result(id, run_id, …)` — appends a row to the per-task
+    `task_results` list (the v3 split table).
+  * `list_results(id, limit, cursor)` — returns rows ordered by
+    `finished_at DESC` (newest first) for `GET /v1/tasks/{id}/runs`.
+All three go through the same `RLock` so the API can observe
+consistent state across reads and writes.
+
 Citations:
   SPEC.md §3 FR-01 (row 4 "delete with results row, same transaction")
+  SPEC.md §3 FR-02 ("task_results" table + state machine)
   TEST_SPEC.md FR-01 case 7
 """
-from dataclasses import dataclass
+from __future__ import annotations
+
+import builtins
+from dataclasses import dataclass, replace
 from threading import RLock
 from typing import Optional
 
@@ -103,3 +118,83 @@ class TaskRepo:
                 ordered[limit].id if len(ordered) > limit else None
             )
             return page, next_cursor
+
+    # ----- FR-02 AC-2.3 — state machine transitions -----
+    def set_status(self, id: str, status: str) -> bool:
+        """Drive the task's `status` field to a new value.
+
+        Returns True on success, False if the id is unknown. The
+        `TaskRow` is replaced atomically under the lock so readers
+        either see the old or the new value, never a partial update.
+        """
+        with self._lock:
+            row = self._tasks.get(id)
+            if row is None:
+                return False
+            self._tasks[id] = replace(row, status=status)
+            return True
+
+    # ----- FR-02 AC-2.4 — task_results row write -----
+    def add_result(
+        self,
+        id: str,
+        run_id: str,
+        exit_code: Optional[int],
+        stdout_tail: str,
+        stderr_tail: str,
+        duration_ms: int,
+        finished_at: str,
+    ) -> bool:
+        """Append a `task_results` row for the given task.
+
+        The five required columns per SPEC §3 FR-02 are
+        `exit_code`, `stdout_tail`, `stderr_tail`, `duration_ms`,
+        `finished_at`. The `id` and `task_id` columns are stored so
+        the cursor can identify individual rows in the history view.
+        """
+        with self._lock:
+            if id not in self._tasks:
+                return False
+            self._results.setdefault(id, []).append(
+                {
+                    "id": run_id,
+                    "task_id": id,
+                    "exit_code": exit_code,
+                    "stdout_tail": stdout_tail,
+                    "stderr_tail": stderr_tail,
+                    "duration_ms": duration_ms,
+                    "finished_at": finished_at,
+                }
+            )
+            return True
+
+    # ----- FR-02 AC-2.6 — run history newest first -----
+    def list_results(
+        self,
+        id: str,
+        limit: int,
+        cursor: Optional[str],
+    ) -> tuple[list[dict], Optional[str]]:
+        """Return a page of `task_results` rows, newest first.
+
+        The order is `finished_at DESC` (SPEC §3 FR-02 paragraph 4).
+        Rows without a `finished_at` (i.e. in-flight) sort to the
+        end, but every FR-02 row is written with a finished_at at
+        the moment of completion, so this branch is unreachable in
+        practice.
+        """
+        with self._lock:
+            rows = list(self._results.get(id, []))
+        rows.sort(key=lambda r: r.get("finished_at") or "", reverse=True)
+        if cursor:
+            idx = next(
+                (i for i, r in enumerate(rows) if r.get("id") == cursor),
+                -1,
+            )
+            if idx >= 0:
+                rows = rows[idx + 1 :]
+        page = rows[:limit]
+        next_cursor: Optional[str] = (
+            rows[limit].get("id") if len(rows) > limit else None
+        )
+        return page, next_cursor
