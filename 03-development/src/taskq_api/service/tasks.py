@@ -14,6 +14,7 @@ any api-layer change.
 Citations: SPEC.md §3 FR-01, FR-06.
 """
 import uuid
+from dataclasses import asdict as _row_to_dict
 from typing import Optional
 
 from taskq_api.repository.session import transaction
@@ -70,12 +71,3 @@ class TaskService:
         )
         items = [_row_to_dict(r) for r in rows]
         return items, next_cursor
-
-
-def _row_to_dict(row) -> dict:
-    return {
-        "id": row.id,
-        "name": row.name,
-        "command": row.command,
-        "status": row.status,
-    }

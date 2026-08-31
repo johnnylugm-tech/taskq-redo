@@ -25,9 +25,9 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request, Response, status
 
-from taskq_api.api.deps import require_scope
+from taskq_api.api.deps import get_task_service, require_scope
 from taskq_api.errors import BadRequestError, ConflictError, NotFoundError
-from taskq_api.models.schemas import TaskCreate, TaskRead
+from taskq_api.models.schemas import TaskCreate, TaskListResponse, TaskRead
 from taskq_api.service.tasks import (
     TaskNameConflictError,
     TaskNotFoundError,
@@ -36,11 +36,6 @@ from taskq_api.service.tasks import (
 
 
 router = APIRouter(tags=["tasks"])
-
-
-def get_task_service(request: Request) -> TaskService:
-    """Resolve the TaskService from app state (DI seam for tests)."""
-    return request.app.state.task_service
 
 
 @router.post(
@@ -78,7 +73,7 @@ def get_task(
     return TaskRead(**result)
 
 
-@router.get("/tasks")
+@router.get("/tasks", response_model=TaskListResponse)
 def list_tasks(
     request: Request,
     limit: int = Query(50, ge=1, le=200),
@@ -86,7 +81,7 @@ def list_tasks(
     status_filter: Optional[str] = Query(None, alias="status"),
     service: TaskService = Depends(get_task_service),
     _scope: str = Depends(require_scope("read")),
-):
+) -> TaskListResponse:
     """AC-1.5 / AC-1.6 — Paginated task list (scope: read).
 
     `limit` is bounded [1, 200] by FastAPI's Query validation, so values
@@ -105,7 +100,10 @@ def list_tasks(
     items, next_cursor = service.list(
         limit=limit, cursor=cursor, status=status_filter
     )
-    return {"items": items, "next_cursor": next_cursor}
+    return TaskListResponse(
+        items=[TaskRead(**item) for item in items],
+        next_cursor=next_cursor,
+    )
 
 
 @router.delete(

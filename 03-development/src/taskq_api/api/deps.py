@@ -22,6 +22,7 @@ from fastapi import Depends, Header, Request
 from taskq_api.errors import ForbiddenError, UnauthorizedError
 from taskq_api.repository.key_repo import ApiKeyRepo
 from taskq_api.service.auth import resolve_scope
+from taskq_api.service.tasks import TaskService
 
 
 # Hierarchical scope ordering. Defined here (api layer) so the api
@@ -32,6 +33,11 @@ SCOPE_RANK: dict[str, int] = {"read": 0, "write": 1, "admin": 2}
 def get_key_repo(request: Request) -> ApiKeyRepo:
     """Resolve the ApiKeyRepo from app state (DI seam for tests)."""
     return request.app.state.api_key_repo
+
+
+def get_task_service(request: Request) -> TaskService:
+    """Resolve the TaskService from app state (DI seam for tests)."""
+    return request.app.state.task_service
 
 
 def require_api_key(
