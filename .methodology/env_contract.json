@@ -1,0 +1,53 @@
+{
+  "classified_at": "2026-08-31T17:20:18Z",
+  "cli_tools": [
+    "alembic",
+    "bandit",
+    "fastapi",
+    "httpx",
+    "lint-imports",
+    "mutmut",
+    "pip-licenses",
+    "piplicenses",
+    "pydantic",
+    "pytest",
+    "pytest-benchmark",
+    "pytest_cov",
+    "python3.11",
+    "sqlalchemy",
+    "starlette",
+    "uvicorn"
+  ],
+  "enforcer_sha": "bd7f8c288d212ce1ba62a56093c5b24d6920d7dd",
+  "env_vars": {
+    "dev_opt_in": [],
+    "has_default": [
+      "TASKQ_CORS_ORIGINS",
+      "TASKQ_DB_POOL_SIZE",
+      "TASKQ_DB_URL",
+      "TASKQ_DRAIN_TIMEOUT",
+      "TASKQ_HOST",
+      "TASKQ_LOG_FORMAT",
+      "TASKQ_LOG_LEVEL",
+      "TASKQ_MAX_CONCURRENT",
+      "TASKQ_PORT",
+      "TASKQ_RATE_BURST",
+      "TASKQ_RATE_PER_SEC",
+      "TASKQ_TASK_TIMEOUT"
+    ],
+    "mandatory": []
+  },
+  "infra_services": {
+    "docker_compose_services": [],
+    "required": [
+      {
+        "checked_via": "taskq-api defaults to sqlite:///./taskq.db (SPEC §5.1); project root writable; SQLite is the dev/test target DB per SPEC §2",
+        "name": "sqlite",
+        "reachable": true,
+        "type": "SQLite (file-based)"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "source_sha256": "53eb46301fe351608dbf154707823bd01cc3a4399f5848d243b6e339493b68d4"
+}

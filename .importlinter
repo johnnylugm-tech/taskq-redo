@@ -1,0 +1,34 @@
+[importlinter]
+root_packages =
+    taskq_api
+include_external_packages = True
+
+[importlinter:contract:layers]
+name = layers
+type = layers
+layers =
+    taskq_api.api
+    taskq_api.service
+    taskq_api.repository
+    taskq_api.models
+
+[importlinter:contract:forbidden-sqlalchemy]
+name = forbidden-sqlalchemy
+type = forbidden
+source_modules =
+    taskq_api
+    taskq_api.app
+    taskq_api.api
+    taskq_api.service
+    taskq_api.models
+    taskq_api.config
+    taskq_api.errors
+forbidden_modules =
+    sqlalchemy
+
+[importlinter:contract:config-and-errors-independent]
+name = config-and-errors-independent
+type = independence
+modules =
+    taskq_api.config
+    taskq_api.errors
