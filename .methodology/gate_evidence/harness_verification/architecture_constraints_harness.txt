@@ -10,11 +10,13 @@
 [1mContracts[0m
 [1m---------[0m
 [22m[0m
-[1mAnalyzed 39 files, 65 dependencies.[0m
+[1mAnalyzed 41 files, 71 dependencies.[0m
 [1m-----------------------------------[0m
 [22m[0m
 [22mlayers [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
 [22mforbidden-sqlalchemy [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
 [22mconfig-and-errors-independent [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
+[22mroot-package-marker-independent [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
+[22mcli-main-independent [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m
 [22m[0m
-[22mContracts: 3 kept, 0 broken.[0m
+[22mContracts: 5 kept, 0 broken.[0m
