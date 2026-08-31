@@ -1,6 +1,6 @@
 """API key repository (SPEC.md §3 FR-03).
 
-[FR-01] The plaintext key never leaves the request header; it is
+[FR-03] The plaintext key never leaves the request header; it is
 hashed (SHA-256, per SPEC.md §3 FR-03 / NFR-02) and matched against
 the store with `hmac.compare_digest` for constant-time comparison.
 
@@ -27,9 +27,16 @@ import hmac
 from threading import RLock
 from typing import Optional
 
+__all__ = ["ApiKeyRepo", "hash_key"]
+
 
 def hash_key(plaintext: str) -> str:
-    """SHA-256 hex digest of a UTF-8 encoded API key (FR-03)."""
+    """Return the 64-hex-char SHA-256 digest of `plaintext` (FR-03).
+
+    Encoding is UTF-8 so the function round-trips any non-ASCII
+    characters an operator might paste into a header by mistake; the
+    resulting digest is what the repo persists, never the plaintext.
+    """
     return hashlib.sha256(plaintext.encode("utf-8")).hexdigest()
 
 
@@ -42,7 +49,7 @@ class ApiKeyRepo:
         self._hash_to_scope: dict[str, str] = {}
         # SHA-256 hexes that have been revoked (AC-3.5 / FR-03 "停用金鑰").
         # A revoked key MUST resolve as unknown to `lookup` from the
-        # instant the revoke() call returns, so this is a fast path
+        # instant the `revoke` call returns, so this is a fast path
         # separate from `_hash_to_scope` rather than a tombstone on
         # the active mapping.
         self._revoked_hashes: set[str] = set()
@@ -50,32 +57,33 @@ class ApiKeyRepo:
     def add(self, plaintext: str, scope: str) -> None:
         """Insert (or overwrite) a key → scope mapping.
 
-        Uses SHA-256 over the plaintext; the plaintext itself is
-        dropped on the floor after hashing.
+        The plaintext is hashed and then dropped; the repo never
+        retains the original value (NFR-02 / AC-3.3).
         """
-        h = hash_key(plaintext)
+        key_hash = hash_key(plaintext)
         with self._lock:
-            self._hash_to_scope[h] = scope
+            self._hash_to_scope[key_hash] = scope
             # Re-adding a previously-revoked key resurrects it — that
             # is the only legitimate way to "undo" a revoke in this
             # in-memory model and matches the operator workflow of
             # "I revoked the wrong key, let me re-issue it".
-            self._revoked_hashes.discard(h)
+            self._revoked_hashes.discard(key_hash)
 
     def revoke(self, plaintext: str) -> None:
         """Revoke the key derived from `plaintext` (AC-3.5).
 
         Idempotent: revoking an already-revoked or unknown key is a
-        no-op. The lookup is constant-time (HMAC compare) over the
-        candidate hash, so we do not echo whether the key existed.
+        no-op. The candidate hash is added to `_revoked_hashes` so
+        subsequent `lookup` calls treat it as unknown, regardless of
+        whether it was ever active.
         """
-        candidate = hash_key(plaintext)
+        candidate_hash = hash_key(plaintext)
         with self._lock:
             # If the key was active, drop it from the active map; the
             # hash still lives in `_revoked_hashes` so subsequent
             # `lookup` calls treat it as unknown.
-            self._hash_to_scope.pop(candidate, None)
-            self._revoked_hashes.add(candidate)
+            self._hash_to_scope.pop(candidate_hash, None)
+            self._revoked_hashes.add(candidate_hash)
 
     def lookup(self, plaintext: str) -> Optional[str]:
         """Return the scope for a plaintext key, or None if unknown.
@@ -87,13 +95,13 @@ class ApiKeyRepo:
         A key whose hash is present in `_revoked_hashes` is treated
         as unknown (returns `None`) — AC-3.5 / FR-03 "停用金鑰".
         """
-        candidate = hash_key(plaintext)
+        candidate_hash = hash_key(plaintext)
         with self._lock:
             # Fast path: a revoked key is always invalid, regardless
             # of what the active map says.
-            if candidate in self._revoked_hashes:
+            if candidate_hash in self._revoked_hashes:
                 return None
             for stored_hash, scope in self._hash_to_scope.items():
-                if hmac.compare_digest(stored_hash, candidate):
+                if hmac.compare_digest(stored_hash, candidate_hash):
                     return scope
             return None

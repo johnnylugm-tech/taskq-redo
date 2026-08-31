@@ -29,22 +29,31 @@ import secrets
 
 from taskq_api.repository.key_repo import ApiKeyRepo
 
+# 24 random bytes -> ~32 url-safe base64 chars; comfortably above the
+# 16-char floor pinned by AC-3.6. Centralised so the entropy choice is
+# obvious at the call site.
+_PLAINTEXT_RANDOM_BYTES = 24
+
+# Exit code is the conventional Unix "success" so shell callers can
+# branch on it without parsing stderr.
+_EXIT_OK = 0
+
 
 def _cmd_key_create(args: argparse.Namespace) -> int:
     """Generate a new API key for the requested scope, print plaintext.
 
-    Returns 0 on success. The plaintext is written to stdout via a
-    bare `print` so the operator can capture it via shell redirection;
-    logging handlers are intentionally not configured here (NFR-04:
-    the plaintext must not appear in any log channel).
+    Returns `_EXIT_OK` on success. The plaintext is written to stdout
+    via a bare `print` so the operator can capture it via shell
+    redirection; logging handlers are intentionally not configured
+    here (NFR-04: the plaintext must not appear in any log channel).
     """
-    plaintext = secrets.token_urlsafe(24)  # ~32 chars; >= 16 (AC-3.6)
-    repo = ApiKeyRepo()
-    repo.add(plaintext, args.scope)
-    # The plaintext appears on stdout EXACTLY ONCE and never on
-    # stderr. No debug/log lines are emitted in this command path.
+    plaintext = secrets.token_urlsafe(_PLAINTEXT_RANDOM_BYTES)
+    key_repo = ApiKeyRepo()
+    key_repo.add(plaintext, args.scope)
+    # Plaintext appears on stdout EXACTLY ONCE and never on stderr.
+    # No debug/log lines are emitted in this command path.
     print(plaintext)
-    return 0
+    return _EXIT_OK
 
 
 def build_parser() -> argparse.ArgumentParser:
