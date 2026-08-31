@@ -102,6 +102,19 @@ def test_burst_over_limit_returns_429_with_retry_after(client, write_api_key):
     # NP-03 (rate limit 429) — the canonical verifier of FR-05 boundary
     #   behaviour (TEST_SPEC.md FR-05 case 1, Inputs: burst_count=21,
     #   burst_capacity=20, expected_status=429, expected_header=Retry-After).
+    # NFR-02 security — the 429 body MUST be the fixed RFC 7807
+    #   envelope (TRACEABILITY_MATRIX.md §FR↔NFR row NFR-02:
+    #   cross-references FR-02 / FR-03 / FR-04 / FR-10); `detail`
+    #   MUST NOT echo internal state such as the bucket row id or
+    #   current token count.
+    # NFR-05 documentation — every public symbol under `taskq_api.*`
+    #   carries an `[FR-XX]`/`[NFR-XX]` tag (TRACEABILITY_MATRIX.md
+    #   §FR↔NFR row NFR-05: cross-references FR-01..FR-10); this
+    #   test pins the `rate_limit` dep / `consume` / `take_token`
+    #   contract that the docstrings encode.
+    # NFR-06 layering — `taskq_api.api.deps.rate_limit` is the
+    #   api-layer seam; service and repository layers stay below it
+    #   per `.importlinter` (`api > service > repository > models`).
     # NFR-10 integration_coverage — full HTTP cycle through ASGITransport
     #   including the rate-limit decision and problem+json envelope.
     # SPEC.md §3 FR-05 paragraph 1: "Over limit → HTTP 429 + problem+json
@@ -180,6 +193,14 @@ def test_rate_limit_recovers_after_refill(client, write_api_key):
     #   TEST_SPEC.md FR-05 case 2 Inputs: rate_per_sec=5.0, burst=20,
     #   refill_seconds=4 → 4 seconds of refill repays ≥ 20 tokens (one
     #   full bucket at the declared rate).
+    # NFR-03 reliability — refill math must live inside the same
+    #   transaction+row-level-lock as the consume (TRACEABILITY_MATRIX.md
+    #   §FR↔NFR row NFR-03: cross-references FR-06 / FR-07 / FR-08 /
+    #   FR-09); a refill computed outside the lock would race the
+    #   consume path and admit stale capacity.
+    # NFR-06 layering — the refill computation lives in
+    #   `taskq_api.service.ratelimit` (service layer) per the
+    #   `.importlinter` contract `api > service > repository > models`.
     # SPEC.md §3 FR-05 paragraph 1: "After the bucket refills at
     #   TASKQ_RATE_PER_SEC, requests succeed again".
 
@@ -248,6 +269,10 @@ def test_bucket_state_shared_across_workers():
     #   a per-process dict; the "shared across workers" guarantee is
     #   exactly what forces the DB-backed implementation, and what
     #   later justifies the row-level lock in AC-5.4.
+    # NFR-06 layering — the shared row is the repository layer's
+    #   contract (`taskq_api.repository.rate_repo`); two repo
+    #   instances over the same backing store MUST observe the same
+    #   state, which is what `.importlinter` exists to enforce.
     # SPEC.md §3 FR-05 paragraph 1 "存於資料庫" clause.
 
     We use the SAB-bound `RateRepo` to simulate two workers (two
@@ -298,6 +323,14 @@ def test_bucket_update_uses_row_level_lock():
     #   observe `tokens=1` and both consume → over-admit by 1.
     #   TEST_SPEC.md FR-05 case 4 Inputs: concurrent_workers=8,
     #   expected_lock_call=with_for_update, no_over_admit=true.
+    # NFR-03 reliability — explicit transaction boundary around the
+    #   read-modify-write (TRACEABILITY_MATRIX.md §FR↔NFR row NFR-03:
+    #   cross-references FR-06 / FR-07 / FR-08 / FR-09); the lock
+    #   alone is insufficient without the surrounding transaction.
+    # NFR-05 documentation — the lock + transaction contract must be
+    #   encoded in the `RateRepo.consume` docstring with `[FR-05]`
+    #   (TRACEABILITY_MATRIX.md §FR↔NFR row NFR-05: cross-references
+    #   FR-01..FR-10).
     # SPEC.md §3 FR-05 paragraph 1: "updates must occur within a single
     #   transaction using a row-level lock".
     # SPEC.md §9 R12 (race-condition mitigation).
@@ -393,6 +426,10 @@ def test_health_endpoints_exempt_from_rate_limit(client):
     # SPEC.md §3 FR-09 — orchestrators probe these endpoints at high
     #   frequency (k8s liveness/readiness); rate-limiting them would
     #   cause the orchestrator to mark the pod unhealthy.
+    # NFR-10 integration_coverage — full HTTP cycle at the boundary
+    #   (TRACEABILITY_MATRIX.md §FR↔NFR row NFR-10: cross-references
+    #   FR-01..FR-10); 100 GETs to /healthz prove the dep short-circuits
+    #   the bucket check.
     # TEST_SPEC.md FR-05 case 5 Inputs: endpoint=/healthz,
     #   burst_count=100, expected_status=200.
 
