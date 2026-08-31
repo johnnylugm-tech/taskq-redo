@@ -1,0 +1,23 @@
+# taskq-api runtime dependency lock (SPEC §6 + NFR-07).
+#
+# All versions are pinned with == per SPEC.md §6 ("全部 runtime 依賴在
+# requirements.txt 以 == 釘版;transitive 依賴以 lock 檔(requirements.lock)
+# 完整鎖定"). This file is the audit point for the license_compliance dimension;
+# `pip-licenses --format=json` is run against this set.
+#
+# Regenerate with: pip-compile --output-file=requirements.lock requirements.txt
+
+# === Direct runtime dependencies (from SPEC.md §0/§2/§6) ===
+fastapi==0.115.0
+pydantic==2.9.2
+sqlalchemy==2.0.36
+alembic==1.13.3
+uvicorn==0.32.0
+httpx==0.27.2
+
+# === Dev/test toolchain (SPEC §6 "requirements-dev.txt" — listed here so the
+# lock is the single license audit point) ===
+import-linter==1.12.2
+pip-licenses==4.3.4
+mutmut==2.5.1
+pytest-benchmark==4.0.0

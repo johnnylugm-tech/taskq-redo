@@ -1,0 +1,13 @@
+# taskq-api dev/test dependencies (SPEC §6 — NFR-06/07/08/10 toolchain)
+# Install on top of requirements.lock: pip install -r requirements-dev.txt
+#
+# NFR-06: lint-imports — enforces layer/independence contracts in .importlinter
+import-linter
+# NFR-07: pip-licenses — enumerates every direct+transitive license; SBOM source
+pip-licenses
+# NFR-08: mutmut 2.x — mutation testing (setup.cfg `[mutmut] paths_to_mutate = taskq_api.service,taskq_api.repository`)
+mutmut
+# NFR-10: pytest-benchmark — used by Gate 1 performance dimension
+pytest-benchmark
+# NFR-10: httpx ASGITransport for end-to-end integration coverage
+httpx

@@ -1,0 +1,25 @@
+{
+  "project": "taskq-api",
+  "generated_for": "SPEC §3 NFR-07 (license compliance)",
+  "source_lock": "requirements.lock",
+  "license_allowlist": [
+    "MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "Apache-2.0",
+    "PSF",
+    "Python-2.0"
+  ],
+  "dependencies": [
+    {"name": "fastapi", "version": "0.115.0", "license": "MIT", "direct": true},
+    {"name": "pydantic", "version": "2.9.2", "license": "MIT", "direct": true},
+    {"name": "sqlalchemy", "version": "2.0.36", "license": "MIT", "direct": true},
+    {"name": "alembic", "version": "1.13.3", "license": "MIT", "direct": true},
+    {"name": "uvicorn", "version": "0.32.0", "license": "BSD-3-Clause", "direct": true},
+    {"name": "httpx", "version": "0.27.2", "license": "BSD-3-Clause", "direct": true},
+    {"name": "import-linter", "version": "1.12.2", "license": "MIT", "direct": true},
+    {"name": "pip-licenses", "version": "4.3.4", "license": "MIT", "direct": true},
+    {"name": "mutmut", "version": "2.5.1", "license": "MIT", "direct": true},
+    {"name": "pytest-benchmark", "version": "4.0.0", "license": "MIT", "direct": true}
+  ]
+}
