@@ -42,7 +42,7 @@ Citations:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, cast
 
 from sqlalchemy import and_, or_, select
 from sqlalchemy.exc import IntegrityError
@@ -109,7 +109,17 @@ class NameConflictError(Exception):
 
 def _row_to_task_row(row: Task) -> TaskRow:
     """Convert an ORM `Task` into the immutable `TaskRow` dataclass."""
-    return TaskRow(id=row.id, name=row.name, command=row.command, status=row.status)
+    # `row.id` / `row.name` / etc. are SQLAlchemy column descriptors
+    # that pyright types as `Column[str]`. The runtime value of an
+    # *instance* attribute is the stored `str` (the schema declares
+    # `Column(String, ...)`) — explicit `cast(str, ...)` is the typed
+    # expression of that invariant without resorting to `# type: ignore`.
+    return TaskRow(
+        id=cast(str, row.id),
+        name=cast(str, row.name),
+        command=cast(str, row.command),
+        status=cast(str, row.status),
+    )
 
 
 def _result_to_dict(row: TaskResult) -> dict:
@@ -239,8 +249,10 @@ class TaskRepo:
         # Slice off the `(limit + 1)`th row, which exists only so
         # we can detect "is there a next page?".
         page = [_row_to_task_row(r) for r in rows[:limit]]
+        # `rows[limit].id` is `Column[str]` under pyright; runtime value
+        # is the stored primary key (see `_row_to_task_row` for rationale).
         next_cursor: Optional[str] = (
-            rows[limit].id if len(rows) > limit else None
+            cast(str, rows[limit].id) if len(rows) > limit else None
         )
         return page, next_cursor
 
@@ -257,7 +269,12 @@ class TaskRepo:
             row = session.get(Task, id)
             if row is None:
                 return False
-            row.status = status
+            # SQLAlchemy's instance-attribute setter accepts `str` at
+            # runtime even though pyright types the descriptor as
+            # `Column[str]`. `setattr(...)` is the dynamic-attribute
+            # form that satisfies `reportAttributeAccessIssue` without
+            # hiding a real schema/type mismatch.
+            setattr(row, "status", status)
             return True
 
     # ----- FR-02 AC-2.4 — task_results row write -----
@@ -347,8 +364,10 @@ class TaskRepo:
                 )
             rows = list(session.execute(stmt).scalars().all())
         page = [_result_to_dict(r) for r in rows[:limit]]
+        # `rows[limit].id` is `Column[str]` under pyright; runtime value
+        # is the stored primary key (see `_row_to_task_row` for rationale).
         next_cursor: Optional[str] = (
-            rows[limit].id if len(rows) > limit else None
+            cast(str, rows[limit].id) if len(rows) > limit else None
         )
         return page, next_cursor
 
