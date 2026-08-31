@@ -104,6 +104,7 @@ def _collect_sqlalchemy_imports(*layers: str) -> list[tuple[str, int, str]]:
 # ----- AC-6.1 — no sqlalchemy imports in service/ or api/ ----------------
 
 
+# NFR-06 (layering / architecture_constraints)
 def test_no_sqlalchemy_imports_in_service_or_api():
     """AC-6.1 — service/ and api/ contain zero sqlalchemy imports.
 
@@ -142,6 +143,7 @@ def test_no_sqlalchemy_imports_in_service_or_api():
 # ----- AC-6.2 — one Session per request via context manager --------------
 
 
+# NFR-03 (reliability — explicit transaction boundaries / no bare except / error_handling)
 def test_one_session_per_request_context_manager(monkeypatch):
     """AC-6.2 — one Session per request, commit on success, rollback on exception.
 
@@ -284,6 +286,7 @@ def test_one_session_per_request_context_manager(monkeypatch):
 # ----- AC-6.3 — no string-concatenated SQL in src/ ------------------------
 
 
+# NFR-02 (security — string SQL composition forbidden)
 def test_no_string_concatenated_sql_in_src():
     """AC-6.3 — string-concatenated SQL is absent from 03-development/src/.
 
@@ -374,6 +377,7 @@ def test_no_string_concatenated_sql_in_src():
 # ----- AC-6.4 — list endpoint SQL count is constant ----------------------
 
 
+# NFR-01 (performance — constant SQL count, no N+1)
 def test_list_endpoint_sql_count_is_constant():
     """AC-6.4 — list endpoint's SQL statement count is constant regardless of row count.
 
@@ -498,6 +502,7 @@ def test_list_endpoint_sql_count_is_constant():
 # ----- AC-6.5 — engine pool config matches env ----------------------------
 
 
+# NFR-04 (security/redaction — engine config driven by env, never by literal DB URL)
 def test_engine_pool_config_matches_env(monkeypatch):
     """AC-6.5 — engine pool_size = TASKQ_DB_POOL_SIZE, pool_pre_ping = True.
 
