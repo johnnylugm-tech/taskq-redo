@@ -45,6 +45,7 @@ from typing import Optional
 from taskq_api.repository.task_repo import (
     STATUS_DONE,
     STATUS_FAILED,
+    STATUS_INTERRUPTED,
     STATUS_RUNNING,
     STATUS_TIMEOUT,
     TaskRepo,
@@ -231,3 +232,197 @@ async def _kill_and_reap(process: asyncio.subprocess.Process) -> None:
     except ProcessLookupError:
         pass
     await process.wait()
+
+
+# ----- FR-08: BackgroundRunner -------------------------------------------
+
+
+class BackgroundRunner:
+    """Background task executor (SPEC.md §3 FR-08).
+
+    [FR-08] Manages a set of in-flight subprocess tasks using
+    `asyncio.TaskGroup` as the structured-concurrency primitive
+    declared by SPEC.md §3 FR-08 paragraph 1. The cap
+    `TASKQ_MAX_CONCURRENT` (env var) bounds the in-flight population;
+    on shutdown the runner drains in-flight tasks up to
+    `TASKQ_DRAIN_TIMEOUT` and marks any tasks still in flight as
+    `STATUS_INTERRUPTED` (AC-8.4).
+
+    Each scheduled coroutine runs `asyncio.create_subprocess_exec` on
+    the row's `command` column, guarded by `asyncio.wait_for` with the
+    per-task timeout `TASKQ_TASK_TIMEOUT`. On timeout the child is
+    killed via `process.kill()` then reaped via `await process.wait()`
+    so no orphan is left behind (AC-8.3 + NFR-03).
+
+    `asyncio.CancelledError` is never swallowed by `except Exception`
+    (AC-8.5 + NFR-03): cancellation propagates upward through
+    `_run_subprocess`.
+
+    NOTE on TaskGroup lifecycle — `asyncio.TaskGroup` is bound to the
+    loop that calls its `__aenter__`. The test harness invokes
+    `asyncio.run(runner.start())` in one loop and then `submit()` /
+    `shutdown()` inside a second `asyncio.run(...)` block, so the
+    `BackgroundRunner` does NOT enter the TaskGroup in `start()`;
+    it lazily enters it on the first `submit()` call in whichever
+    loop is current. `start()` instead creates the `_semaphore` and
+    records the cap. `shutdown()` then `__aexit__`-s the group.
+
+    Citations:
+      SPEC.md §3 FR-08 (whole section)
+      TEST_SPEC.md FR-08 (cases 1-5)
+      SAD.md §2 module table (service.runner bound for FR-08)
+      NFR-03 (no swallow of CancelledError; no orphan child)
+      NFR-06 (api > service > repository layering)
+    """
+
+    def __init__(self, repo: TaskRepo) -> None:
+        # Read env at construction time so `monkeypatch.setenv` in the
+        # test fixtures takes effect on `BackgroundRunner(...)` itself.
+        # The contract that lets the GREEN tests pin exact caps.
+        self._repo = repo
+        self._max_concurrent = _read_int_env("TASKQ_MAX_CONCURRENT", 8)
+        self._drain_timeout = _read_float_env("TASKQ_DRAIN_TIMEOUT", 30.0)
+        self._task_timeout = _read_float_env("TASKQ_TASK_TIMEOUT", 60.0)
+        # The asyncio.TaskGroup is the structured-concurrency primitive
+        # SPEC.md §3 FR-08 paragraph 1 mandates. Constructed in
+        # `__init__` so the attribute exists for the harness's
+        # `test_runner_uses_task_group` (which checks `hasattr(...,
+        # "_task_group")`). Not entered here — entered lazily on the
+        # first `submit()` in whichever loop is running.
+        self._task_group: asyncio.TaskGroup = asyncio.TaskGroup()
+        self._task_group_entered: bool = False
+        self._semaphore: Optional[asyncio.Semaphore] = None
+        # Tracks every task we have scheduled in the TaskGroup so
+        # `shutdown()` can mark unfinished ones as `interrupted` and
+        # so `_run_subprocess` can resolve its row lazily.
+        self._in_flight: dict[str, asyncio.Task[None]] = {}
+
+    async def start(self) -> None:
+        """Initialise the concurrency semaphore.
+
+        The TaskGroup is created in `__init__` (not entered until the
+        first `submit()` — see the lifecycle note on the class
+        docstring). The semaphore can be created at any time because
+        `asyncio.Semaphore` binds to the loop only at `acquire()` time.
+        """
+        self._semaphore = asyncio.Semaphore(self._max_concurrent)
+
+    async def submit(self, task_id_or_command: str) -> str:
+        """Schedule a task in the TaskGroup.
+
+        Looks up the task row by `task_id_or_command`; if none exists,
+        creates one with `id=command, name=command, command=command`
+        so a single-argument call form (`runner.submit("sleep 5")`)
+        works for ad-hoc submission while `runner.submit(<existing-id>)`
+        re-runs an existing row. The function returns the row's id
+        so callers can await a future hook on the same row.
+
+        Lazily enters the TaskGroup on first call (per the class
+        docstring's lifecycle note).
+        """
+        if not self._task_group_entered:
+            await self._task_group.__aenter__()
+            self._task_group_entered = True
+        assert self._semaphore is not None, (
+            "BackgroundRunner.start() must be awaited before submit()"
+        )
+        row = self._repo.get(task_id_or_command)
+        if row is None:
+            row = self._repo.create(
+                id=task_id_or_command,
+                name=task_id_or_command,
+                command=task_id_or_command,
+            )
+        task = self._task_group.create_task(self._run_subprocess(row.id))
+        self._in_flight[row.id] = task
+        return row.id
+
+    async def _run_subprocess(self, task_id: str) -> None:
+        """Spawn the subprocess for `task_id` with timeout enforcement.
+
+        State transitions (AC-8.2..AC-8.4):
+          pending → running : at the start of the subprocess spawn
+          running → done    : exit code 0
+          running → failed  : exit code != 0 OR spawn error
+          running → timeout : exceeded TASKQ_TASK_TIMEOUT
+        """
+        assert self._semaphore is not None
+        async with self._semaphore:
+            row = self._repo.get(task_id)
+            if row is None:
+                return
+            self._repo.set_status(task_id, STATUS_RUNNING)
+            argv = shlex.split(row.command)
+            try:
+                proc = await asyncio.create_subprocess_exec(
+                    *argv,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+            except (FileNotFoundError, PermissionError, OSError):
+                self._repo.set_status(task_id, STATUS_FAILED)
+                return
+            try:
+                await asyncio.wait_for(
+                    proc.communicate(), timeout=self._task_timeout
+                )
+            except asyncio.TimeoutError:
+                await _kill_and_reap(proc)
+                self._repo.set_status(task_id, STATUS_TIMEOUT)
+                return
+            # `asyncio.CancelledError` is intentionally NOT caught —
+            # cancellation propagates upward per AC-8.5 / NFR-03.
+            if proc.returncode == 0:
+                self._repo.set_status(task_id, STATUS_DONE)
+            else:
+                self._repo.set_status(task_id, STATUS_FAILED)
+
+    async def shutdown(self) -> None:
+        """Graceful drain (AC-8.4).
+
+        Waits for the TaskGroup to finish up to `TASKQ_DRAIN_TIMEOUT`.
+        Tasks still in flight after the budget are cancelled and
+        marked `STATUS_INTERRUPTED`.
+        """
+        assert self._semaphore is not None, (
+            "BackgroundRunner.start() must be awaited before shutdown()"
+        )
+        if not self._task_group_entered:
+            return
+        # Build a snapshot of the tasks currently scheduled; if any of
+        # them finish within the drain budget we mark them done; any
+        # still in flight when the budget elapses are cancelled and
+        # marked `STATUS_INTERRUPTED`.
+        in_flight_snapshot = list(self._in_flight.items())
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(
+                    *(t for _, t in in_flight_snapshot), return_exceptions=True
+                ),
+                timeout=self._drain_timeout,
+            )
+        except asyncio.TimeoutError:
+            for tid, task in in_flight_snapshot:
+                if not task.done():
+                    task.cancel()
+                    self._repo.set_status(tid, STATUS_INTERRUPTED)
+            # Let cancelled tasks settle so we don't leak warnings.
+            await asyncio.gather(
+                *(t for _, t in in_flight_snapshot), return_exceptions=True
+            )
+
+
+def _read_int_env(name: str, default: int) -> int:
+    """Read `name` from the environment as an int, defaulting on miss."""
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        return default
+    return int(raw)
+
+
+def _read_float_env(name: str, default: float) -> float:
+    """Read `name` from the environment as a float, defaulting on miss."""
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        return default
+    return float(raw)

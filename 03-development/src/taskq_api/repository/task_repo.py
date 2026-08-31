@@ -61,11 +61,22 @@ STATUS_RUNNING: str = "running"
 STATUS_DONE: str = "done"
 STATUS_FAILED: str = "failed"
 STATUS_TIMEOUT: str = "timeout"
+# [FR-08] Graceful-drain terminal status. Assigned to tasks still
+# in-flight when `BackgroundRunner.shutdown()` elapses
+# `TASKQ_DRAIN_TIMEOUT` (SPEC.md §3 FR-08 AC-8.4).
+STATUS_INTERRUPTED: str = "interrupted"
 
 # All valid states, in transition order. Useful for input validation
 # at the api boundary.
 ALL_STATUSES: frozenset[str] = frozenset(
-    {STATUS_PENDING, STATUS_RUNNING, STATUS_DONE, STATUS_FAILED, STATUS_TIMEOUT}
+    {
+        STATUS_PENDING,
+        STATUS_RUNNING,
+        STATUS_DONE,
+        STATUS_FAILED,
+        STATUS_TIMEOUT,
+        STATUS_INTERRUPTED,
+    }
 )
 
 # Tail length (chars) kept for stdout/stderr in a task_results row.
