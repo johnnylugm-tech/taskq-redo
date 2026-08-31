@@ -107,7 +107,10 @@ def test_read_scope_post_tasks_returns_403(client, read_api_key):
 
     Sub-assertion: FR04-read-fails-write-required.
     # NFR-02 security — insufficient scope surfaces as 403 + problem+json,
-    #   NOT 422 (validation) and NOT 401 (authn).
+    #   NOT 422 (validation) and NOT 401 (authn). Cross-cutting grep
+    #   target (TRACEABILITY_MATRIX.md §FR↔NFR row NFR-02: cross-references
+    #   FR-02 / FR-03 / FR-04 / FR-10). Insufficient-scope decisions must
+    #   never leak whether the resource exists.
     # SPEC.md §3 FR-04 paragraph 1: "權限不足 → 403 + problem+json".
     # SPEC.md §3 FR-01 row 1: POST /v1/tasks scope=write.
 
@@ -140,7 +143,8 @@ def test_write_scope_delete_returns_403_no_resource_leak(client, write_api_key):
     # NFR-02 security — the 403 body MUST NOT disclose whether the id
     #   exists. If the resource is missing, a naive handler would
     #   short-circuit to 404, leaking existence; SPEC.md §8 #6 forbids
-    #   that. We exercise BOTH a syntactically-valid random id and a
+    #   that. Cross-cutting grep target (TRACEABILITY_MATRIX.md §FR↔NFR
+    #   row NFR-02: cross-references FR-02 / FR-03 / FR-04 / FR-10). We exercise BOTH a syntactically-valid random id and a
     #   non-existent id and assert identical 403 status — the response
     #   body shape must also be indistinguishable.
     # SPEC.md §3 FR-04 paragraph 1 "權限判定必須在單一中介層".
@@ -241,8 +245,11 @@ def test_single_authz_dependency_used_by_every_v1_route():
     """AC-4.4 — every /v1/* route shares exactly one authz dependency.
 
     Sub-assertion: FR04-single-dep-count-1.
-    # SPEC.md §3 FR-04 paragraph 1: "授權判定必須在單一中介層" —
-    #   authorisation MUST be performed by a single middleware-style
+    # NFR-06 layering — single authz seam across the api layer
+    #   (TRACEABILITY_MATRIX.md §FR↔NFR row NFR-06: `.importlinter`
+    #   contracts `api > service > repository > models`; all /v1
+    #   routes flow through `taskq_api.api.deps.require_scope`).
+    #   Authorisation MUST be performed by a single middleware-style
     #   dependency, NOT scattered across handlers. The unique_dep_count
     #   on the authz factory is exactly 1: every route's authz dep
     #   was built by calling `taskq_api.api.deps.require_scope`.
@@ -299,6 +306,12 @@ def test_scope_hierarchy_admin_satisfies_write(client, admin_api_key):
     """AC-4.5 — admin-scope key is accepted by a write-required endpoint.
 
     Sub-assertion: FR04-hierarchy-admin-contains-write.
+    # NFR-05 documentation — every public symbol must carry an
+    #   `[FR-XX]` or `[NFR-XX]` docstring tag (TRACEABILITY_MATRIX.md
+    #   §FR↔NFR row NFR-05: cross-references FR-01..FR-10). The FR-04
+    #   `require_scope` factory and `SCOPE_RANK` constant live in
+    #   `taskq_api.api.deps`; this test pins the hierarchy semantics
+    #   those symbols encode.
     # SPEC.md §3 FR-04 paragraph 1 — `read` < `write` < `admin`
     #   hierarchical inclusion: an admin key MUST satisfy any
     #   endpoint whose required scope is write (or read).
