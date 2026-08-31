@@ -38,7 +38,6 @@ import math
 import threading
 import time
 from dataclasses import dataclass
-from typing import Optional
 
 
 # Bucket parameters (SPEC.md §5 — TASKQ_RATE_BURST / TASKQ_RATE_PER_SEC
@@ -86,6 +85,24 @@ _BUCKETS: dict[str, _BucketEntry] = {}
 _BUCKETS_LOCK = threading.Lock()
 
 
+def _refill_level(scope: str, now: float) -> float:
+    """[FR-05] Compute the refilled token count for `scope` at `now`.
+
+    First-time callers (no prior `_BUCKETS[scope]` row) see a full
+    bucket — the implicit `last_refill_at` is `now`, so the first
+    consume observes capacity = DEFAULT_BURST exactly. Subsequent
+    callers see their stored level topped up by `elapsed *
+    DEFAULT_RATE_PER_SEC`, capped at `DEFAULT_BURST` so a long idle
+    period does not let the bucket accumulate unbounded capacity
+    (AC-5.2).
+    """
+    entry = _BUCKETS.get(scope)
+    if entry is None:
+        return DEFAULT_BURST
+    elapsed = max(0.0, now - entry.last_refill_at)
+    return min(DEFAULT_BURST, entry.tokens + elapsed * DEFAULT_RATE_PER_SEC)
+
+
 class RateRepo:
     """[FR-05] Repository for the per-scope token-bucket row.
 
@@ -117,9 +134,11 @@ class RateRepo:
         Returns a `RateDecision`:
           * `allowed=True` — bucket had capacity; level is decremented
             by `n` and persisted.
-          * `allowed=False` — bucket cannot grant; the level is
-            persisted unchanged and `retry_after_seconds` carries
-            `ceil((n - tokens) / RATE_PER_SEC)` (AC-5.1).
+          * `allowed=False` — bucket cannot grant; the (refilled,
+            unconsumed) level is persisted anyway so subsequent
+            `peek` / `consume` calls see the current state, and
+            `retry_after_seconds` carries `ceil((n - tokens) /
+            DEFAULT_RATE_PER_SEC)` (AC-5.1).
 
         Citations:
           SPEC.md §3 FR-05 paragraph 1 (over limit → 429)
@@ -133,37 +152,21 @@ class RateRepo:
         #   row = session.query(RateBucket).filter_by(scope=scope).with_for_update().first()
         with _BUCKETS_LOCK:
             now = time.monotonic()
-            entry = _BUCKETS.get(scope)
-            if entry is None:
-                # First consume for this scope — initialise to a full
-                # bucket; the implicit last_refill_at is `now` so the
-                # first call observes capacity = BURST exactly.
-                tokens = DEFAULT_BURST
-                last_refill_at = now
-            else:
-                # Apply refill since last consume (AC-5.2). Capped at
-                # BURST so a long idle period does not let the bucket
-                # accumulate unbounded capacity.
-                elapsed = max(0.0, now - entry.last_refill_at)
-                tokens = min(
-                    DEFAULT_BURST,
-                    entry.tokens + elapsed * DEFAULT_RATE_PER_SEC,
-                )
-                last_refill_at = now
-            if tokens >= float(n):
+            refilled = _refill_level(scope, now)
+            if refilled >= float(n):
                 _BUCKETS[scope] = _BucketEntry(
-                    tokens=tokens - float(n),
-                    last_refill_at=last_refill_at,
+                    tokens=refilled - float(n),
+                    last_refill_at=now,
                 )
                 return RateDecision(allowed=True, retry_after_seconds=0)
-            deficit = float(n) - tokens
-            retry_after = max(1, math.ceil(deficit / DEFAULT_RATE_PER_SEC))
-            # Persist the (refilled, unconsumed) level so subsequent
-            # peek/consume see the current state even on rejection.
+            # Persist the (refilled, unconsumed) level on rejection so
+            # subsequent peek/consume observe the current state.
             _BUCKETS[scope] = _BucketEntry(
-                tokens=tokens,
-                last_refill_at=last_refill_at,
+                tokens=refilled,
+                last_refill_at=now,
             )
+            deficit = float(n) - refilled
+            retry_after = max(1, math.ceil(deficit / DEFAULT_RATE_PER_SEC))
             return RateDecision(allowed=False, retry_after_seconds=retry_after)
 
     # ----- AC-5.3 -----
