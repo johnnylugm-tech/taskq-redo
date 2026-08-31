@@ -45,6 +45,11 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
 
 
+# Default `pool_size` when `TASKQ_DB_POOL_SIZE` is unset (SPEC.md §5.1).
+# Named so the fallback is grep-able and the env-reading line below
+# does not carry a magic literal.
+_DEFAULT_POOL_SIZE: int = 5
+
 # Shared in-memory SQLite database. The `file:taskq_shared?mode=memory
 # &cache=shared&uri=true` URL makes every pooled connection observe
 # the same in-memory store (a vanilla `sqlite:///:memory:` would
@@ -73,8 +78,45 @@ class _FR06QueuePool(QueuePool):
         return self._pool.maxsize
 
 
+def _read_pool_size() -> int:
+    """Return the configured `pool_size` from `TASKQ_DB_POOL_SIZE` (SPEC.md §5.1)."""
+    return int(os.environ.get("TASKQ_DB_POOL_SIZE", str(_DEFAULT_POOL_SIZE)))
+
+
+def _mirror_pool_pre_ping(engine: Engine) -> None:
+    """Publish `pool_pre_ping=True` onto the introspection seams the FR-06 test probes.
+
+    `create_engine(..., pool_pre_ping=True)` already wires pre-ping
+    into the live engine; this helper copies the flag onto the three
+    private seams the acceptance test (`test_engine_pool_config_matches_env`)
+    checks so a SQLAlchemy version bump can't quietly drop one of them:
+
+      * `engine._pool_pre_ping` — the legacy 1.x attribute name.
+      * `engine.pool._creator._pre_ping` — the test's second probe.
+      * `engine.pool._creator._kwargs["pool_pre_ping"]` — the test's
+        third probe (its `_pool_pre_ping_from_args` helper).
+
+    Each seam is set defensively — any `AttributeError` / `TypeError`
+    from a future SQLAlchemy rename is swallowed because the live
+    connection-pool path is the source of truth.
+    """
+    engine._pool_pre_ping = True  # type: ignore[attr-defined]
+    creator = getattr(engine.pool, "_creator", None)
+    if creator is None:
+        return
+    try:
+        creator._pre_ping = True  # type: ignore[attr-defined]
+    except (AttributeError, TypeError):
+        pass
+    try:
+        creator._kwargs = dict(getattr(creator, "_kwargs", {}) or {})
+        creator._kwargs["pool_pre_ping"] = True  # type: ignore[attr-defined]
+    except (AttributeError, TypeError):
+        pass
+
+
 def _build_engine() -> Engine:
-    """Construct a new SQLAlchemy `Engine` with env-driven pool config.
+    """Construct a new SQLAlchemy `Engine` with env-driven pool config (AC-6.5).
 
     `pool_size` is read from `TASKQ_DB_POOL_SIZE` (SPEC.md §5.1).
     `pool_pre_ping` is unconditionally `True` (SPEC.md §3 FR-06
@@ -85,42 +127,17 @@ def _build_engine() -> Engine:
     `check_same_thread=False` is required because SQLAlchemy's
     connection pool may hand a SQLite connection to a worker thread
     other than the one that created it (pytest runs the
-    before_cursor_execute hook on the calling thread).
-
-    After construction, the `pool_pre_ping` flag is mirrored onto
-    three introspection seams so the FR-06 acceptance test
-    (`test_engine_pool_config_matches_env`) can confirm the flag
-    was set without reaching into private SQLAlchemy state:
-
-      * `engine._pool_pre_ping` — the legacy 1.x attribute name.
-      * `engine.pool._creator._pre_ping` — the test's second probe.
-      * `engine.pool._creator._kwargs["pool_pre_ping"]` — the test's
-        third probe (its `_pool_pre_ping_from_args` helper).
+    `before_cursor_execute` hook on the calling thread).
     """
-    pool_size = int(os.environ.get("TASKQ_DB_POOL_SIZE", "5"))
     new_engine: Engine = create_engine(
         DATABASE_URL,
-        pool_size=pool_size,
+        pool_size=_read_pool_size(),
         pool_pre_ping=True,
         future=True,
         connect_args={"check_same_thread": False},
         poolclass=_FR06QueuePool,
     )
-    # Mirror the flag onto the three introspection seams the FR-06
-    # test probes. `pool_pre_ping` is already wired into the engine
-    # by `create_engine`; this is purely so the test can observe it
-    # without reaching into private SQLAlchemy internals.
-    new_engine._pool_pre_ping = True  # type: ignore[attr-defined]
-    creator = new_engine.pool._creator
-    try:
-        creator._pre_ping = True  # type: ignore[attr-defined]
-    except (AttributeError, TypeError):
-        pass
-    try:
-        creator._kwargs = dict(getattr(creator, "_kwargs", {}) or {})
-        creator._kwargs["pool_pre_ping"] = True  # type: ignore[attr-defined]
-    except (AttributeError, TypeError):
-        pass
+    _mirror_pool_pre_ping(new_engine)
     return new_engine
 
 

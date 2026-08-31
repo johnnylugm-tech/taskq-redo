@@ -41,15 +41,15 @@ Citations:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
-from typing import Callable, Optional, TypeVar
+from dataclasses import dataclass
+from typing import Optional
 
 from sqlalchemy import and_, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from taskq_api.models.orm import Task, TaskResult
-from taskq_api.repository.session import SessionLocal, transaction
+from taskq_api.repository.session import transaction
 
 
 # State machine constants (SPEC.md §3 FR-02). Defined here so the
@@ -72,8 +72,6 @@ ALL_STATUSES: frozenset[str] = frozenset(
 # SPEC.md §3 FR-02 requires the column to exist; bounding the size
 # protects the in-memory store from unbounded output.
 _TAIL_CHARS: int = 2000
-
-T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -134,15 +132,15 @@ def _result_to_dict(row: TaskResult) -> dict:
 class TaskRepo:
     """SQL-backed `tasks` + `task_results` repository (FR-06).
 
-    Every method opens a Session via `SessionLocal()` (or wraps its
-    work in `transaction()`), performs the operation, and closes the
-    Session. The Session is NEVER held by the caller; the service
-    layer talks to this repository through the dataclass snapshots
-    (`TaskRow` / dict), never through SQLAlchemy ORM objects
-    (SPEC.md §3 FR-06 paragraph 1: business layer does not hold a
-    Session).
+    Every method wraps its work in `transaction()` so the Session is
+    open for exactly the duration of one request and is committed
+    / rolled back atomically. The Session is NEVER held by the
+    caller; the service layer talks to this repository through the
+    dataclass snapshots (`TaskRow` / dict), never through SQLAlchemy
+    ORM objects (SPEC.md §3 FR-06 paragraph 1: business layer does
+    not hold a Session).
 
-    The list endpoint's N+1 guard is encoded in `_list_query`: every
+    The list endpoint's N+1 guard is encoded in `list`: every
     page-sized SELECT is paired with a single
     `selectinload(Task.results)` so the related rows are fetched in
     one round-trip regardless of page size (NFR-01 + SPEC.md §8 #14).
@@ -361,41 +359,10 @@ class TaskRepo:
 
         Clears the SQL store so the next `create` starts from an
         empty slate. This is the in-DB equivalent of
-        `TRUNCATE TABLE tasks, task_results` — a real SQLAlchemy
-        implementation would expose the same operation via a
-        `TaskRepo.truncate()` method for the test suite to call
-        between cases. NOT exposed on the public `peek`/`get`/`list`
-        surface so production callers cannot accidentally wipe the
-        store.
+        `TRUNCATE TABLE tasks, task_results`. NOT exposed on the
+        public `get` / `list` / `set_status` / `add_result` surface
+        so production callers cannot accidentally wipe the store.
         """
         with transaction() as session:
             session.query(TaskResult).delete()
             session.query(Task).delete()
-
-
-def _paginate(
-    rows: list[T],
-    *,
-    limit: int,
-    cursor: Optional[str],
-    key: Callable[[T], str],
-) -> tuple[list[T], Optional[str]]:
-    """Slice `rows` at the cursor and return `(page, next_cursor)`.
-
-    Kept for compatibility with the legacy in-memory `list` /
-    `list_results` implementation. The SQL-backed `list` and
-    `list_results` methods do their own pagination in SQL; this
-    helper is retained so the module's public surface is unchanged.
-    """
-    if cursor:
-        idx = next(
-            (i for i, row in enumerate(rows) if key(row) == cursor),
-            -1,
-        )
-        if idx >= 0:
-            rows = rows[idx + 1 :]
-    page = rows[:limit]
-    next_cursor: Optional[str] = (
-        key(rows[limit]) if len(rows) > limit else None
-    )
-    return page, next_cursor
