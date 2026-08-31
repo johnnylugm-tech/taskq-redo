@@ -30,7 +30,31 @@ from __future__ import annotations
 import builtins
 from dataclasses import dataclass, replace
 from threading import RLock
-from typing import Optional
+from typing import Callable, Optional, TypeVar
+
+
+# State machine constants (SPEC.md §3 FR-02). Defined here so the
+# repository — the single owner of the `status` field — is the single
+# source of truth; the runner and service import these instead of
+# repeating string literals.
+STATUS_PENDING: str = "pending"
+STATUS_RUNNING: str = "running"
+STATUS_DONE: str = "done"
+STATUS_FAILED: str = "failed"
+STATUS_TIMEOUT: str = "timeout"
+
+# All valid states, in transition order. Useful for input validation
+# at the api boundary.
+ALL_STATUSES: frozenset[str] = frozenset(
+    {STATUS_PENDING, STATUS_RUNNING, STATUS_DONE, STATUS_FAILED, STATUS_TIMEOUT}
+)
+
+# Tail length (chars) kept for stdout/stderr in a task_results row.
+# SPEC.md §3 FR-02 requires the column to exist; bounding the size
+# protects the in-memory store from unbounded output.
+_TAIL_CHARS: int = 2000
+
+T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -40,7 +64,26 @@ class TaskRow:
     id: str
     name: str
     command: str
-    status: str = "pending"
+    status: str = STATUS_PENDING
+
+
+@dataclass(frozen=True)
+class TaskResultRow:
+    """Immutable snapshot of a `task_results` row (SPEC.md §3 FR-02).
+
+    The five required columns per the SPEC are `exit_code`,
+    `stdout_tail`, `stderr_tail`, `duration_ms`, `finished_at`. The
+    `id` column mirrors `run_id` (the task_results primary key) so the
+    cursor can identify individual rows in the history view.
+    """
+
+    id: str
+    task_id: str
+    exit_code: Optional[int]
+    stdout_tail: str
+    stderr_tail: str
+    duration_ms: int
+    finished_at: str
 
 
 class NameConflictError(Exception):
@@ -104,20 +147,9 @@ class TaskRepo:
         """Return a page of tasks plus the next cursor (or None)."""
         with self._lock:
             ordered = sorted(self._tasks.values(), key=lambda r: r.id)
-            if cursor:
-                idx = next(
-                    (i for i, r in enumerate(ordered) if r.id == cursor),
-                    -1,
-                )
-                if idx >= 0:
-                    ordered = ordered[idx + 1 :]
             if status is not None:
                 ordered = [r for r in ordered if r.status == status]
-            page = ordered[:limit]
-            next_cursor: Optional[str] = (
-                ordered[limit].id if len(ordered) > limit else None
-            )
-            return page, next_cursor
+            return _paginate(ordered, limit=limit, cursor=cursor, key=lambda r: r.id)
 
     # ----- FR-02 AC-2.3 — state machine transitions -----
     def set_status(self, id: str, status: str) -> bool:
@@ -185,16 +217,37 @@ class TaskRepo:
         """
         with self._lock:
             rows = list(self._results.get(id, []))
-        rows.sort(key=lambda r: r.get("finished_at") or "", reverse=True)
-        if cursor:
-            idx = next(
-                (i for i, r in enumerate(rows) if r.get("id") == cursor),
-                -1,
-            )
-            if idx >= 0:
-                rows = rows[idx + 1 :]
-        page = rows[:limit]
-        next_cursor: Optional[str] = (
-            rows[limit].get("id") if len(rows) > limit else None
+        # Sort newest-first before paginating so the cursor references
+        # the post-sort order (a row id encodes its finished_at).
+        rows.sort(
+            key=lambda r: r.get("finished_at") or "", reverse=True
         )
-        return page, next_cursor
+        return _paginate(rows, limit=limit, cursor=cursor, key=lambda r: r["id"])
+
+
+def _paginate(
+    rows: list[T],
+    *,
+    limit: int,
+    cursor: Optional[str],
+    key: Callable[[T], str],
+) -> tuple[list[T], Optional[str]]:
+    """Slice `rows` at the cursor and return `(page, next_cursor)`.
+
+    Shared by `TaskRepo.list` (AC-1.5) and `TaskRepo.list_results`
+    (AC-2.6) — both use a stable id-based cursor and a hard cap on
+    page size. The caller is responsible for sorting `rows` first;
+    this helper preserves caller-supplied order.
+    """
+    if cursor:
+        idx = next(
+            (i for i, row in enumerate(rows) if key(row) == cursor),
+            -1,
+        )
+        if idx >= 0:
+            rows = rows[idx + 1 :]
+    page = rows[:limit]
+    next_cursor: Optional[str] = (
+        key(rows[limit]) if len(rows) > limit else None
+    )
+    return page, next_cursor

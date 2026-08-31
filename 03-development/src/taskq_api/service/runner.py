@@ -38,15 +38,51 @@ import asyncio
 import os
 import shlex
 import time
+from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
-from taskq_api.repository.task_repo import TaskRepo
+from taskq_api.repository.task_repo import (
+    STATUS_DONE,
+    STATUS_FAILED,
+    STATUS_RUNNING,
+    STATUS_TIMEOUT,
+    TaskRepo,
+)
 
 
 # Default subprocess timeout when TASKQ_TASK_TIMEOUT is unset. The
 # value is re-read on every run() call so test fixtures using
 # `monkeypatch.setenv` take effect immediately.
 _DEFAULT_TIMEOUT_SECONDS: float = 60.0
+
+# Stdout / stderr tail length kept per task_results row. Bounds the
+# in-memory store against unbounded subprocess output.
+_TAIL_CHARS: int = 2000
+
+# Subprocess-spawn failure modes we convert to a `failed` result row
+# rather than letting them propagate to the api layer.
+_SPAWN_ERRORS: tuple[type[BaseException], ...] = (
+    FileNotFoundError,
+    PermissionError,
+    OSError,
+)
+
+
+@dataclass(frozen=True)
+class _RunOutcome:
+    """Captured outcome of a single subprocess execution.
+
+    Groups the fields `_finalize` needs so each execution branch
+    constructs one value (with the right terminal_status) instead of
+    repeating the same 7-argument call.
+    """
+
+    terminal_status: str
+    exit_code: Optional[int]
+    stdout_tail: str
+    stderr_tail: str
+    duration_ms: int
 
 
 class TaskRunner:
@@ -74,7 +110,7 @@ class TaskRunner:
         the timeout-kill test take effect on every invocation.
         """
         raw = os.environ.get("TASKQ_TASK_TIMEOUT")
-        if raw is None or raw == "":
+        if not raw:
             return _DEFAULT_TIMEOUT_SECONDS
         return float(raw)
 
@@ -90,78 +126,61 @@ class TaskRunner:
         if row is None:
             return
 
-        command = row.command
-        timeout = self._read_timeout()
-
-        # Transition to running. The api layer will observe this via
+        # AC-2.3: transition pending -> running before we hand off to
+        # the subprocess. The api layer observes this via
         # `GET /v1/tasks/{id}` between the 202 and the terminal state.
-        self._repo.set_status(task_id, "running")
+        self._repo.set_status(task_id, STATUS_RUNNING)
 
+        outcome = await self._execute(row.command)
+        self._finalize(task_id=task_id, run_id=run_id, outcome=outcome)
+
+    async def _execute(self, command: str) -> _RunOutcome:
+        """Spawn the subprocess and capture its outcome.
+
+        Returns one of three terminal outcomes — done/failed (via
+        exit code), failed (via spawn error), or timeout — packaged
+        as a `_RunOutcome` for `_finalize`.
+        """
+        timeout = self._read_timeout()
         argv = shlex.split(command)
         start = time.monotonic()
+
         try:
             process = await asyncio.create_subprocess_exec(
                 *argv,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
-        except (FileNotFoundError, PermissionError, OSError) as exc:
-            # The command could not even be started. Mark the task
-            # as failed and record the error in stderr_tail so the
-            # api can return a structured row.
-            duration_ms = int((time.monotonic() - start) * 1000)
-            self._finalize(
-                task_id=task_id,
-                run_id=run_id,
+        except _SPAWN_ERRORS as exc:
+            duration_ms = _elapsed_ms(start)
+            return _RunOutcome(
+                terminal_status=STATUS_FAILED,
                 exit_code=None,
                 stdout_tail="",
                 stderr_tail=str(exc),
                 duration_ms=duration_ms,
-                terminal_status="failed",
             )
-            return
 
         try:
             stdout, stderr = await asyncio.wait_for(
                 process.communicate(), timeout=timeout
             )
         except asyncio.TimeoutError:
-            # AC-2.5 / SPEC §3 FR-08 paragraph 3: kill the child and
-            # reap it so no orphan process remains. We deliberately
-            # do NOT capture output on timeout — the subprocess may
-            # have produced unbounded output that we are about to
-            # discard anyway.
-            try:
-                process.kill()
-            except ProcessLookupError:
-                pass
-            await process.wait()
-            duration_ms = int((time.monotonic() - start) * 1000)
-            self._finalize(
-                task_id=task_id,
-                run_id=run_id,
+            await _kill_and_reap(process)
+            return _RunOutcome(
+                terminal_status=STATUS_TIMEOUT,
                 exit_code=None,
                 stdout_tail="",
                 stderr_tail="",
-                duration_ms=duration_ms,
-                terminal_status="timeout",
+                duration_ms=_elapsed_ms(start),
             )
-            return
 
-        duration_ms = int((time.monotonic() - start) * 1000)
-        exit_code = process.returncode
-        stdout_tail = (stdout or b"").decode("utf-8", errors="replace")[-2000:]
-        stderr_tail = (stderr or b"").decode("utf-8", errors="replace")[-2000:]
-
-        terminal_status = "done" if exit_code == 0 else "failed"
-        self._finalize(
-            task_id=task_id,
-            run_id=run_id,
-            exit_code=exit_code,
-            stdout_tail=stdout_tail,
-            stderr_tail=stderr_tail,
-            duration_ms=duration_ms,
-            terminal_status=terminal_status,
+        return _RunOutcome(
+            terminal_status=STATUS_DONE if process.returncode == 0 else STATUS_FAILED,
+            exit_code=process.returncode,
+            stdout_tail=_tail(stdout),
+            stderr_tail=_tail(stderr),
+            duration_ms=_elapsed_ms(start),
         )
 
     def _finalize(
@@ -169,11 +188,7 @@ class TaskRunner:
         *,
         task_id: str,
         run_id: str,
-        exit_code: int | None,
-        stdout_tail: str,
-        stderr_tail: str,
-        duration_ms: int,
-        terminal_status: str,
+        outcome: _RunOutcome,
     ) -> None:
         """Set the terminal status and append a `task_results` row.
 
@@ -182,13 +197,37 @@ class TaskRunner:
         or post-finalize state, never an in-between row missing its
         status update.
         """
-        self._repo.set_status(task_id, terminal_status)
+        self._repo.set_status(task_id, outcome.terminal_status)
         self._repo.add_result(
             id=task_id,
             run_id=run_id,
-            exit_code=exit_code,
-            stdout_tail=stdout_tail,
-            stderr_tail=stderr_tail,
-            duration_ms=duration_ms,
+            exit_code=outcome.exit_code,
+            stdout_tail=outcome.stdout_tail,
+            stderr_tail=outcome.stderr_tail,
+            duration_ms=outcome.duration_ms,
             finished_at=datetime.now().isoformat(),
         )
+
+
+def _elapsed_ms(start: float) -> int:
+    """Milliseconds elapsed since `start` (a `time.monotonic()` value)."""
+    return int((time.monotonic() - start) * 1000)
+
+
+def _tail(data: Optional[bytes]) -> str:
+    """Decode bytes as utf-8 (replacing errors) and keep the tail."""
+    return (data or b"").decode("utf-8", errors="replace")[-_TAIL_CHARS:]
+
+
+async def _kill_and_reap(process: asyncio.subprocess.Process) -> None:
+    """Terminate `process` and wait for the OS to reap it (AC-2.5).
+
+    A `ProcessLookupError` means the child already exited between the
+    timeout firing and our kill — in that case there is nothing to
+    reap and we proceed to `wait()` unconditionally.
+    """
+    try:
+        process.kill()
+    except ProcessLookupError:
+        pass
+    await process.wait()
