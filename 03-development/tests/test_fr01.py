@@ -189,6 +189,140 @@ def test_list_pagination_is_cursor_based(client, read_api_key):
     assert offset_resp.status_code in (400, 422)
 
 
+def test_get_task_existing_returns_200_with_body(client, write_api_key, read_api_key):
+    """Coverage — AC-1.3 happy-path GET /v1/tasks/{id} returns the task body.
+
+    Exercises the api `get_task` `return TaskRead(**result)` branch and the
+    service `return _row_to_dict(row)` branch — both are reachable only by
+    hitting an existing id, which the dedicated 404 test in this file
+    intentionally skips.
+    """
+    created = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo hi", "name": "get-happy-1"},
+    )
+    assert created.status_code == 201
+    task_id = created.json()["id"]
+
+    response = client.get(
+        f"/v1/tasks/{task_id}",
+        headers={"X-API-Key": read_api_key},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == task_id
+    assert body["name"] == "get-happy-1"
+    assert body["command"] == "echo hi"
+
+
+def test_delete_task_unknown_id_returns_404(client, admin_api_key):
+    """Coverage — DELETE /v1/tasks/{unknown} surfaces 404 from the
+    repository's `row is None` branch.
+
+    The repository contract returns False when the id is unknown
+    (`task_repo.py` line 77), the service raises TaskNotFoundError on
+    `not ok` (line 60), and the api translates that into a NotFoundError
+    problem+json (lines 127-128).
+    """
+    response = client.delete(
+        "/v1/tasks/00000000-0000-0000-0000-000000000000",
+        headers={"X-API-Key": admin_api_key},
+    )
+    assert response.status_code == 404
+    assert response.headers["content-type"].startswith("application/problem+json")
+
+
+def test_post_task_with_injection_character_returns_422(client, write_api_key):
+    """Coverage — AC-1.2 / injection blacklist branch in `_command_nonempty_and_safe`.
+
+    The blacklist loop `for ch in _INJECTION_BLACKLIST: if ch in value:`
+    (`schemas.py` lines 48-50) is unreachable unless a forbidden character
+    is supplied; this test sends `;` which is in the blacklist and expects
+    a 422 problem+json response.
+    """
+    response = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo bad; rm -rf /", "name": "bad-injection-1"},
+    )
+    assert response.status_code == 422
+    assert response.headers["content-type"].startswith("application/problem+json")
+
+
+def test_post_task_whitespace_only_name_returns_422(client, write_api_key):
+    """Coverage — `_name_nonempty` validator branch on whitespace-only input.
+
+    The validator returns a specific ValueError for whitespace strings
+    (`schemas.py` line 57) which is unreachable when the input is `""` —
+    that already fails Pydantic's `min_length=1`. A whitespace-only name
+    (e.g. `"   "`) reaches the second branch.
+    """
+    response = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo hi", "name": "   "},
+    )
+    assert response.status_code == 422
+
+
+def test_list_tasks_with_cursor_matching_existing_id(client, write_api_key, read_api_key):
+    """Coverage — `TaskRepo.list` cursor-matches-existing branch
+    (`task_repo.py` line 98: `ordered = ordered[idx + 1 :]`).
+
+    Creates a task then requests a list whose `cursor` is that task's
+    own id; since the list returns rows ordered by id ascending and the
+    cursor slice skips the cursor row, an empty `items` list is the
+    expected outcome (no rows follow the just-created one when many
+    tasks already share the in-memory store from earlier tests). The
+    exercised line is the `idx >= 0` slice.
+    """
+    created = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo a", "name": "cursor-test-1"},
+    )
+    assert created.status_code == 201
+    cursor_id = created.json()["id"]
+
+    # Use a high limit so EVERY row >= cursor is returned; the cursor
+    # itself must NOT be present (it was sliced away on the covered branch).
+    response = client.get(
+        "/v1/tasks",
+        params={"cursor": cursor_id, "limit": 200},
+        headers={"X-API-Key": read_api_key},
+    )
+    assert response.status_code == 200
+    ids = [item["id"] for item in response.json()["items"]]
+    assert cursor_id not in ids
+
+
+def test_list_tasks_with_status_filter(client, write_api_key, read_api_key):
+    """Coverage — `TaskRepo.list` status-filter branch
+    (`task_repo.py` line 100: `ordered = [r for r in ordered if r.status == status]`).
+
+    Creates a task and requests the list filtered by `status=pending`
+    (the default task status). The first task id must appear in the
+    filtered page; otherwise the filter branch was not exercised.
+    """
+    created = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo filter", "name": "status-filter-1"},
+    )
+    assert created.status_code == 201
+    target_id = created.json()["id"]
+
+    response = client.get(
+        "/v1/tasks",
+        params={"status": "pending", "limit": 50},
+        headers={"X-API-Key": read_api_key},
+    )
+    assert response.status_code == 200
+    ids = [item["id"] for item in response.json()["items"]]
+    assert target_id in ids
+
+
 def test_delete_task_removes_results_in_same_transaction(
     client, write_api_key, admin_api_key
 ):
