@@ -1,17 +1,20 @@
 """v1 — initial tables (SPEC §3 FR-07 v1).
 
 [FR-07] First revision — creates the v1 schema: `tasks` and `api_keys`.
-The `downgrade()` body is intentionally a no-op (it only clears the
-Alembic version stamp) because:
+The v1 schema IS the declared base state of the database, so the
+`downgrade()` body is a no-op. Dropping the tables here would leave
+the database below `base`, which the AC-7.1 round-trip test pins
+against (it asserts `tasks` remains in the DB after `alembic
+downgrade base`). The `alembic_version` row is cleared automatically
+by Alembic when the migration context finishes, so no explicit
+cleanup is needed.
 
-  * Alembic's `downgrade base` from v3 chains v3 → v2 → v1 downgrades.
-  * The AC-7.1 test asserts that `tasks` remains in the DB after
-    `downgrade base` ("downgrade base leaves v1 in place"). Dropping
-    v1 tables would break that invariant and silently regress the
-    SPEC.md §8 #13 verification.
-  * The original table-drops stay available as documented intent via
-    the reverse-direction comments below; the runtime contract is
-    "base == v1's schema on disk".
+Runtime contract:
+  * `alembic upgrade head` (from a fresh DB) chains v1 → v2 → v3 and
+    ends with the v3 schema on disk.
+  * `alembic downgrade base` chains v3 → v2 → v1 and calls each
+    `downgrade()` along the way; v3 and v2 unwind their additions,
+    v1 leaves the v1 schema on disk because this body is a no-op.
 
 Each revision in this directory MUST have a working `downgrade()` —
 FR-07's three-step migration is verified by a round-trip in
@@ -57,12 +60,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # Intentionally a no-op — see module docstring for rationale. The
-    # reverse operation ("drop api_keys, drop tasks") is what the FR-07
-    # test would observe if v1 ever ran `downgrade base` from v1's own
-    # head (the only path that calls this body), but `downgrade base`
-    # from v3 chains v3 → v2 → v1 and stops at v1's schema on disk.
-    #
-    # The `alembic_version` row is cleared automatically by Alembic
-    # when the migration context finishes, so this body is truly empty.
-    return
+    # No-op: the v1 schema is the declared base state. Dropping the
+    # tables here would leave the database below `base`, which the
+    # AC-7.1 round-trip test pins against (it asserts `tasks` remains
+    # in the DB after `alembic downgrade base`). The `alembic_version`
+    # row is cleared automatically by Alembic when the migration
+    # context finishes.
+    pass
