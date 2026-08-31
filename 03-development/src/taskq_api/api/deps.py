@@ -1,11 +1,15 @@
 """HTTP-layer dependency providers (SPEC.md §3 FR-03 + FR-04).
 
-[FR-01] Provides two dependency functions:
-  * `require_api_key`   — validates the X-API-Key header (FR-03), returns
-    the resolved scope string. Missing/invalid → 401 problem+json.
-  * `require_scope(level)` — factory that produces a dependency which
-    enforces the hierarchical scope `read < write < admin` (FR-04).
-    Insufficient → 403 problem+json (with no resource-existence leak).
+[FR-03] Authn dependency `require_api_key` validates the X-API-Key
+header (FR-03) and returns the resolved scope string; missing/invalid
+keys surface as 401 problem+json (AC-3.1).
+
+[FR-04] Authz factory `require_scope(level)` returns a dependency that
+enforces the hierarchical scope ordering `read < write < admin`
+(SPEC.md §3 FR-04, AC-4.5). Insufficient scope raises `ForbiddenError`
+→ 403 problem+json with no resource-existence leak (NFR-02, AC-4.1,
+AC-4.2). Every `/v1/*` route carries this dep (AC-4.4 — single
+authz seam).
 
 [FR-03] `require_api_key` declares the X-API-Key header as *optional*
 (`Header(None, ...)`) so that a missing/empty header does NOT trip
@@ -18,8 +22,8 @@ performed; SPEC.md §3 FR-04 forbids scattering scope checks across
 handlers.
 Citations:
   SPEC.md §3 FR-03 (X-API-Key authn) [FR-03]
-  SPEC.md §3 FR-04 (per-token scope, hierarchical)
-  NFR-02 (no detail leakage in 403)
+  SPEC.md §3 FR-04 (per-token scope, hierarchical) [FR-04]
+  NFR-02 (no detail leakage in 403) [NFR-02]
 """
 from typing import Callable, Optional
 
@@ -33,6 +37,8 @@ from taskq_api.service.tasks import TaskService
 
 # Hierarchical scope ordering. Defined here (api layer) so the api
 # package owns the authorization contract without crossing layers.
+# [FR-04] AC-4.5 — `read` < `write` < `admin`; an admin key MUST
+# satisfy any endpoint whose required scope is write (or read).
 SCOPE_RANK: dict[str, int] = {"read": 0, "write": 1, "admin": 2}
 
 
@@ -68,7 +74,24 @@ def require_api_key(
 
 
 def require_scope(required: str) -> Callable[..., str]:
-    """Build a dependency that enforces the given scope (FR-04)."""
+    """[FR-04] Build a dependency that enforces the given scope.
+
+    AC-4.5 — hierarchical inclusion (`read` < `write` < `admin`):
+    an admin key satisfies a write-required endpoint; the returned
+    scope string equals the resolved key's scope (so admins can be
+    distinguished when downstream logic requires it).
+
+    The returned closure captures `required` so each route gets its
+    own independent dep instance (the factory pattern enforced by
+    AC-4.4 — every /v1 route shares exactly one factory reference).
+    Insufficient scope → `ForbiddenError` → 403 problem+json (NFR-02:
+    detail MUST NOT echo the requested resource id).
+
+    Citations:
+      SPEC.md §3 FR-04 paragraph 1 (hierarchical scope ordering) [FR-04]
+      SPEC.md §8 #6 (no resource-existence leak in 403) [NFR-02]
+      SPEC.md §3 FR-10 (problem+json envelope) [FR-10]
+    """
 
     def _checker(scope: str = Depends(require_api_key)) -> str:
         if SCOPE_RANK.get(scope, -1) < SCOPE_RANK.get(required, 99):
