@@ -415,7 +415,7 @@ class BackgroundRunner:
 def _read_int_env(name: str, default: int) -> int:
     """Read `name` from the environment as an int, defaulting on miss."""
     raw = os.environ.get(name)
-    if raw is None or raw == "":
+    if not raw:
         return default
     return int(raw)
 
@@ -423,6 +423,6 @@ def _read_int_env(name: str, default: int) -> int:
 def _read_float_env(name: str, default: float) -> float:
     """Read `name` from the environment as a float, defaulting on miss."""
     raw = os.environ.get(name)
-    if raw is None or raw == "":
+    if not raw:
         return default
     return float(raw)
