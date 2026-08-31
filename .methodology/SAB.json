@@ -99,7 +99,8 @@
           "name": "taskq_api.config"
         },
         "taskq_api",
-        "taskq_api.app"
+        "taskq_api.app",
+        "taskq_api.__main__"
       ],
       "allowed_dependencies": []
     }
