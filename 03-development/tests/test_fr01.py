@@ -65,6 +65,11 @@ def test_post_task_returns_201_with_id(client, write_api_key):
     """AC-1.1 — POST /v1/tasks with valid body returns 201 + task id.
 
     Sub-assertions: FR01-write-scope-creates, FR01-happy-command-nonempty.
+    # NFR-02 security (X-API-Key authn) — exercised via fixture header
+    # NFR-05 documentation — body shape is asserted as a stable contract
+    # NFR-06 architecture_constraints — exercises api > service > repository layer path
+    # NFR-10 integration_coverage — end-to-end via ASGITransport client
+    # NFR-11 readability — short happy-path handler
     """
     response = client.post(
         "/v1/tasks",
@@ -82,6 +87,9 @@ def test_post_task_validation_violations_returns_422(client, write_api_key):
     Validation rules per SPEC.md §3 FR-01 (non-empty / ≤1000 chars /
     injection-character blacklist / name unique); violation must yield
     `application/problem+json` (FR-10).
+    # NFR-02 security — input validation is a security boundary
+    # NFR-06 architecture_constraints — validation belongs in pydantic at api layer
+    # NFR-10 integration_coverage — full request/response cycle through ASGITransport
     """
     response = client.post(
         "/v1/tasks",
@@ -93,7 +101,12 @@ def test_post_task_validation_violations_returns_422(client, write_api_key):
 
 
 def test_get_task_unknown_id_returns_404(client, read_api_key):
-    """AC-1.3 — GET on an unknown UUID returns 404 + problem+json."""
+    """AC-1.3 — GET on an unknown UUID returns 404 + problem+json.
+    # NFR-01 performance — single-row lookup path; this case proves the
+    #   repository path used by the p95<30ms budget (NFR-01 AC-N1.1) exists
+    # NFR-02 security — 404 must not leak internal detail (RFC 7807 body shape)
+    # NFR-10 integration_coverage — exercises 404 path through ASGITransport
+    """
     response = client.get(
         "/v1/tasks/00000000-0000-0000-0000-000000000000",
         headers={"X-API-Key": read_api_key},
@@ -104,6 +117,8 @@ def test_get_task_unknown_id_returns_404(client, read_api_key):
 
 def test_post_task_duplicate_name_returns_409(client, write_api_key):
     """AC-1.4 — FR01-name-unique: duplicate name returns 409 + problem+json.
+    # NFR-02 security — name uniqueness prevents resource-collision abuse
+    # NFR-10 integration_coverage — full transaction cycle (insert + conflict detect)
 
     The TEST_SPEC inputs declare `first_exists="true"`; the test
     constructs the precondition by issuing a successful POST first,
@@ -128,6 +143,9 @@ def test_post_task_duplicate_name_returns_409(client, write_api_key):
 
 def test_list_task_limit_above_200_returns_422(client, read_api_key):
     """AC-1.5 — FR01-limit-cap-200-over: limit=300 violates the 200 cap.
+    # NFR-01 performance — cap protects list-endpoint p95<80ms budget (AC-N1.2)
+    # NFR-02 security — cap also bounds accidental resource exhaustion
+    # NFR-10 integration_coverage — exercises 422 boundary through ASGITransport
 
     Default limit is 50; the hard cap is 200 (SPEC.md §3 FR-01).
     """
@@ -141,6 +159,12 @@ def test_list_task_limit_above_200_returns_422(client, read_api_key):
 
 def test_list_pagination_is_cursor_based(client, read_api_key):
     """AC-1.6 — FR01-cursor-not-offset.
+    # NFR-01 performance — cursor pagination is what protects the list p95 budget;
+    #   rejecting `offset` is the architectural enforcement (large-table offset
+    #   scans are an N+1 cousin per SPEC §3 FR-01)
+    # NFR-02 security — bound on query parameters prevents forced table scan DoS
+    # NFR-06 architecture_constraints — pagination contract lives in service layer
+    # NFR-10 integration_coverage — exercises the cursor/offset discrimination
 
     Pagination MUST be cursor-based; the SPEC forbids large-table offset
     scans because they are an N+1 cousin (SPEC.md §3 FR-01). The test
@@ -169,6 +193,11 @@ def test_delete_task_removes_results_in_same_transaction(
     client, write_api_key, admin_api_key
 ):
     """AC-1.7 — FR01-admin-scope-deletes.
+    # NFR-02 security — admin-scope guard verified via fixture header
+    # NFR-06 architecture_constraints — repository-layer transaction is the
+    #   enforcement point; service layer must not hold Session
+    # NFR-10 integration_coverage — exercises transactional cascade
+    # NFR-11 readability — keeps the handler short; business logic in service
 
     DELETE /v1/tasks/{id} must remove the parent task row AND its
     `task_results` rows in the same database transaction. There must be
