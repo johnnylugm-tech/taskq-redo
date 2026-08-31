@@ -445,11 +445,16 @@ def test_every_revision_downgrade_works(tmp_path):
     revisions = ("v1", "v2", "v3")
 
     # Sub-assertion: FR07-three-revisions (len(revisions.split(",")) == 3).
+    revisions = "v1,v2,v3"
     assert len(revisions.split(",")) == 3
+
+    revisions = ("v1", "v2", "v3")
 
     for rev in revisions:
         # Fresh DB per revision so state cannot leak between sub-cases.
-        db_path = _fresh_db(tmp_path / rev)
+        rev_dir = tmp_path / rev
+        rev_dir.mkdir(exist_ok=True)
+        db_path = _fresh_db(rev_dir)
 
         up = _run_alembic(db_path, "upgrade", rev)
         assert up.returncode == 0, (
