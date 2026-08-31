@@ -67,7 +67,10 @@ def require_api_key(
     so we just translate None to 401 here (NFR-02: no distinction
     leaks).
     """
-    scope = resolve_scope(repo, x_api_key)
+    # Collapse `None` (missing header) into the same empty-string path
+    # the service-layer `resolve_scope` already guards — both cases
+    # surface as a single 401 below (NFR-02: no distinction leaks).
+    scope = resolve_scope(repo, x_api_key or "")
     if scope is None:
         raise UnauthorizedError(detail="missing or invalid api key")
     return scope
