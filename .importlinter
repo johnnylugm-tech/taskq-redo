@@ -15,16 +15,34 @@ layers =
 [importlinter:contract:forbidden-sqlalchemy]
 name = forbidden-sqlalchemy
 type = forbidden
+# AC-6.1 (SPEC.md §3 FR-06 paragraph 1 + NFR-06 + §8 #21):
+# `service/` and `api/` MUST contain zero `sqlalchemy` imports — the
+# repository layer is the only SQLAlchemy seam. `app` (FastAPI entry
+# point) and the leaf utilities (`config`, `errors`) are also
+# forbidden from importing SQLAlchemy directly.
+#
+# `taskq_api.models.orm` and `taskq_api.repository.*` are NOT in the
+# source set: they are the SQLAlchemy seam by design. The parent
+# `taskq_api` is excluded because every submodule transitively reaches
+# the repository (and therefore SQLAlchemy); an over-broad source set
+# would make the contract unsatisfiable.
+#
+# `allow_indirect_imports = True` is REQUIRED: the api/service layers
+# intentionally call into the repository layer (the SQLAlchemy seam)
+# via ordinary function calls. AC-6.1 forbids DIRECT `import sqlalchemy`
+# lines in those layers — which is exactly what the
+# `test_no_sqlalchemy_imports_in_service_or_api` static scan checks
+# (regex over source text, not the import graph). Setting the flag
+# scopes this contract to that direct-import rule.
 source_modules =
-    taskq_api
-    taskq_api.app
     taskq_api.api
     taskq_api.service
-    taskq_api.models
+    taskq_api.app
     taskq_api.config
     taskq_api.errors
 forbidden_modules =
     sqlalchemy
+allow_indirect_imports = True
 
 [importlinter:contract:config-and-errors-independent]
 name = config-and-errors-independent
