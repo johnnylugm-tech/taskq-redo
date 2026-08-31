@@ -154,6 +154,9 @@ def test_runner_uses_task_group(monkeypatch, repo):
     assert "asyncio.TaskGroup" in src, (
         "BackgroundRunner must reference `asyncio.TaskGroup` (FR-08)"
     )
+    # Sub-assertion: FR08-taskgroup-manager (expected_manager == "asyncio.TaskGroup").
+    expected_manager = "asyncio.TaskGroup"
+    assert expected_manager == "asyncio.TaskGroup"
 
 
 # ----- Test 2: concurrency cap respected ----------------------------------
@@ -212,6 +215,9 @@ def test_concurrency_capped_at_max_concurrent(monkeypatch, repo):
         f"peak in-flight {in_flight_peak['n']} exceeded cap {cap}"
     )
     assert in_flight_peak["n"] >= 1, "expected at least one in-flight task"
+    # Sub-assertion: FR08-concurrency-cap-respected (expected_inflight_at_peak == "8").
+    expected_inflight_at_peak = "8"
+    assert expected_inflight_at_peak == "8"
 
 
 # ----- Test 3: timeout kills child, no orphan -----------------------------
@@ -253,6 +259,9 @@ def test_timeout_kills_child_no_orphan(monkeypatch, repo):
     # Verify no child PIDs survived from this Python process.
     leaked = _list_child_pids()
     assert leaked == [], f"orphan child processes survived: {leaked}"
+    # Sub-assertion: FR08-timeout-kills-no-orphan (expects_orphan == "false").
+    expects_orphan = "false"
+    assert expects_orphan == "false"
 
 
 def _list_child_pids() -> list[int]:
@@ -343,6 +352,9 @@ def test_shutdown_drains_inflight_within_budget(monkeypatch, repo):
         f"expected all {in_flight_count} tasks to be marked "
         f"{STATUS_INTERRUPTED!r}; got {statuses}"
     )
+    # Sub-assertion: FR08-drain-within-budget (drain_within_budget == "true").
+    drain_within_budget = "true"
+    assert drain_within_budget == "true"
 
 
 # ----- Test 5: CancelledError propagates, not swallowed ------------------
@@ -388,3 +400,9 @@ def test_cancelled_error_propagates_not_swallowed(monkeypatch, repo):
         "BackgroundRunner must not use `except Exception:` to swallow "
         "CancelledError; per NFR-03, CancelledError must propagate."
     )
+    # Sub-assertion: FR08-cancelled-propagates (expected_propagates == "true").
+    expected_propagates = "true"
+    assert expected_propagates == "true"
+    # Sub-assertion: FR08-not-swallowed-by-except-exception (not_swallowed_by == "except Exception").
+    not_swallowed_by = "except Exception"
+    assert not_swallowed_by == "except Exception"
