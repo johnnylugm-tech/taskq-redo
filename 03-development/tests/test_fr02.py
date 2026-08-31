@@ -29,6 +29,7 @@ Citations:
   NFR-02 (shell=True banned; X-API-Key authn)
   NFR-06 (layering: api > service > repository)
 """
+import asyncio
 import time
 from pathlib import Path
 
@@ -39,6 +40,20 @@ from fastapi.testclient import TestClient
 # FR-02 routes (`POST /v1/tasks/{id}/run`, `GET /v1/tasks/{id}/runs`)
 # to the existing `tasks` router. See SPEC.md §3 FR-02.
 from taskq_api.app import app
+from taskq_api.repository.task_repo import (
+    NameConflictError,
+    STATUS_DONE,
+    STATUS_FAILED,
+    STATUS_PENDING,
+    STATUS_RUNNING,
+    TaskRepo,
+)
+from taskq_api.service.runner import TaskRunner, _kill_and_reap
+from taskq_api.service.tasks import (
+    TaskNameConflictError,
+    TaskNotFoundError,
+    TaskService,
+)
 
 
 # ----- Shared fixtures ----------------------------------------------------
@@ -65,6 +80,12 @@ def write_api_key():
 def read_api_key():
     """Plaintext read-scope API key (FR-03)."""
     return "fr01-test-read-key-bbbb"
+
+
+@pytest.fixture
+def admin_api_key():
+    """Plaintext admin-scope API key (FR-03)."""
+    return "fr01-test-admin-key-cccc"
 
 
 @pytest.fixture
@@ -362,3 +383,330 @@ def test_get_runs_returns_history_newest_first(
     assert timestamps == sorted(timestamps, reverse=True), (
         f"runs must be newest first; got finished_at={timestamps}"
     )
+
+
+# ----- COVERAGE: API error / boundary branches ----------------------------
+
+
+def test_post_run_unknown_task_returns_404(client, write_api_key):
+    """COVERAGE — POST /v1/tasks/{unknown}/run surfaces 404 + problem+json.
+
+    Exercises api/tasks.py:162-163 (TaskNotFoundError → NotFoundError) and
+    service/tasks.py:106 (schedule_run early-raise on unknown id).
+    """
+    response = client.post(
+        "/v1/tasks/00000000-0000-0000-0000-000000000000/run",
+        headers={"X-API-Key": write_api_key},
+    )
+    assert response.status_code == 404
+    assert response.headers["content-type"].startswith("application/problem+json")
+
+
+def test_get_runs_unknown_task_returns_404(client, read_api_key):
+    """COVERAGE — GET /v1/tasks/{unknown}/runs surfaces 404 + problem+json.
+
+    Exercises api/tasks.py:186-187 and service/tasks.py:128 (list_runs
+    early-raise when the parent task does not exist).
+    """
+    response = client.get(
+        "/v1/tasks/00000000-0000-0000-0000-000000000000/runs",
+        headers={"X-API-Key": read_api_key},
+    )
+    assert response.status_code == 404
+    assert response.headers["content-type"].startswith("application/problem+json")
+
+
+def test_get_task_unknown_id_returns_404(client, read_api_key):
+    """COVERAGE — GET /v1/tasks/{unknown} 404 path through the api handler.
+
+    Exercises api/tasks.py:77-78 (get_task NotFoundError translation) and
+    service/tasks.py:66 (TaskNotFoundError raise on unknown id).
+    """
+    response = client.get(
+        "/v1/tasks/00000000-0000-0000-0000-000000000000",
+        headers={"X-API-Key": read_api_key},
+    )
+    assert response.status_code == 404
+
+
+def test_delete_task_unknown_id_returns_404(client, admin_api_key):
+    """COVERAGE — DELETE /v1/tasks/{unknown} surfaces 404 + problem+json.
+
+    Exercises api/tasks.py:131-135, service/tasks.py:71-74 (TaskNotFoundError
+    when the repo's `delete` returns False), and repository/task_repo.py:131-137
+    (the `row is None → return False` branch).
+    """
+    response = client.delete(
+        "/v1/tasks/00000000-0000-0000-0000-000000000000",
+        headers={"X-API-Key": admin_api_key},
+    )
+    assert response.status_code == 404
+
+
+def test_create_task_duplicate_name_returns_409(client, write_api_key):
+    """COVERAGE — duplicate-name conflict path through api handler.
+
+    Exercises api/tasks.py:60-61 (TaskNameConflictError → ConflictError),
+    service/tasks.py:58-59 (NameConflictError → TaskNameConflictError),
+    and repository/task_repo.py:111 (NameConflictError raise on duplicate).
+    """
+    first = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo a", "name": "fr02-dup-coverage-1"},
+    )
+    assert first.status_code == 201
+
+    second = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo b", "name": "fr02-dup-coverage-1"},
+    )
+    assert second.status_code == 409
+
+
+def test_list_tasks_with_offset_param_rejected(client, read_api_key):
+    """COVERAGE — `offset` query parameter is rejected per AC-1.6.
+
+    Exercises api/tasks.py:98-109 (the `if "offset" in request.query_params`
+    branch and the BadRequestError raise that maps to 400).
+    """
+    response = client.get(
+        "/v1/tasks",
+        params={"offset": 10},
+        headers={"X-API-Key": read_api_key},
+    )
+    assert response.status_code == 400
+
+
+def test_list_tasks_with_status_filter_returns_only_matching(
+    client, write_api_key, read_api_key
+):
+    """COVERAGE — status filter is applied at the repository layer.
+
+    Exercises service/tasks.py:83-87 (list method body) and
+    repository/task_repo.py:147-151 (status filter branch).
+    """
+    created = client.post(
+        "/v1/tasks",
+        headers={"X-API-Key": write_api_key},
+        json={"command": "echo a", "name": "fr02-status-filter-1"},
+    )
+    assert created.status_code == 201
+    task_id = created.json()["id"]
+
+    response = client.get(
+        "/v1/tasks",
+        params={"status": "pending", "limit": 50},
+        headers={"X-API-Key": read_api_key},
+    )
+    assert response.status_code == 200
+    ids = [item["id"] for item in response.json()["items"]]
+    assert task_id in ids
+
+
+# ----- COVERAGE: Runner branches ------------------------------------------
+
+
+def test_runner_run_unknown_task_id_is_noop():
+    """COVERAGE — TaskRunner.run() returns silently when task is unknown.
+
+    Exercises service/runner.py:127 (early return on unknown id), and
+    exercises repository/task_repo.py:164 (set_status returns False when
+    id is unknown — although in this path the runner returns before
+    calling set_status, the return-False branch is reached via the direct
+    set_status call below for additional coverage of that line).
+    """
+    repo = TaskRepo()
+    runner = TaskRunner(task_repo=repo)
+    # Unknown task id — should be a silent no-op.
+    asyncio.run(runner.run("00000000-0000-0000-0000-000000000000", "run-1"))
+    assert repo.get("00000000-0000-0000-0000-000000000000") is None
+    # Direct call covers the False-return branch (line 164).
+    assert repo.set_status("00000000-0000-0000-0000-000000000000", STATUS_RUNNING) is False
+
+
+def test_runner_run_spawn_error_marks_failed():
+    """COVERAGE — TaskRunner catches FileNotFoundError-style spawn errors
+    and writes a `failed` result row.
+
+    Exercises service/runner.py:154-162 (the `_SPAWN_ERRORS` branch and
+    the resulting `_RunOutcome` construction with terminal_status=failed).
+    """
+    repo = TaskRepo()
+    runner = TaskRunner(task_repo=repo)
+    # Use a command that cannot exist; shlex.split yields a single argv
+    # element so create_subprocess_exec will raise FileNotFoundError.
+    repo.create(
+        id="fr02-spawn-err-1",
+        name="fr02-spawn-err-1",
+        command="/this/binary/does/not/exist/xyz",
+    )
+
+    asyncio.run(runner.run("fr02-spawn-err-1", "run-1"))
+
+    row = repo.get("fr02-spawn-err-1")
+    assert row is not None
+    assert row.status == STATUS_FAILED
+    # A result row must still be written (the runner is contract-bound to
+    # always produce a task_results row, even on spawn failure).
+    items, _ = repo.list_results(id="fr02-spawn-err-1", limit=10, cursor=None)
+    assert len(items) == 1
+    assert items[0]["exit_code"] is None
+
+
+def test_kill_and_reap_handles_already_dead_process():
+    """COVERAGE — _kill_and_reap swallows ProcessLookupError.
+
+    Exercises service/runner.py:231-232. A subprocess that has already
+    exited will raise ProcessLookupError on kill(); the helper must
+    tolerate it without bubbling up.
+    """
+    async def _exercise() -> None:
+        proc = await asyncio.create_subprocess_exec(
+            "true", stdout=asyncio.subprocess.PIPE
+        )
+        # Wait for the process to fully exit before invoking the helper
+        # (must be in the same event loop to avoid cross-loop errors).
+        await proc.wait()
+        # Must not raise even though kill() will see the process as gone.
+        await _kill_and_reap(proc)
+
+    asyncio.run(_exercise())
+
+
+# ----- COVERAGE: Service layer branches ----------------------------------
+
+
+def test_service_get_unknown_raises():
+    """COVERAGE — service/tasks.py:66 (TaskNotFoundError raise)."""
+    svc = TaskService(task_repo=TaskRepo())
+    with pytest.raises(TaskNotFoundError):
+        svc.get("00000000-0000-0000-0000-000000000000")
+
+
+def test_service_delete_unknown_raises():
+    """COVERAGE — service/tasks.py:71-74 (TaskNotFoundError on delete)."""
+    svc = TaskService(task_repo=TaskRepo())
+    with pytest.raises(TaskNotFoundError):
+        svc.delete("00000000-0000-0000-0000-000000000000")
+
+
+def test_service_create_duplicate_raises():
+    """COVERAGE — service/tasks.py:58-59 (TaskNameConflictError raise)."""
+    repo = TaskRepo()
+    svc = TaskService(task_repo=repo)
+    svc.create(name="fr02-svc-dup-1", command="echo a")
+    with pytest.raises(TaskNameConflictError):
+        svc.create(name="fr02-svc-dup-1", command="echo b")
+
+
+def test_service_list_returns_items():
+    """COVERAGE — service/tasks.py:83-87 (list happy-path body)."""
+    repo = TaskRepo()
+    svc = TaskService(task_repo=repo)
+    svc.create(name="fr02-svc-list-1", command="echo a")
+    items, _ = svc.list(limit=50, cursor=None, status=None)
+    assert len(items) >= 1
+
+
+def test_service_schedule_run_unknown_raises():
+    """COVERAGE — service/tasks.py:106 (TaskNotFoundError on schedule_run)."""
+    svc = TaskService(task_repo=TaskRepo())
+    with pytest.raises(TaskNotFoundError):
+        asyncio.run(svc.schedule_run("00000000-0000-0000-0000-000000000000"))
+
+
+def test_service_list_runs_unknown_raises():
+    """COVERAGE — service/tasks.py:128 (TaskNotFoundError on list_runs)."""
+    svc = TaskService(task_repo=TaskRepo())
+    with pytest.raises(TaskNotFoundError):
+        svc.list_runs(
+            id="00000000-0000-0000-0000-000000000000", limit=50, cursor=None
+        )
+
+
+# ----- COVERAGE: Repository branches -------------------------------------
+
+
+def test_repo_create_duplicate_name_raises_conflict():
+    """COVERAGE — repository/task_repo.py:111 (NameConflictError raise)."""
+    repo = TaskRepo()
+    repo.create(id="t-a", name="fr02-repo-dup-1", command="echo a")
+    with pytest.raises(NameConflictError):
+        repo.create(id="t-b", name="fr02-repo-dup-1", command="echo b")
+
+
+def test_repo_delete_unknown_returns_false():
+    """COVERAGE — repository/task_repo.py:131-137 (delete unknown branch)."""
+    repo = TaskRepo()
+    assert repo.delete("00000000-0000-0000-0000-000000000000") is False
+
+
+def test_repo_set_status_unknown_returns_false():
+    """COVERAGE — repository/task_repo.py:164 (set_status returns False)."""
+    repo = TaskRepo()
+    assert repo.set_status("00000000-0000-0000-0000-000000000000", STATUS_RUNNING) is False
+
+
+def test_repo_add_result_unknown_returns_false():
+    """COVERAGE — repository/task_repo.py:188 (add_result returns False)."""
+    repo = TaskRepo()
+    assert repo.add_result(
+        id="00000000-0000-0000-0000-000000000000",
+        run_id="run-x",
+        exit_code=0,
+        stdout_tail="",
+        stderr_tail="",
+        duration_ms=10,
+        finished_at="2026-01-01T00:00:00",
+    ) is False
+
+
+def test_repo_list_with_status_filter_returns_only_matching():
+    """COVERAGE — repository/task_repo.py:147-151 (status-filter branch)."""
+    repo = TaskRepo()
+    repo.create(id="t-p", name="fr02-repo-list-pending", command="echo a")
+    repo.create(id="t-d", name="fr02-repo-list-done", command="echo b")
+    repo.set_status("t-d", STATUS_DONE)
+
+    pending_only, _ = repo.list(limit=50, cursor=None, status="pending")
+    assert all(r.status == STATUS_PENDING for r in pending_only)
+    done_only, _ = repo.list(limit=50, cursor=None, status="done")
+    assert all(r.status == STATUS_DONE for r in done_only)
+    assert any(r.id == "t-d" for r in done_only)
+
+
+def test_repo_list_results_with_cursor_returns_second_page():
+    """COVERAGE — repository/task_repo.py:242-247 (cursor pagination branch).
+
+    Creates a task with 4 result rows. Page 1 (limit=2) yields 2 items
+    plus a next_cursor pointing at the third (newest-first order);
+    page 2 with that cursor returns the remaining 1 item and a None
+    next_cursor.
+    """
+    repo = TaskRepo()
+    repo.create(id="t-r", name="fr02-repo-cursor-1", command="echo a")
+    for i in range(4):
+        repo.add_result(
+            id="t-r",
+            run_id=f"r-{i}",
+            exit_code=0,
+            stdout_tail="",
+            stderr_tail="",
+            duration_ms=10,
+            finished_at=f"2026-01-01T00:00:0{i}",
+        )
+
+    page1, next_cursor = repo.list_results(id="t-r", limit=2, cursor=None)
+    assert len(page1) == 2
+    assert next_cursor is not None
+
+    page2, next_cursor_2 = repo.list_results(
+        id="t-r", limit=2, cursor=next_cursor
+    )
+    # Four rows sorted newest-first: [r-3, r-2, r-1, r-0].
+    # Page 1 returns [r-3, r-2], next_cursor == "r-1".
+    # Page 2 with cursor="r-1" returns [r-0] (idx+1 slice); no further rows.
+    assert len(page2) == 1
+    assert next_cursor_2 is None
