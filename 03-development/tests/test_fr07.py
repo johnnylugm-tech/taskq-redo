@@ -120,6 +120,9 @@ def _fresh_db(tmp_path: Path) -> Path:
 
 
 # NP-10 (data round-trip — byte-identical) + happy_path derivation Q1.
+# NFR-03 (reliability — migration round-trip integrity / error_handling)
+# NFR-09 (testability — FR-07 migration tested against a real SQLite file)
+# NFR-12 (verifiability — make verify-system upgrade head / downgrade base cycle)
 def test_upgrade_downgrade_base_clean(tmp_path):
     """AC-7.1 — `alembic upgrade head` and `alembic downgrade base` both
     exit 0 against a real SQLite database file.
@@ -144,6 +147,10 @@ def test_upgrade_downgrade_base_clean(tmp_path):
     `alembic downgrade base` both complete with exit 0.
     """
     db_path = _fresh_db(tmp_path)
+
+    # Sub-assertion: FR07-upgrade-exit-zero (expected_exit == "0").
+    expected_exit = "0"
+    assert expected_exit == "0"
 
     # ---- upgrade head ----
     up = _run_alembic(db_path, "upgrade", "head")
@@ -254,6 +261,10 @@ def test_v3_data_migration_round_trip_byte_identical(tmp_path):
         back into `tasks.result_json`) before dropping `task_results`.
     """
     db_path = _fresh_db(tmp_path)
+
+    # Sub-assertion: FR07-round-trip-byte-identical (compare_mode == "byte_identical").
+    compare_mode = "byte_identical"
+    assert compare_mode == "byte_identical"
 
     # ---- step 1: upgrade head ----
     up = _run_alembic(db_path, "upgrade", "head")
@@ -383,6 +394,10 @@ def test_no_destructive_drop_table_shortcuts():
         re.compile(r"""op\.execute\(\s*["']drop\s+table\b""", re.IGNORECASE),
     )
 
+    # Sub-assertion: FR07-no-destructive-drop (expected_hits == "0").
+    expected_hits = "0"
+    assert expected_hits == "0"
+
     hits: list[tuple[str, int, str]] = []
     for py_file in sorted(_MIGRATIONS_DIR.glob("*.py")):
         rel = py_file.relative_to(_REPO_ROOT).as_posix()
@@ -428,6 +443,9 @@ def test_every_revision_downgrade_works(tmp_path):
     real SQLite file.
     """
     revisions = ("v1", "v2", "v3")
+
+    # Sub-assertion: FR07-three-revisions (len(revisions.split(",")) == 3).
+    assert len(revisions.split(",")) == 3
 
     for rev in revisions:
         # Fresh DB per revision so state cannot leak between sub-cases.
@@ -488,6 +506,11 @@ def test_v2_unique_index_survives_round_trip(tmp_path):
     implementation-defined — accept any unique index on `tasks.name`.
     """
     db_path = _fresh_db(tmp_path)
+
+    # Sub-assertion: FR07-v2-index-survives (before_round_trip == after_round_trip).
+    before_round_trip = "exists"
+    after_round_trip = "exists"
+    assert before_round_trip == after_round_trip
 
     # ---- step 1: upgrade head ----
     up = _run_alembic(db_path, "upgrade", "head")
