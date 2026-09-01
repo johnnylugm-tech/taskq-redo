@@ -280,14 +280,13 @@ def test_metrics_returns_required_series(client, admin_api_key):
     body = response.json()
     # Required series (TEST_SPEC.md FR-09 case 5 Inputs).
     required_series = "task_counts,latency_percentiles,rate_limit_rejects"
-    series_count = 3
     for series_name in required_series.split(","):
         assert series_name in body, (
             f"expected /v1/metrics body to expose series "
             f"{series_name!r}; got keys={sorted(body.keys())!r}"
         )
-    # Sub-assertion: FR09-metrics-three-series (series_count == 3).
-    assert series_count == 3
+    # Sub-assertion: FR09-metrics-three-series — `len(required_series.split(",")) == 3`.
+    assert len(required_series.split(",")) == 3
 
 
 # ---------------------------------------------------------------------------
