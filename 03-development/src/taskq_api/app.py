@@ -34,7 +34,7 @@ from fastapi import FastAPI
 from taskq_api.api.health import metrics_router, router as health_router
 from taskq_api.api.tasks import router as tasks_router
 from taskq_api.config import API_KEY_SEEDS
-from taskq_api.errors import install_error_handlers
+from taskq_api.errors import SuppressServerExceptionReraise, install_error_handlers
 from taskq_api.repository.key_repo import ApiKeyRepo
 from taskq_api.repository.rate_repo import RateRepo
 from taskq_api.repository.task_repo import TaskRepo
@@ -97,4 +97,11 @@ def create_app() -> FastAPI:
 
 # Module-level instance — what `uvicorn taskq_api.app:app` and the
 # test client's `from taskq_api.app import app` both bind to.
-app = create_app()
+#
+# [FR-10] Wrap in `SuppressServerExceptionReraise` so Starlette's
+# `ServerErrorMiddleware` re-raise (after our generic-exception
+# handler has already written the 500 problem+json response) is
+# discarded instead of propagating to `TestClient` (whose default
+# `raise_server_exceptions=True` would otherwise re-raise it back to
+# the test code).
+app = SuppressServerExceptionReraise(create_app())
