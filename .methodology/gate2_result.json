@@ -64,7 +64,7 @@
       "score_source": "framework"
     },
     "test_assertion_quality": {
-      "score": 97.4,
+      "score": 97.5,
       "threshold": 60,
       "tool_output": ".methodology/gate_evidence/gate2/test_assertion_quality.json",
       "tool_evidence": "AST scan over 03-development/tests/*.py: total_funcs=215, total_asserts=506, zero_assert=13, density=2.35, zr=0.060. Score = min(100, density × 25 + (1 − zr) × 50) = 100",
@@ -93,8 +93,8 @@
       "calibration": {
         "cohesion_healthy": 0.17,
         "community_oversized": 50,
-        "graph_files": 44,
-        "source_files": 44
+        "graph_files": 43,
+        "source_files": 43
       }
     }
   },
@@ -199,9 +199,9 @@
   },
   "crg_review_context": {
     "status": "ok",
-    "summary": "Review context for 14 changed file(s):\n  - Risk: high\n  - 242 impacted nodes in 30 files",
+    "summary": "Review context for 16 changed file(s):\n  - Risk: high\n  - 248 impacted nodes in 30 files",
     "risk": "high",
-    "changed_file_count": 14,
+    "changed_file_count": 16,
     "impacted_file_count": 30,
     "key_entities": [
       "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/errors.py",
@@ -218,13 +218,13 @@
     ],
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 40805,
+      "saved_tokens": 49664,
       "saved_percent": 100
     }
   },
   "crg_impact_radius": {
     "status": "ok",
-    "summary": "Blast radius for 14 changed file(s):\n  - 95 nodes directly changed\n  - 242 nodes impacted (within 2 hops)\n  - 30 additional files affected",
+    "summary": "Blast radius for 16 changed file(s):\n  - 118 nodes directly changed\n  - 248 nodes impacted (within 2 hops)\n  - 30 additional files affected",
     "risk": "high",
     "impacted_file_count": 30,
     "key_entities": [
@@ -237,7 +237,7 @@
     "truncated": false,
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 40820,
+      "saved_tokens": 49678,
       "saved_percent": 100
     }
   },
@@ -286,7 +286,7 @@
       }
     ]
   },
-  "composite_score": 98.036,
+  "composite_score": 98.04,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],

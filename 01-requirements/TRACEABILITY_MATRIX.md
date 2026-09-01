@@ -15,7 +15,7 @@
 | Code Coverage | 100.0% | 100% |
 | Test Coverage | 100.0% | 100% |
 | Verification Rate | 100.0% | 100% |
-| Total Links | 69 | — |
+| Total Links | 68 | — |
 
 ### ASPICE SWE.3 Compliance
 
@@ -29,7 +29,7 @@
 
 | Requirement | Status | Code Files | Test Files | SAD Module |
 |-------------|--------|------------|------------|------------|
-| FR-01 | verified | 03-development/src/taskq_api/__init__.py, 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/tasks.py (+11) | 03-development/tests/test_fr01.py | — |
+| FR-01 | verified | 03-development/src/taskq_api/__init__.py, 03-development/src/taskq_api/api/__init__.py, 03-development/src/taskq_api/api/tasks.py (+10) | 03-development/tests/test_fr01.py | — |
 | FR-02 | verified | 03-development/src/taskq_api/api/tasks.py, 03-development/src/taskq_api/app.py, 03-development/src/taskq_api/models/orm.py (+3) | 03-development/tests/test_fr02.py | — |
 | FR-03 | verified | 03-development/src/taskq_api/__main__.py, 03-development/src/taskq_api/api/deps.py, 03-development/src/taskq_api/api/health.py (+2) | 03-development/tests/test_fr03.py | — |
 | FR-04 | verified | 03-development/src/taskq_api/api/deps.py | 03-development/tests/test_fr04.py | — |
