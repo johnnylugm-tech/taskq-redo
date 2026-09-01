@@ -4,7 +4,7 @@
 
 ..........................................................F.F........... [ 41%]
 ........................................................................ [ 82%]
-..............................                                           [100%]
+...............................                                          [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
@@ -35,17 +35,17 @@ Name                                                     Stmts   Miss  Cover   M
 03-development/src/taskq_api/repository/task_repo.py       106      0   100%
 03-development/src/taskq_api/service/__init__.py             0      0   100%
 03-development/src/taskq_api/service/auth.py                 7      0   100%
-03-development/src/taskq_api/service/health.py              47      1    98%   138
+03-development/src/taskq_api/service/health.py              47      0   100%
 03-development/src/taskq_api/service/ratelimit.py           11      0   100%
 03-development/src/taskq_api/service/runner.py             135      0   100%
 03-development/src/taskq_api/service/tasks.py               48      0   100%
 --------------------------------------------------------------------------------------
-TOTAL                                                      850      1    99%
+TOTAL                                                      850      0   100%
 =========================== short test summary info ============================
 FAILED 03-development/tests/test_fr04.py::test_write_scope_delete_returns_403_no_resource_leak
 FAILED 03-development/tests/test_fr04.py::test_single_authz_dependency_used_by_every_v1_route
-2 failed, 172 passed, 1 warning in 18.93s
-/Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10b71e160>
+2 failed, 173 passed, 1 warning in 18.81s
+/Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10999a160>
 
 Traceback (most recent call last):
   File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
