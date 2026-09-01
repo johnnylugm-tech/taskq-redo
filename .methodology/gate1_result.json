@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-07",
+  "fr_id": "FR-08",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.577}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 58,
+      "tests_passed": 108,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "58 passed, 1 warning in 17.64s; session.py coverage 100% (48/48 statements)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
+      "tool_evidence": "Coverage: 100% (241/241 lines covered). Tests: 108 passed, 0 failed, 0 skipped. test_fr08.py: 39 tests, test_fr01.py: 13, test_fr02.py: 30, test_fr06.py: 26",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-07",
+      "coverage_scope_fr": "FR-08",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 5 kept, 0 broken. (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)",
+      "tool_evidence": "Analyzed 48 files, 92 dependencies. Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,23 +71,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "dd965a75dc505cacc83dc686b40b2d807ee746c9017ffecbb1d60d708217b385",
-      "bytes": 141,
-      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
+      "sha256": "894d8be2021ca3f2dcf891a6a86cb9134b3fa99e820bf728b065a7a9825790f8",
+      "bytes": 135,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.577}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5579c6a7718099d3dbb1a9c97a89ce5eebb1a2accc79a68b13af523d602abebe",
-      "bytes": 75,
-      "head": "58 passed, 1 warning in 17.64s; session.py coverage 100% (48/48 statements)"
+      "sha256": "d988d2b2dace7421b739c17103bc5e348a663a11d0db911f025b04df3f88321c",
+      "bytes": 156,
+      "head": "Coverage: 100% (241/241 lines covered). Tests: 108 passed, 0 failed, 0 skipped. test_fr08.py: 39 tests, test_fr01.py: 13, test_fr02.py: 30, test_fr06.py: 26"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "597da6a224649d098d4afca61e3e4b64bc32804deca86f55bd8b1de999658835",
-      "bytes": 145,
-      "head": "Contracts: 5 kept, 0 broken. (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)"
+      "sha256": "7531080298dbefa594a52655e0853d33e5bf318ed752773a9a08f27ddf5532f1",
+      "bytes": 204,
+      "head": "Analyzed 48 files, 92 dependencies. Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT"
     }
   },
   "composite_score": 100.0,
