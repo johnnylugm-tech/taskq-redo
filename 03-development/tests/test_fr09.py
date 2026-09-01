@@ -629,10 +629,15 @@ def test_alembic_head_revision_returns_head_from_alembic_ini(tmp_path):
     revision declared by the script directory (line 70). The real
     `alembic.ini` shipped by SPEC §3 FR-07 points at
     `migrations/versions/`, whose head is `v3`.
+
+    Resolves the `alembic.ini` path from `__file__` rather than cwd so
+    the test is independent of where pytest happens to be invoked
+    (repo root vs `03-development/`).
     """
     from taskq_api.repository.health_repo import alembic_head_revision
 
-    head = alembic_head_revision(Path("alembic.ini"))
+    alembic_ini = Path(__file__).resolve().parent.parent.parent / "alembic.ini"
+    head = alembic_head_revision(alembic_ini)
     assert head == "v3"
 
 

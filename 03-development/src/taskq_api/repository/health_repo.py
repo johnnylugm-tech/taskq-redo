@@ -20,6 +20,7 @@ Citations:
 """
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Optional
 
 from alembic.config import Config
@@ -63,9 +64,18 @@ def alembic_current_revision(target=engine) -> Optional[str]:
 
 
 def alembic_head_revision(cfg_path) -> Optional[str]:
-    """Return the alembic script-directory head revision (or `None`)."""
+    """Return the alembic script-directory head revision (or `None`).
+
+    `script_location = migrations` in `alembic.ini` is a relative path,
+    so we resolve it against the directory holding `cfg_path` rather
+    than the caller's cwd — that lets `/readyz` work the same way no
+    matter where pytest / `python -m taskq_api` happens to be invoked
+    (repo root, `03-development/`, or anywhere else).
+    """
     try:
         cfg = Config(str(cfg_path))
+        script_dir = Path(str(cfg_path)).resolve().parent
+        cfg.set_main_option("script_location", str(script_dir / "migrations"))
         script = ScriptDirectory.from_config(cfg)
         return script.get_current_head()
     except Exception:  # noqa: BLE001 — readiness probe must never raise
