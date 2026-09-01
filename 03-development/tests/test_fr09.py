@@ -411,6 +411,26 @@ def test_latency_percentiles_interpolates_when_data_present(monkeypatch):
     assert result == {"p50": 30, "p90": 46, "p99": 50}
 
 
+def test_latency_percentiles_returns_zeros_when_no_data(monkeypatch):
+    """AC-9.5 — When `task_result_durations_ms()` returns an empty
+    list, `_latency_percentiles()` returns the zero-sentinel dict
+    `{"p50": 0, "p90": 0, "p99": 0}` so the series shape stays stable
+    when no runs have completed yet (SPEC.md §3 FR-09 row 3
+    enumeration — series MUST always be present).
+
+    Covers the `if not durations: return ...` early-exit branch on
+    line 138 of `service/health.py` (the data-empty path the
+    happy-path test does not exercise).
+    """
+    from taskq_api.service import health as health_module
+
+    monkeypatch.setattr(
+        health_module, "task_result_durations_ms", lambda: []
+    )
+    result = health_module._latency_percentiles()
+    assert result == {"p50": 0, "p90": 0, "p99": 0}
+
+
 # ----- service/health.py : _percentile (lines 154-160) ---------------------
 
 
