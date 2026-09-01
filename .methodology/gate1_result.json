@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-01",
+  "fr_id": "FR-02",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,14 +9,14 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!\nEXIT=0\n[Ruff exit 0 — zero violations across 03-development/src/]",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}, \"generalDiagnostics\": []}\nEXIT=0\n[Pyright — zero errors, zero warnings across 24 source files]",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788294640387\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.593}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,16 @@
       "tests_passed": 108,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "108 passed, 1 warning in 16.18s\n[test_fr01.py: 13, test_fr02.py: 28, test_fr06.py: 26, test_fr08.py: 41 — all 108 passed]\n[coverage.json: percent_covered=100.0 across all 4 FR-01 source files]\n[7/7 required tests present and passing (AC-1.1..AC-1.7) — spec_cov_pct=100%]",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=3 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.2, hypothesis-6.112.1, benchmark-4.0.0\ncollected 108 items\n\n03-development/tests/test_fr02.py ............................           [ 25%]\n03-development/tests/test_fr01.py .............                          [ 37%]\n03-development/tests/test_fr06.py ..........................             [ 62%]\n03-development/tests/test_fr08.py ...................................... [ 97%]\n...                                                                      [100%]\n\n======================= 108 passed, 1 warning in 16.32s ========================\n{\"meta\": {\"format\": 3, \"version\": \"7.16.0\", \"timestamp\": \"2026-09-02T04:30:57.724769\", \"branch_coverage\": false, \"show_contexts\": false}, \"files\": {\"03-development/src/taskq_api/api/tasks.py\": {\"executed_lines\": [30, 32, 34, 35, 36, 37, 44, 50, 55, 61, 62, 63, 64, 65, 68, 72, 78, 79, 80, 81, 82, 85, 86, 101, 105, 109, 112, 118, 123, 134, 135, 136, 137, 138, 146, 150, 163, 164, 165, 166, 167, 170, 171, 185, 186, 189, 190, 191], \"summary\": {\"covered_lines\": 48, \"num_statements\": 48, \"percent_covered\": 100.0, \"percent_covered_display\": \"100\", \"missing_lines\": 0, \"excluded_lines\": 0, \"percent_statements_covered\": 100.0, \"percent_statements_covered_display\": \"100\"}, \"missing_lines\": [], \"excluded_lines\": [], \"functions\": {\"create_task\": {\"executed_lines\": [61, 62, 63, 64, 65], \"summary\": {\"covered_lines\": 5, \"num_statements\": 5, \"percent_covered\": 100.0, \"percent_covered_display\": \"100\", \"missing_lines\": 0, \"excluded_lines\": 0, \"percent_statements_covered\": 100.0, \"percent_statements_covered_display\": \"100\"}, \"missing_lines\": [], \"excluded_lines\": [], \"start_line\": 55}, \"get_task\": {\"executed_lines\": [78, 79, 80, 81, 82], \"summary\": {\"covered_lines\": 5, \"num_statements\": 5, \"percent_covered\": 100.0, \"percent_covered_display\": \"100\", \"missing_lines\": 0, \"excluded_lines\": 0, \"percent_statements_covered\": 100.0, \"percent_statements_covered_display\": \"100\"}, \"missing_lines\": [], \"excluded_lines\": [], \"start_line\": 72}, \"list_tasks\": {\"executed_lines\": [101, 105, 109, 112], \"summary\": {\"covered_lines\": 4, \"num_statements\": 4, \"percent_covered\": 100.0, \"percent_covered_display\": \"100\", \"missing_lines\": 0, \"excluded_lines\": 0, \"percent_statements_covered\": 100.0, \"percent_statements_covered_display\": \"100\"}, \"missing_lines\": [], \"excluded_lines\": [], \"start_line\": 55}",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-01",
+      "coverage_scope_fr": "FR-02",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 48 files, 92 dependencies.\nlayers KEPT | forbidden-sqlalchemy KEPT | config-and-errors-independent KEPT | root-package-marker-independent KEPT | cli-main-independent KEPT\nContracts: 5 kept, 0 broken.\nEXIT=0",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 92 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -64,30 +64,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "57915715623a65185c903c9100b258a2c1120d53f54ff45090807a881aea8456",
-      "bytes": 86,
-      "head": "All checks passed!\nEXIT=0\n[Ruff exit 0 — zero violations across 03-development/src/]"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "4564cdae209ecafe33ab3dc9cd271585fa9b76d66b74a878efb2d33b32dc8ee6",
-      "bytes": 212,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}, \"generalDiagnostics\": []}\nEXIT=0\n[Pyright — zero errors, zero warnings across 24 source files]"
+      "sha256": "60a8359a5b4ec587f6983096d2772a2456153855dd53fe077f375995a6c21ddf",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788294640387\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.593}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "e6babcdffca710a142bd3b799cd103d6e63a67f859a8a44d31b766477e3e7faf",
-      "bytes": 274,
-      "head": "108 passed, 1 warning in 16.18s\n[test_fr01.py: 13, test_fr02.py: 28, test_fr06.py: 26, test_fr08.py: 41 — all 108 passed]\n[coverage.json: percent_covered=100.0 across all 4 FR-01 source files]\n[7/7 required tests present and passing (AC-1.1..AC-1.7) — spec_cov_pct=100%]"
+      "sha256": "09e36ddebc9854ae51013e8c6f67df9b0a00448d41369f2ab3a002ac2e93c817",
+      "bytes": 2743,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=3 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.2, hypothesis-6.112.1, benchmark-4.0.0\ncollected 108 items\n\n03-development/tests/test_fr02.py ............................           [ 25%]\n03-development/tests/test_fr01.py .............                          [ 37%]\n03-development/tests/test_fr06.py ..........................             [ 62%]\n03-development/tests/test_fr08.py ...................................... [ 97%]\n...                                                                      [100%]\n\n======================= 108 passed, 1 warning in 16.32s ========================\n{\"meta\": {\"format\": 3, \"version\": \"7.16.0\", \"timestamp\": \"2026-09-02T04:30:57.724769\", \"branch_coverage\": false, \"show_contexts\": false}, \"files\": {\"03-development/src/taskq_api/api/tasks.py\": {\"executed_lines\": [30, 32, 34, 35, 36, 37, 44, 50, 55, 61, 62, 63, 64, 65, 68, 72, 78, 79, 80, 81, 82, 85, 86, 101, 105, 109, 112, 118, 123, 134, 135, 136, 137, 138, 146, 150, 163, 164, 165, 166, 167, 170, 171, 185, 186, 189, 190, 191], \"summary\": {\"covered_lines\": 48, \"num_statements\": 48, \"percent_covered\": 100.0, \"percent_covered_display\": \"100\", \"missing_lines\": 0, \"excluded_lines\": 0, \"percent_statements_covered\": 100.0, \"percent_statements_covered_display\": \"100\"}, \"missing_lines\": [], \"excluded_lines\": [], \"functions\": {\"create_task\": {\"executed_lines\": [61, 62, 63, 64, 65], \"summary\": {\"covered_lines\": 5, \"num_statements\": 5, \"percent_covered\": 100.0, \"percent_covered_display\": \"100\", \"missing_lines\": 0, \"excluded_lines\": 0, \"percent_statements_covered\": 100.0, \"percent_statements_covered_display\": \"100\"}, \"missing_lines\": [], \"excluded_lines\": [], \"start_line\": 55}, \"get_task"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "59cee5d1b998121d77540e0c9c62424c7c8b95a2e799c82d6504a5e525f36a72",
-      "bytes": 215,
-      "head": "Analyzed 48 files, 92 dependencies.\nlayers KEPT | forbidden-sqlalchemy KEPT | config-and-errors-independent KEPT | root-package-marker-independent KEPT | cli-main-independent KEPT\nContracts: 5 kept, 0 broken.\nEXIT=0"
+      "sha256": "fe757381671db5a8661c667ca607a7c04e145860d90c1be9cdffaed364989926",
+      "bytes": 312,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 92 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
