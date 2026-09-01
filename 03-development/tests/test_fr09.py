@@ -288,3 +288,231 @@ def test_metrics_returns_required_series(client, admin_api_key):
         )
     # Sub-assertion: FR09-metrics-three-series (series_count == 3).
     assert series_count == 3
+
+
+# ---------------------------------------------------------------------------
+# Coverage tests — exercise code paths the API-level tests reach only via
+# monkeypatch stubs. These tests call the underlying service functions
+# directly so the FR-09 readiness / metrics logic is covered end-to-end
+# (TEST_SPEC.md FR-09 cross-cut).
+# ---------------------------------------------------------------------------
+
+from pathlib import Path  # noqa: E402  (placed near the coverage tests)
+
+
+# ----- service/health.py : check_migration (lines 93-114) -----------------
+
+
+def test_check_migration_skips_when_no_alembic_ini(monkeypatch, tmp_path):
+    """AC-9.4 — `check_migration` returns the soft-pass tuple when no
+    `alembic.ini` is reachable from cwd or cwd.parent (SPEC.md §3 FR-09
+    row 2; FR-09 contract is for live deployments, not sandbox envs).
+    """
+    from taskq_api.service import health as health_module
+
+    # Move into a directory with no alembic.ini so the candidate scan
+    # in `check_migration` resolves to `cfg_path is None`.
+    monkeypatch.chdir(tmp_path)
+    ok, detail = health_module.check_migration()
+    assert ok is True
+    assert "skipped" in detail.lower()
+    assert "no alembic.ini" in detail.lower()
+
+
+def test_check_migration_returns_true_when_at_head(monkeypatch):
+    """AC-9.4 — When `alembic current == alembic head`, the probe
+    returns `(True, "migration at head")` (SPEC.md §3 FR-09 row 2 +
+    §8 #11).
+    """
+    from taskq_api.service import health as health_module
+
+    monkeypatch.setattr(
+        health_module, "alembic_head_revision", lambda cfg: "v3"
+    )
+    monkeypatch.setattr(
+        health_module, "alembic_current_revision", lambda target: "v3"
+    )
+    ok, detail = health_module.check_migration(cfg_path=Path("alembic.ini"))
+    assert ok is True
+    assert detail == "migration at head"
+
+
+def test_check_migration_returns_false_when_behind_head(monkeypatch):
+    """AC-9.3 — When `alembic current != alembic head`, the probe
+    returns `(False, "...behind head (current=..., head=...)")` so
+    `/readyz` can fail closed (SPEC.md §3 FR-09 row 2 + §8 #11).
+    """
+    from taskq_api.service import health as health_module
+
+    monkeypatch.setattr(
+        health_module, "alembic_head_revision", lambda cfg: "v3"
+    )
+    monkeypatch.setattr(
+        health_module, "alembic_current_revision", lambda target: "v2"
+    )
+    ok, detail = health_module.check_migration(cfg_path=Path("alembic.ini"))
+    assert ok is False
+    assert "v2" in detail and "v3" in detail
+    assert "behind" in detail.lower()
+
+
+def test_check_migration_skips_when_head_unresolvable(monkeypatch):
+    """AC-9.4 — When `alembic_head_revision` returns `None` (alembic
+    tables not yet created, or env missing), the probe returns the
+    `(True, "migration check skipped")` soft-pass (SPEC.md §3 FR-09
+    row 2 tolerance clause).
+    """
+    from taskq_api.service import health as health_module
+
+    monkeypatch.setattr(
+        health_module, "alembic_head_revision", lambda cfg: None
+    )
+    monkeypatch.setattr(
+        health_module, "alembic_current_revision", lambda target: "v3"
+    )
+    ok, detail = health_module.check_migration(cfg_path=Path("alembic.ini"))
+    assert ok is True
+    assert detail == "migration check skipped"
+
+
+def test_check_migration_returns_false_when_alembic_raises(monkeypatch):
+    """AC-9.3 — When the probe encounters an unexpected exception (e.g.
+    `alembic` cannot read the script directory), it returns
+    `(False, "migration check failed: <ExceptionClass>")` so the
+    readiness probe fails closed (SPEC.md §3 FR-09 row 2 + §8 #11 +
+    NFR-03 reliability — the probe must never raise).
+    """
+    from taskq_api.service import health as health_module
+
+    def _explode(cfg):
+        raise RuntimeError("alembic exploded")
+
+    monkeypatch.setattr(health_module, "alembic_head_revision", _explode)
+    ok, detail = health_module.check_migration(cfg_path=Path("alembic.ini"))
+    assert ok is False
+    assert "RuntimeError" in detail
+    assert "failed" in detail.lower()
+
+
+# ----- service/health.py : _latency_percentiles (lines 139-140) -------------
+
+
+def test_latency_percentiles_interpolates_when_data_present(monkeypatch):
+    """AC-9.5 — When `task_result_durations_ms()` returns a non-empty
+    list, `_latency_percentiles()` sorts the values and returns the
+    NIST/Excel linear-interpolation percentiles p50/p90/p99 (SPEC.md
+    §3 FR-09 row 3 series 2 — `latency_percentiles`).
+    """
+    from taskq_api.service import health as health_module
+
+    monkeypatch.setattr(
+        health_module, "task_result_durations_ms", lambda: [10, 20, 30, 40, 50]
+    )
+    result = health_module._latency_percentiles()
+    assert result == {"p50": 30, "p90": 46, "p99": 50}
+
+
+# ----- service/health.py : _percentile (lines 154-160) ---------------------
+
+
+def test_percentile_returns_single_value_when_n_is_one():
+    """`_percentile` returns the only value when `len(sorted_values) == 1`
+    (the `f == c` early-exit branch — the median of a single sample
+    is that sample)."""
+    from taskq_api.service.health import _percentile
+
+    assert _percentile([42], 0.5) == 42
+    assert _percentile([99], 0.99) == 99
+
+
+def test_percentile_interpolates_between_surrounding_values():
+    """`_percentile` linearly interpolates between the two values that
+    bracket the `(n - 1) * p` index (NIST / Excel default method)."""
+    from taskq_api.service.health import _percentile
+
+    # n=4, p=0.5 -> k=1.5; f=1, c=2; result = 20 + (40 - 20) * 0.5 = 30.
+    assert _percentile([10, 20, 40, 80], 0.5) == 30
+    # n=3, p=0.5 -> k=1.0; f=1, c=2; k-f=0 -> result = sorted_values[1].
+    assert _percentile([5, 7, 9], 0.5) == 7
+    # n=3, p=1.0 -> k=2.0; f=2, c=min(3, 2)=2 -> f == c -> 9.
+    assert _percentile([5, 7, 9], 1.0) == 9
+
+
+# ----- repository/session.py : _FR06QueuePool.size() (line 78) -------------
+
+
+def test_pool_size_returns_configured_maxsize():
+    """AC-6.5 — `engine.pool.size()` returns the configured `pool_size`
+    (SPEC.md §3 FR-06 paragraph 1 — the 1.x-style callable still
+    works under SQLAlchemy 2.x via the `_FR06QueuePool` subclass)."""
+    from taskq_api.repository.session import engine
+
+    size = engine.pool.size()
+    assert isinstance(size, int)
+    assert size > 0
+
+
+# ----- repository/session.py : _mirror_pool_pre_ping (lines 106, 109-110, 114-115) -----
+
+
+def test_mirror_pool_pre_ping_returns_early_when_no_creator():
+    """When the engine's pool has no `_creator` attribute (e.g. a
+    third-party pool class), `_mirror_pool_pre_ping` returns early
+    without raising (the defensive seams at lines 105-106)."""
+    from taskq_api.repository.session import _mirror_pool_pre_ping
+
+    class _NoCreatorPool:
+        """Pool stand-in whose `_creator` attribute is intentionally
+        absent — exercises the `creator is None` early-return path."""
+
+    class _StubEngine:
+        pool = _NoCreatorPool()
+
+    # Must not raise.
+    _mirror_pool_pre_ping(_StubEngine())  # type: ignore[arg-type]
+
+
+def test_mirror_pool_pre_ping_swallows_frozen_creator_errors():
+    """When the creator object rejects `setattr` (defensive-pass
+    exercise for future SQLAlchemy renames), the two
+    `except (AttributeError, TypeError): pass` blocks swallow the
+    error so the live engine's pool pre-ping (the source of truth)
+    remains the canonical signal (lines 109-110, 114-115)."""
+    from taskq_api.repository.session import _mirror_pool_pre_ping
+
+    class _FrozenCreator:
+        """Raises AttributeError on every setattr — simulates a
+        `__slots__`-locked creator that exposes `_pre_ping` /
+        `_kwargs` as read-only attributes."""
+
+        _kwargs = {}
+
+        def __setattr__(self, name, value):
+            raise AttributeError(f"cannot set {name}")
+
+    class _FrozenPool:
+        _creator = _FrozenCreator()
+
+    class _StubEngine:
+        pool = _FrozenPool()
+
+    # Both except blocks fire; the function must not raise.
+    _mirror_pool_pre_ping(_StubEngine())  # type: ignore[arg-type]
+
+
+# ----- repository/session.py : transaction() rollback path (lines 188-196) ---
+
+
+def test_transaction_rolls_back_on_exception():
+    """FR-06 / AC-6.2 — `transaction()` rolls back the partial work
+    and re-raises when the with-block exits with an exception
+    (SPEC.md §3 FR-06 paragraph 1 — atomic transaction boundary;
+    NFR-03 reliability — no dirty sessions leak back to the pool)."""
+    from sqlalchemy import text
+
+    from taskq_api.repository.session import transaction
+
+    with pytest.raises(RuntimeError, match="test rollback"):
+        with transaction() as session:
+            session.execute(text("SELECT 1"))
+            raise RuntimeError("test rollback")
