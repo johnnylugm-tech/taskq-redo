@@ -11,24 +11,9 @@
   /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
 
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import ALL as RULE_ALL
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import FRAME as RULE_FRAME
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import HEADER as RULE_HEADER
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import NONE as RULE_NONE
-
+03-development/tests/test_bughunt_runner.py::test_background_runner_writes_task_results_row
 03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10746e3e0>
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1071223e0>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -48,6 +33,22 @@
   Enable tracemalloc to get traceback where the object was allocated.
   See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
     warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import ALL as RULE_ALL
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import FRAME as RULE_FRAME
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import HEADER as RULE_HEADER
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import NONE as RULE_NONE
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 ================================ tests coverage ================================
@@ -84,11 +85,11 @@ TOTAL                                                      887      0   100%
 --------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
 Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_service_get_by_id_p95_under_30ms     105.3330 (1.0)         349.3750 (1.0)      115.5515 (1.0)         15.0447 (1.0)      113.6455 (1.0)       3.9790 (1.0)         31;68        8.6542 (1.0)        1548           1
-test_service_list_p95_under_80ms          652.7080 (6.20)     46,323.7500 (132.59)   816.0382 (7.06)     1,613.0835 (107.22)   740.5625 (6.52)     70.7085 (17.77)        1;35        1.2254 (0.14)        800           1
+test_service_get_by_id_p95_under_30ms     109.7920 (1.0)      20,993.5000 (1.0)      171.0071 (1.0)        726.3035 (1.0)      114.2500 (1.0)       4.7070 (1.0)         6;113        5.8477 (1.0)        1304           1
+test_service_list_p95_under_80ms          641.1660 (5.84)     52,995.8330 (2.52)     845.1595 (4.94)     1,853.6136 (2.55)     761.1250 (6.66)     83.3330 (17.70)        1;32        1.1832 (0.20)        798           1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-242 passed, 6 warnings in 107.20s (0:01:47)
+242 passed, 7 warnings in 114.02s (0:01:54)

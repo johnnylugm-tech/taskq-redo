@@ -11,9 +11,24 @@
   /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
 
-03-development/tests/test_bughunt_runner.py::test_background_runner_writes_task_results_row
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import ALL as RULE_ALL
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import FRAME as RULE_FRAME
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import HEADER as RULE_HEADER
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import NONE as RULE_NONE
+
 03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1092e0ae0>
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10969cae0>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -34,35 +49,19 @@
   See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
     warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
 
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import ALL as RULE_ALL
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import FRAME as RULE_FRAME
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import HEADER as RULE_HEADER
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import NONE as RULE_NONE
-
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 
 --------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
 Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_service_get_by_id_p95_under_30ms     111.1660 (1.0)         524.3330 (1.0)      118.4894 (1.0)         23.3988 (1.0)      115.2500 (1.0)       3.9580 (1.0)         30;66        8.4396 (1.0)        1550           1
-test_service_list_p95_under_80ms          657.5410 (5.91)     42,562.8330 (81.18)    819.0435 (6.91)     1,520.1521 (64.97)    749.4375 (6.50)     60.9590 (15.40)        1;33        1.2209 (0.14)        758           1
+test_service_get_by_id_p95_under_30ms     111.4160 (1.0)         547.7920 (1.0)      116.7306 (1.0)         15.0968 (1.0)      115.5830 (1.0)       3.4163 (1.0)         10;30        8.5667 (1.0)        1325           1
+test_service_list_p95_under_80ms          622.2080 (5.58)     40,526.5000 (73.98)    831.8940 (7.13)     1,451.8475 (96.17)    762.7085 (6.60)     72.4580 (21.21)        1;32        1.2021 (0.14)        756           1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-242 passed, 7 warnings in 125.86s (0:02:05)
+242 passed, 6 warnings in 140.66s (0:02:20)
 --- verify-system: service smoke ---
 service smoke: OK
 --- verify-system: PASS ---
