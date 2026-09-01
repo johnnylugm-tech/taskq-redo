@@ -27,9 +27,16 @@ module is the source-level contract pinned by TEST_SPEC.md FR-05
 case 4; the in-process lock provides the same serialisation
 guarantee (AC-5.4: no over-admit under contention).
 
+[FR-09] Each rejection increments a per-scope counter so
+`/v1/metrics` can surface the "rate-limit reject counts" series
+(SPEC.md §3 FR-09 row 3). Counters live alongside `_BUCKETS` under
+the same lock so a rejection and its counter read are observed
+atomically.
+
 Citations:
   SPEC.md §3 FR-05 (rate limiting whole section, "存於資料庫" clause)
   SPEC.md §9 R12 (race-condition mitigation: row-level lock)
+  SPEC.md §3 FR-09 (rate_limit_rejects metrics series)
   TEST_SPEC.md FR-05 (cases 3 shared-state, 4 row-level lock)
 """
 from __future__ import annotations
@@ -37,6 +44,7 @@ from __future__ import annotations
 import math
 import threading
 import time
+from collections import Counter
 from dataclasses import dataclass
 
 
@@ -82,6 +90,11 @@ class _BucketEntry:
 # dict protected by a single lock so concurrent `RateRepo` instances
 # see the same state (AC-5.3).
 _BUCKETS: dict[str, _BucketEntry] = {}
+# [FR-09] Per-scope reject counters. Incremented inside the same
+# critical section as `_BUCKETS` so a rejection and its counter read
+# cannot race. The /v1/metrics handler exposes this as the
+# `rate_limit_rejects` series (SPEC.md §3 FR-09 row 3).
+_REJECT_COUNTS: Counter[str] = Counter()
 _BUCKETS_LOCK = threading.Lock()
 
 
@@ -165,6 +178,10 @@ class RateRepo:
                 tokens=refilled,
                 last_refill_at=now,
             )
+            # [FR-09] Bump the per-scope reject counter under the same
+            # lock as the bucket write so a metrics read cannot see a
+            # rejection without its counter increment (or vice versa).
+            _REJECT_COUNTS[scope] += 1
             deficit = float(n) - refilled
             retry_after = max(1, math.ceil(deficit / DEFAULT_RATE_PER_SEC))
             return RateDecision(allowed=False, retry_after_seconds=retry_after)
@@ -187,22 +204,36 @@ class RateRepo:
                 return DEFAULT_BURST
             return entry.tokens
 
+    # ----- [FR-09] Reject counter read seam -----
+    def reject_counts(self) -> dict[str, int]:
+        """[FR-09] Return `{scope: reject_count}` for every scope seen.
+
+        The /v1/metrics `rate_limit_rejects` series is built from this
+        snapshot. Read under the same lock as the counter writes so a
+        reject observed here is the same reject observed by the bucket
+        state (atomic rejection + counter bump).
+        """
+        with _BUCKETS_LOCK:
+            return dict(_REJECT_COUNTS)
+
     # ----- Test seam: reset module-level state between tests -----
     @classmethod
     def reset_all(cls) -> None:
         """[FR-05] Drop every persisted bucket row (test-seam only).
 
-        Clears the module-level `_BUCKETS` dict so the next `consume`
-        re-seeds each scope to a full bucket. This is the in-process
-        analog of `TRUNCATE TABLE rate_buckets` — a real SQLAlchemy
+        Clears the module-level `_BUCKETS` dict AND the reject-counter
+        map so the next `consume` re-seeds each scope to a full bucket
+        with a zeroed reject count. This is the in-process analog of
+        `TRUNCATE TABLE rate_buckets` — a real SQLAlchemy
         implementation would expose the same operation via a
         `RateRepo.truncate()` method for the test suite to call
         between cases. NOT exposed on `RateRepo.peek`/`consume` so
         production callers cannot accidentally wipe bucket state.
         """
-        global _BUCKETS
+        global _BUCKETS, _REJECT_COUNTS
         with _BUCKETS_LOCK:
             _BUCKETS = {}
+            _REJECT_COUNTS = Counter()
 
 
 __all__ = ["DEFAULT_BURST", "DEFAULT_RATE_PER_SEC", "RateDecision", "RateRepo"]

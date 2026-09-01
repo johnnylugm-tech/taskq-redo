@@ -36,6 +36,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.engine import Engine
 
 from taskq_api.models.orm import Task, TaskResult
+from taskq_api.repository.rate_repo import RateRepo
 from taskq_api.repository.session import engine, transaction
 
 
@@ -139,30 +140,44 @@ def _latency_percentiles() -> dict:
     if not durations:
         return {"p50": 0, "p90": 0, "p99": 0}
     durations.sort()
-    n = len(durations)
-
-    def pct(p: float) -> int:
-        k = (n - 1) * p
-        f = int(k)
-        c = min(f + 1, n - 1)
-        if f == c:
-            return durations[f]
-        return int(round(durations[f] + (durations[c] - durations[f]) * (k - f)))
-
-    return {"p50": pct(0.5), "p90": pct(0.9), "p99": pct(0.99)}
+    return {
+        "p50": _percentile(durations, 0.5),
+        "p90": _percentile(durations, 0.9),
+        "p99": _percentile(durations, 0.99),
+    }
 
 
-def _rate_limit_rejects() -> dict:
+def _percentile(sorted_values: list[int], p: float) -> int:
+    """Linear-interpolation percentile (NIST / Excel default).
+
+    Assumes `sorted_values` is non-empty and sorted ascending. The
+    `p`-th percentile index is `(n - 1) * p`; integer and fractional
+    parts are linearly interpolated.
+    """
+    n = len(sorted_values)
+    k = (n - 1) * p
+    f = int(k)
+    c = min(f + 1, n - 1)
+    if f == c:
+        return sorted_values[f]
+    return int(
+        round(sorted_values[f] + (sorted_values[c] - sorted_values[f]) * (k - f))
+    )
+
+
+def _rate_limit_rejects(rate_repo: RateRepo = RateRepo()) -> dict:
     """Return the rate-limit reject count series (FR-09 row 3 series 3).
 
-    No reject counter is persisted yet, so the series is exposed
-    as an empty mapping — the schema is stable and downstream
-    tooling can rely on the key's presence.
+    Reads the per-scope reject counter the FR-05 `RateRepo.consume`
+    path increments on every rejected `try_consume` call. The series
+    is exposed as `{scope: count}` so operators can spot which scope
+    is being throttled hardest; an empty dict is returned when no
+    rejection has happened yet (so the series shape stays stable).
     """
-    return {}
+    return rate_repo.reject_counts()
 
 
-def collect_metrics() -> dict:
+def collect_metrics(rate_repo: RateRepo = RateRepo()) -> dict:
     """Return the three FR-09 metrics series as a JSON-serialisable dict.
 
     The handler at `/v1/metrics` returns this dict verbatim; every
@@ -173,7 +188,7 @@ def collect_metrics() -> dict:
     return {
         "task_counts": _task_counts_by_status(),
         "latency_percentiles": _latency_percentiles(),
-        "rate_limit_rejects": _rate_limit_rejects(),
+        "rate_limit_rejects": _rate_limit_rejects(rate_repo),
     }
 
 

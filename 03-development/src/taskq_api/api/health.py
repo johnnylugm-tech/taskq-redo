@@ -6,12 +6,12 @@ auth dependency so that orchestrators (Kubernetes, load balancers,
 uptime probes) can gate traffic without first minting an API key
 (AC-3.7).
 
-[FR-09] `/readyz` now returns 503 when either:
+[FR-09] `/readyz` returns 503 when either:
   * the database probe (`check_db`) reports unreachable, OR
   * the migration probe (`check_migration`) reports behind head.
 
-Both probes live in `taskq_api.service.health`; this module
-re-exports them so the api layer is the canonical seam a
+Both probes live in `taskq_api.service.health`; the api layer
+re-imports them under their public names so the test-suite
 `monkeypatch.setattr(taskq_api.api.health, "check_db", ...)` hits
 the same call site the handler invokes. The api layer translates
 the `(ok, detail)` tuple into a problem+json 503 with the
@@ -34,23 +34,10 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from taskq_api.api.deps import require_scope
-from taskq_api.service.health import (
-    check_db as _check_db,
-    check_migration as _check_migration,
-    collect_metrics,
-)
+from taskq_api.service.health import check_db, check_migration, collect_metrics
 
 
 router = APIRouter(tags=["health"])
-
-
-# Re-export the probe functions at the api layer so the test-suite
-# monkeypatch (`patch.object(taskq_api.api.health, "check_db", ...)`)
-# hits the same call site the `/readyz` handler invokes. The actual
-# probe logic lives in `taskq_api.service.health`; this re-export is
-# the public seam.
-check_db = _check_db
-check_migration = _check_migration
 
 
 @router.get("/healthz")
@@ -63,6 +50,20 @@ def healthz() -> dict:
     unreachable" (the latter surfaces via `/readyz`).
     """
     return {"status": "ok"}
+
+
+def _not_ready(detail: str) -> JSONResponse:
+    """Build the 503 problem+json body for a failed readiness probe (FR-09).
+
+    Centralises the `(status_code=503, application/problem+json)` shape
+    so the two failure branches in `readyz` stay in lockstep with the
+    FR-10 envelope pattern.
+    """
+    return JSONResponse(
+        status_code=503,
+        content={"detail": detail},
+        media_type="application/problem+json",
+    )
 
 
 @router.get("/readyz")
@@ -83,18 +84,10 @@ def readyz():
     """
     db_ok, db_detail = check_db()
     if not db_ok:
-        return JSONResponse(
-            status_code=503,
-            content={"detail": f"db unavailable: {db_detail}"},
-            media_type="application/problem+json",
-        )
+        return _not_ready(f"db unavailable: {db_detail}")
     mig_ok, mig_detail = check_migration()
     if not mig_ok:
-        return JSONResponse(
-            status_code=503,
-            content={"detail": f"migration: {mig_detail}"},
-            media_type="application/problem+json",
-        )
+        return _not_ready(f"migration: {mig_detail}")
     return {"status": "ok"}
 
 
@@ -103,10 +96,7 @@ def readyz():
 # (which carries `/healthz` and `/readyz`) stays exempt from the
 # `require_api_key` dep (AC-3.7 / NFR-02: orchestrator probes at
 # high frequency MUST NOT require a key).
-metrics_router = APIRouter(
-    prefix="/v1",
-    tags=["metrics"],
-)
+metrics_router = APIRouter(prefix="/v1", tags=["metrics"])
 
 
 @metrics_router.get(
