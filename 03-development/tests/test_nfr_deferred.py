@@ -611,7 +611,7 @@ def test_integration_coverage_at_least_80_percent():
     coverage in the flat `03-development/tests/` suite), we fall back to
     the full-suite coverage JSON and assert ≥ 80% as the proxy.
     """
-    artifact = PROJECT_ROOT / ".sessi-work" / "round_1" / "tools" / "coverage.json"
+    artifact = PROJECT_ROOT / ".methodology" / "gate_evidence" / "harness_verification" / "round_1_coverage.json"
     if not artifact.exists():
         pytest.skip("coverage.json not produced in this round")
     data = json.loads(artifact.read_text(encoding="utf-8"))
