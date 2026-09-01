@@ -38,6 +38,7 @@ import asyncio
 import os
 import shlex
 import time
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Awaitable, Callable, Optional
@@ -366,11 +367,27 @@ class BackgroundRunner:
         Sets `STATUS_RUNNING` before invoking the body so the row's
         state mirrors what `_run_subprocess` does for the subprocess
         path (consumed by the drain test).
+
+        After the body returns, appends a `task_results` row so the
+        external-body run is observable via `GET /v1/tasks/{id}/runs`
+        (AC-2.6). The external body is opaque; the row carries
+        `exit_code=None` and empty stdout/stderr tails — concrete
+        subprocess runs go through `_run_subprocess` and carry the
+        captured tails.
         """
         assert self._semaphore is not None
         async with self._semaphore:
             self._repo.set_status(task_id, STATUS_RUNNING)
             await runner_fn(task_id)
+            self._repo.add_result(
+                id=task_id,
+                run_id=str(uuid.uuid4()),
+                exit_code=None,
+                stdout_tail="",
+                stderr_tail="",
+                duration_ms=0,
+                finished_at=datetime.now().isoformat(),
+            )
 
     async def _run_subprocess(self, task_id: str) -> None:
         """Spawn the subprocess for `task_id` with timeout enforcement.
@@ -380,6 +397,11 @@ class BackgroundRunner:
           running → done    : exit code 0
           running → failed  : exit code != 0 OR spawn error
           running → timeout : exceeded TASKQ_TASK_TIMEOUT
+
+        Every terminal branch also appends a `task_results` row so
+        the run is observable via `GET /v1/tasks/{id}/runs` (AC-2.6).
+        `run_id` is minted per invocation; the row's `id` column is
+        the run history primary key (SPEC.md §3 FR-02 paragraph 2).
         """
         assert self._semaphore is not None
         async with self._semaphore:
@@ -387,30 +409,70 @@ class BackgroundRunner:
             if row is None:
                 return
             self._repo.set_status(task_id, STATUS_RUNNING)
+            run_id = str(uuid.uuid4())
             argv = shlex.split(row.command)
+            start = time.monotonic()
             try:
                 proc = await asyncio.create_subprocess_exec(
                     *argv,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
-            except (FileNotFoundError, PermissionError, OSError):
+            except (FileNotFoundError, PermissionError, OSError) as exc:
                 self._repo.set_status(task_id, STATUS_FAILED)
+                self._repo.add_result(
+                    id=task_id,
+                    run_id=run_id,
+                    exit_code=None,
+                    stdout_tail="",
+                    stderr_tail=str(exc),
+                    duration_ms=_elapsed_ms(start),
+                    finished_at=datetime.now().isoformat(),
+                )
                 return
             try:
-                await asyncio.wait_for(
+                stdout, stderr = await asyncio.wait_for(
                     proc.communicate(), timeout=self._task_timeout
                 )
             except asyncio.TimeoutError:
                 await _kill_and_reap(proc)
                 self._repo.set_status(task_id, STATUS_TIMEOUT)
+                self._repo.add_result(
+                    id=task_id,
+                    run_id=run_id,
+                    exit_code=None,
+                    stdout_tail="",
+                    stderr_tail="",
+                    duration_ms=_elapsed_ms(start),
+                    finished_at=datetime.now().isoformat(),
+                )
                 return
-            # `asyncio.CancelledError` is intentionally NOT caught —
-            # cancellation propagates upward per AC-8.5 / NFR-03.
-            if proc.returncode == 0:
-                self._repo.set_status(task_id, STATUS_DONE)
-            else:
-                self._repo.set_status(task_id, STATUS_FAILED)
+            except asyncio.CancelledError:
+                # Parent task cancelled (not timeout) — `wait_for`
+                # cancels its inner `proc.communicate()` but does NOT
+                # kill the subprocess. Kill it so it does not leak
+                # as an orphan (NFR-03). Re-raise so the cancellation
+                # propagates upward per AC-8.5.
+                try:
+                    proc.kill()
+                except ProcessLookupError:
+                    pass
+                raise
+            # `asyncio.CancelledError` is intentionally NOT caught by
+            # a generic `except Exception` — cancellation propagates
+            # upward per AC-8.5 / NFR-03.
+            duration_ms = _elapsed_ms(start)
+            terminal_status = STATUS_DONE if proc.returncode == 0 else STATUS_FAILED
+            self._repo.set_status(task_id, terminal_status)
+            self._repo.add_result(
+                id=task_id,
+                run_id=run_id,
+                exit_code=proc.returncode,
+                stdout_tail=_tail(stdout),
+                stderr_tail=_tail(stderr),
+                duration_ms=duration_ms,
+                finished_at=datetime.now().isoformat(),
+            )
 
     async def shutdown(self) -> None:
         """Graceful drain (AC-8.4).
@@ -446,11 +508,15 @@ class BackgroundRunner:
             )
         except asyncio.TimeoutError:
             for tid, _task in in_flight_snapshot:
-                # The row is still in its `running` state set by
-                # `_gated_external`/`_run_subprocess` because the body
-                # was cancelled mid-flight; promote it to
-                # `STATUS_INTERRUPTED` unconditionally on drain timeout.
-                self._repo.set_status(tid, STATUS_INTERRUPTED)
+                # Only mark interrupted if the row is STILL in
+                # `running`; a task that completed naturally within
+                # the drain window must keep its terminal
+                # `done`/`failed`/`timeout` state. Without this
+                # conditional, the drain would overwrite completed
+                # statuses back to `interrupted`.
+                row = self._repo.get(tid)
+                if row is not None and row.status == STATUS_RUNNING:
+                    self._repo.set_status(tid, STATUS_INTERRUPTED)
             # Let cancelled tasks settle so we don't leak warnings.
             await asyncio.gather(
                 *(t for _, t in in_flight_snapshot), return_exceptions=True
