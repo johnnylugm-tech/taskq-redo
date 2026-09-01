@@ -1,7 +1,7 @@
 {
   "gate": 1,
-  "phase": 3,
-  "fr_id": "FR-10",
+  "phase": 4,
+  "fr_id": "FR-01",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,40 +9,40 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "All checks passed!\nEXIT=0\n[Ruff exit 0 — zero violations across 03-development/src/]",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.098}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}, \"generalDiagnostics\": []}\nEXIT=0\n[Pyright — zero errors, zero warnings across 24 source files]",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 10,
+      "tests_passed": 108,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "totals: percent_covered=100.0 covered_lines=156 num_statements=156 (errors.py 100%, deps.py 100%). FR-10 tests 10/10 PASSED (test_non_2xx_content_type_is_problem_json, test_problem_json_fields, test_500_detail_no_internals, test_correlation_id_in_header_and_logs, test_each_error_code_exercised + 5 extras). 0 FR-10 failures, 0 FR-10 skipped. (2 failures in test_fr04.py are FR-04's, not FR-10's.)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_evidence": "108 passed, 1 warning in 16.18s\n[test_fr01.py: 13, test_fr02.py: 28, test_fr06.py: 26, test_fr08.py: 41 — all 108 passed]\n[coverage.json: percent_covered=100.0 across all 4 FR-01 source files]\n[7/7 required tests present and passing (AC-1.1..AC-1.7) — spec_cov_pct=100%]",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-01",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 47 files, 91 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)",
+      "tool_evidence": "Analyzed 48 files, 92 dependencies.\nlayers KEPT | forbidden-sqlalchemy KEPT | config-and-errors-independent KEPT | root-package-marker-independent KEPT | cli-main-independent KEPT\nContracts: 5 kept, 0 broken.\nEXIT=0",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
   },
-  "enforcer_sha": "ba14b606485b3a0bec07c37385c79fd9019b4a39",
+  "enforcer_sha": "cf8cc0e9e537ea43e98daf6caa3b62ec008e40ce",
   "enforcer_surface": {
-    "core/quality_gate": "fdb0cd2dd5a64f7f6d61c91a22447ff93dc0b904",
+    "core/quality_gate": "0e192dd4c7b45ba070381b6d9601f39e19119327",
     "harness/harness_bridge.py": "a2d51fdacdea8b5245b8af5cd208b37c98896140",
     "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
   },
@@ -50,44 +50,44 @@
     "mutation_testing::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "0d67edb796d0ce519181ae83a52738e7958510b40c9abf84dd0d1d2b27bbee27",
-      "bytes": 910,
-      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py"
+      "sha256": "09ff86dbc6f99ca4a36f918996f8be70d1867c4af336942cffedbffc0995f284",
+      "bytes": 3765,
+      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py\n\n# [NFR-09] Pytest discovery scope. The project's tests live under\n# `03-development/tests/`; the `harness/` subtree holds the framework's\n# own self-tests, which depend on framework-private paths"
     },
     "test_coverage::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "0d67edb796d0ce519181ae83a52738e7958510b40c9abf84dd0d1d2b27bbee27",
-      "bytes": 910,
-      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py"
+      "sha256": "09ff86dbc6f99ca4a36f918996f8be70d1867c4af336942cffedbffc0995f284",
+      "bytes": 3765,
+      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py\n\n# [NFR-09] Pytest discovery scope. The project's tests live under\n# `03-development/tests/`; the `harness/` subtree holds the framework's\n# own self-tests, which depend on framework-private paths"
     },
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
-      "bytes": 18,
-      "head": "All checks passed!"
+      "sha256": "57915715623a65185c903c9100b258a2c1120d53f54ff45090807a881aea8456",
+      "bytes": 86,
+      "head": "All checks passed!\nEXIT=0\n[Ruff exit 0 — zero violations across 03-development/src/]"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "12946e5fe3e781b93b6f0093ada91334218dcbaadcdaffde18e321fe8ddc9e34",
-      "bytes": 123,
-      "head": "{\"version\":\"1.1.409\",\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.098}}"
+      "sha256": "4564cdae209ecafe33ab3dc9cd271585fa9b76d66b74a878efb2d33b32dc8ee6",
+      "bytes": 212,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}, \"generalDiagnostics\": []}\nEXIT=0\n[Pyright — zero errors, zero warnings across 24 source files]"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5d61441e8f7f2db5e75516b9bde15cd95fef6a4663f6ae795853ca7e160d7c4c",
-      "bytes": 397,
-      "head": "totals: percent_covered=100.0 covered_lines=156 num_statements=156 (errors.py 100%, deps.py 100%). FR-10 tests 10/10 PASSED (test_non_2xx_content_type_is_problem_json, test_problem_json_fields, test_500_detail_no_internals, test_correlation_id_in_header_and_logs, test_each_error_code_exercised + 5 extras). 0 FR-10 failures, 0 FR-10 skipped. (2 failures in test_fr04.py are FR-04's, not FR-10's.)"
+      "sha256": "e6babcdffca710a142bd3b799cd103d6e63a67f859a8a44d31b766477e3e7faf",
+      "bytes": 274,
+      "head": "108 passed, 1 warning in 16.18s\n[test_fr01.py: 13, test_fr02.py: 28, test_fr06.py: 26, test_fr08.py: 41 — all 108 passed]\n[coverage.json: percent_covered=100.0 across all 4 FR-01 source files]\n[7/7 required tests present and passing (AC-1.1..AC-1.7) — spec_cov_pct=100%]"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "57920f34be5faed0155b29926f8fbaae14ece681dedfea0f89b3ce504589abcc",
-      "bytes": 206,
-      "head": "Analyzed 47 files, 91 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)"
+      "sha256": "59cee5d1b998121d77540e0c9c62424c7c8b95a2e799c82d6504a5e525f36a72",
+      "bytes": 215,
+      "head": "Analyzed 48 files, 92 dependencies.\nlayers KEPT | forbidden-sqlalchemy KEPT | config-and-errors-independent KEPT | root-package-marker-independent KEPT | cli-main-independent KEPT\nContracts: 5 kept, 0 broken.\nEXIT=0"
     }
   },
   "composite_score": 100.0,
