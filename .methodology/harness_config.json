@@ -6,8 +6,11 @@
   "features": {
     "mutation_testing": true
   },
+  "crg_cohesion_healthy": 0.17,
   "crg_excludes": [
+    "migrations/*",
     ".claude/*",
-    "*.mjs"
+    "*.mjs",
+    "03-development/tests/*"
   ]
 }

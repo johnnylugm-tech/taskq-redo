@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-09-01T18:06:58.430215+00:00",
+  "tool": "mutmut",
+  "survivor_count": 0,
+  "survivors": [],
+  "raw": "To apply a mutant on disk:\n    mutmut apply <id>\n\nTo show a mutant:\n    mutmut show <id>",
+  "reported_total": null
+}

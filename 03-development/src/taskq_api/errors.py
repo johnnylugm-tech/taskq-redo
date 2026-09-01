@@ -224,6 +224,37 @@ def _correlation_id_for(request: Request) -> str:
     return str(getattr(request.state, "correlation_id", "") or "")
 
 
+def _forbidden_instance(path: str) -> str:
+    """[FR-04 / NFR-02] Sanitised instance URI for 403 responses.
+
+    A 403 body MUST NOT disclose whether the requested resource exists
+    (SPEC.md §8 #6). The default `_problem_body` writes `request.url`
+    verbatim, which leaks the resource id (the URL's last path segment)
+    back to the caller. We redact the trailing path segment IFF it
+    looks like a resource id (UUID/ULID/hex token); collection paths
+    (`/v1/tasks`, `/v1/keys`) and bare health endpoints (`/healthz`)
+    pass through unchanged so authorised verbs on a collection are
+    not over-redacted.
+    """
+    import re as _re
+
+    if not path or path == "/":
+        return path or "/"
+    base, _, last = path.rpartition("/")
+    # A resource id is treated as the trailing segment when it
+    # contains at least one dash (UUID4/ULID) OR is a long hex blob
+    # (>=16 chars, all hex). Plain collection names (`tasks`, `keys`,
+    # `runs`) and short verb tokens (`run`) do NOT match, so we
+    # never over-redact a collection-level 403 (e.g. POST /v1/tasks
+    # with insufficient scope).
+    _ID_RE = _re.compile(r"^[0-9a-fA-F]{8,}-|^[0-9a-fA-F]{16,}$")
+    if not last or not _ID_RE.match(last):
+        return path
+    # `base` always non-empty because `path` contains "/"; the
+    # outer `or "/"` only fires for the impossible "no slash" case.
+    return base or "/"
+
+
 def _problem_body(
     request: Request,
     *,
@@ -231,6 +262,8 @@ def _problem_body(
     title: str,
     detail: str,
     type_uri: str = "about:blank",
+    include_correlation_id: bool = True,
+    instance: Optional[str] = None,
 ) -> tuple[dict[str, Any], str]:
     """Build the FR-10 problem+json body dict (AC-10.2).
 
@@ -243,9 +276,15 @@ def _problem_body(
 
     `correlation_id` is taken from `request.state.correlation_id` so
     the body is self-describing even when a proxy strips custom
-    headers (AC-10.2). `instance` is the request URI per RFC 7807
-    §3.1 — "a URI reference that identifies the specific occurrence
-    of the problem".
+    headers (AC-10.2). Callers pass `include_correlation_id=False`
+    to drop the field from the body (the header still carries it)
+    — used for 403 where per-request body data would defeat the
+    NFR-02 "no resource-existence leak" guarantee by making two
+    responses on different ids byte-distinguishable.
+
+    `instance` defaults to the request URI per RFC 7807 §3.1; the
+    403 handler overrides this with the sanitised path so the body
+    is deterministic for any caller-supplied id.
     """
     correlation_id = _correlation_id_for(request)
     body: dict[str, Any] = {
@@ -253,9 +292,10 @@ def _problem_body(
         "title": title,
         "status": status_code,
         "detail": detail,
-        "instance": str(request.url),
-        "correlation_id": correlation_id,
+        "instance": instance if instance is not None else str(request.url),
     }
+    if include_correlation_id:
+        body["correlation_id"] = correlation_id
     return body, correlation_id
 
 
@@ -265,6 +305,8 @@ def _problem_response(
     title: str,
     detail: str,
     type_uri: str = "about:blank",
+    include_correlation_id: bool = True,
+    instance: Optional[str] = None,
 ) -> JSONResponse:
     """Wrap the FR-10 body in an `application/problem+json` JSONResponse.
 
@@ -273,6 +315,13 @@ def _problem_response(
     non-exception paths; setting it here covers the exception paths
     that bypass the middleware's send_wrapper, and the middleware's
     dedup logic prevents double-stamping when both fire.
+
+    `include_correlation_id=False` skips the `correlation_id` field
+    on the body (the header is still stamped) — used by the 403 path
+    to make the body deterministic across different resource ids.
+    `instance` overrides the default request URI in the body's
+    `instance` field — used by the 403 path to redact the requested
+    resource id.
     """
     body, correlation_id = _problem_body(
         request,
@@ -280,6 +329,8 @@ def _problem_response(
         title=title,
         detail=detail,
         type_uri=type_uri,
+        include_correlation_id=include_correlation_id,
+        instance=instance,
     )
     resp = JSONResponse(
         status_code=status_code,
@@ -314,12 +365,21 @@ def install_error_handlers(app: FastAPI) -> None:
             cid,
             exc.title,
         )
+        # [FR-04 / NFR-02] 403 bodies MUST be deterministic across
+        # different resource ids: drop per-request correlation_id from
+        # the body (the header still carries it for AC-10.4) and
+        # replace `instance` with the sanitised path. Without this,
+        # two 403s on different ids differ in both fields and the
+        # discriminator is leaked (SPEC.md §8 #6).
+        is_forbidden = exc.status_code == status.HTTP_403_FORBIDDEN
         resp = _problem_response(
             request=request,
             status_code=exc.status_code,
             title=exc.title,
             detail=exc.detail,
             type_uri=exc.type_uri,
+            include_correlation_id=not is_forbidden,
+            instance=_forbidden_instance(request.url.path) if is_forbidden else None,
         )
         # [FR-05] Copy Retry-After off the exception if present. The
         # attribute only exists on `TooManyRequestsError`; the
@@ -396,6 +456,18 @@ class SuppressServerExceptionReraise:
     def __init__(self, app) -> None:
         self.app = app
 
+    def __getattr__(self, name: str):
+        # Delegate attribute access (e.g. `app.router`, `app.routes`,
+        # `app.state`, `app.dependency_overrides`) to the wrapped
+        # FastAPI instance. This keeps the wrapper transparent for
+        # in-process route introspection — tests that walk
+        # `app.router.routes` to audit the dependency wiring do not
+        # need to know the FastAPI app was wrapped, and Starlette's
+        # `ServerErrorMiddleware` still sees the wrapper as the
+        # outermost ASGI app so its post-handler `raise exc` is
+        # caught by our `__call__` instead of propagating.
+        return getattr(self.app, name)
+
     async def __call__(self, scope, receive, send):
         try:
             await self.app(scope, receive, send)
@@ -406,3 +478,24 @@ class SuppressServerExceptionReraise:
             # test client (or any caller) into thinking no response was
             # produced.
             return
+
+
+def _redact_db_url_password(url: str) -> str:
+    """[NFR-04] Redact password from a DB URL.
+
+    Replaces the password segment in `user:password@host` style URLs with
+    `***`. Returns the input unchanged if no password is present.
+
+    Examples:
+      `postgres://u:hunter2@db/x` → `postgres://u:***@db/x`
+      `sqlite:///./foo.db` → `sqlite:///./foo.db`
+    """
+    import re
+    if not url:
+        return url
+    # Match user:password@ pattern
+    return re.sub(
+        r"(://[^:]+:)[^@]+(@)",
+        r"\1***\2",
+        url,
+    )

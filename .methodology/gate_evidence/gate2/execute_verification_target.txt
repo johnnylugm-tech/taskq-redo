@@ -1,0 +1,20 @@
+  /Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+03-development/tests/integration/test_task_lifecycle_e2e.py::test_task_create_with_write_key_returns_201
+03-development/tests/integration/test_task_lifecycle_e2e.py::test_task_create_validation_returns_422
+03-development/tests/test_fr01.py::test_post_task_validation_violations_returns_422
+03-development/tests/test_fr01.py::test_list_task_limit_above_200_returns_422
+03-development/tests/test_fr01.py::test_post_task_with_injection_character_returns_422
+03-development/tests/test_fr01.py::test_post_task_whitespace_only_name_returns_422
+03-development/tests/test_fr10.py::test_non_2xx_content_type_is_problem_json
+03-development/tests/test_fr10.py::test_problem_json_fields
+03-development/tests/test_fr10.py::test_each_error_code_exercised
+  /Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/site-packages/starlette/_exception_handler.py:59: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    response = await handler(conn, exc)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+211 passed, 4 skipped, 13 warnings in 80.28s (0:01:20)
+--- verify-system: service smoke ---
+service smoke: OK
+--- verify-system: PASS ---

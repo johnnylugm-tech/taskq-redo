@@ -1,0 +1,7 @@
+{
+  "generated_at": "2026-09-02T00:57:00.000000+00:00",
+  "tool": "mutmut",
+  "score": null,
+  "could_not_measure": "mutmut 2.x timed out in multiple attempts (Round 81 R3). Each run started fresh, baseline passed after fixing health_repo.py:92 (`counts: dict[str, int] = None` → `{}`), but the full test suite (211 tests × ~80s) × 254 mutants / 10 parallel workers exceeds the 60-min STALL_TIMEOUTS['mutation'] cap. Observed throughput: 0.5–0.7 mutants/min — full sweep would need ~6 hours. Killed to free the gate; no further data available.",
+  "enforcer_sha": "ba14b606485b3a0bec07c37385c79fd9019b4a39"
+}

@@ -1,0 +1,10 @@
+03-development/src/taskq_api/repository/task_repo.py       106     60    43%   128, 142, 180-202, 206-207, 211-214, 227-232, 249-268, 279-289, 310-325, 349-383, 396-398
+03-development/src/taskq_api/service/__init__.py             0      0   100%
+03-development/src/taskq_api/service/auth.py                 7      0   100%
+03-development/src/taskq_api/service/health.py              47     21    55%   102, 110-114, 124, 136-140, 154-160, 174, 185
+03-development/src/taskq_api/service/ratelimit.py           11      0   100%
+03-development/src/taskq_api/service/runner.py             135     97    28%   113-116, 126-136, 145-179, 201-202, 215, 220, 230-234, 282-298, 308, 334-354, 370-373, 384-413, 430-455, 462-465, 470-473
+03-development/src/taskq_api/service/tasks.py               48     30    38%   54-60, 64-67, 71-74, 83-87, 104-110, 126-132
+--------------------------------------------------------------------------------------
+TOTAL                                                      867    319    63%
+10 passed, 1 warning in 0.60s

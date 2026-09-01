@@ -1,6 +1,6 @@
-# Harness-executed: pytest-cov
+# Harness-executed: system-verification
 # returncode: 0
-# agent_score: 100.0 | threshold: 80.0
+# agent_score: 100.0 | threshold: 100.0
 
 ........................................................................ [ 30%]
 ........................................................................ [ 61%]
@@ -28,38 +28,11 @@
     from prettytable import NONE as RULE_NONE
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-================================ tests coverage ================================
-______________ coverage: platform darwin, python 3.11.15-final-0 _______________
-
-Name                                                     Stmts   Miss  Cover   Missing
---------------------------------------------------------------------------------------
-03-development/src/taskq_api/__init__.py                     0      0   100%
-03-development/src/taskq_api/api/__init__.py                 0      0   100%
-03-development/src/taskq_api/api/deps.py                    36      0   100%
-03-development/src/taskq_api/api/health.py                  23      0   100%
-03-development/src/taskq_api/api/tasks.py                   48      0   100%
-03-development/src/taskq_api/app.py                         28      0   100%
-03-development/src/taskq_api/config.py                       1      0   100%
-03-development/src/taskq_api/errors.py                     139      0   100%
-03-development/src/taskq_api/models/__init__.py              0      0   100%
-03-development/src/taskq_api/models/orm.py                  30      0   100%
-03-development/src/taskq_api/models/schemas.py              37      0   100%
-03-development/src/taskq_api/repository/__init__.py          0      0   100%
-03-development/src/taskq_api/repository/health_repo.py      44      0   100%
-03-development/src/taskq_api/repository/key_repo.py         31      0   100%
-03-development/src/taskq_api/repository/rate_repo.py        53      0   100%
-03-development/src/taskq_api/repository/session.py          48      0   100%
-03-development/src/taskq_api/repository/task_repo.py       106      0   100%
-03-development/src/taskq_api/service/__init__.py             0      0   100%
-03-development/src/taskq_api/service/auth.py                 7      0   100%
-03-development/src/taskq_api/service/health.py              47      0   100%
-03-development/src/taskq_api/service/ratelimit.py           11      0   100%
-03-development/src/taskq_api/service/runner.py             135      0   100%
-03-development/src/taskq_api/service/tasks.py               48      0   100%
---------------------------------------------------------------------------------------
-TOTAL                                                      872      0   100%
-235 passed, 5 warnings in 84.95s (0:01:24)
-/Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1098fa160>
+235 passed, 5 warnings in 90.48s (0:01:30)
+--- verify-system: service smoke ---
+service smoke: OK
+--- verify-system: PASS ---
+/Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10928c720>
 
 Traceback (most recent call last):
   File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__

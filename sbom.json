@@ -1,0 +1,2347 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "components": [
+    {
+      "type": "library",
+      "name": "Authlib",
+      "version": "1.8.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Mako",
+      "version": "1.4.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "MarkupSafe",
+      "version": "3.0.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "PyJWT",
+      "version": "2.12.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "PyYAML",
+      "version": "6.0.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Pygments",
+      "version": "2.21.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "SQLAlchemy",
+      "version": "2.0.36",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "aiofile",
+      "version": "3.12.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "alembic",
+      "version": "1.13.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "annotated-doc",
+      "version": "0.0.5",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "anyio",
+      "version": "4.14.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "attrs",
+      "version": "26.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "backports.tarfile",
+      "version": "1.2.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "banal",
+      "version": "1.1.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "bandit",
+      "version": "1.8.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "beartype",
+      "version": "0.22.9",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "beautifulsoup4",
+      "version": "4.15.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "binaryornot",
+      "version": "0.6.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "boltons",
+      "version": "21.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "boolean.py",
+      "version": "5.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-2-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "bracex",
+      "version": "3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "cachetools",
+      "version": "7.1.7",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "caio",
+      "version": "0.12.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "certifi",
+      "version": "2026.7.22",
+      "licenses": [
+        {
+          "license": {
+            "name": "Mozilla Public License 2.0 (MPL 2.0)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "cffi",
+      "version": "2.1.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "chardet",
+      "version": "7.6.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "charset-normalizer",
+      "version": "3.5.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "click",
+      "version": "8.5.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "click-option-group",
+      "version": "0.5.9",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "code-review-graph",
+      "version": "2.3.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "colorama",
+      "version": "0.4.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "commoncode",
+      "version": "32.5.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "container-inspector",
+      "version": "33.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "coverage",
+      "version": "7.16.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "cryptography",
+      "version": "50.0.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "cyclopts",
+      "version": "4.23.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "debian_inspector",
+      "version": "31.1.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0 AND BSD-3-Clause AND MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "dnspython",
+      "version": "2.8.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "ISC License (ISCL)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "dockerfile-parse",
+      "version": "2.0.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "docstring_parser",
+      "version": "0.18.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "dparse2",
+      "version": "0.7.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "email-validator",
+      "version": "2.3.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "The Unlicense (Unlicense)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "exceptiongroup",
+      "version": "1.2.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "extractcode",
+      "version": "31.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "extractcode-7z",
+      "version": "16.5.210525",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "extractcode-libarchive",
+      "version": "3.5.1.210525",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "face",
+      "version": "26.0.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fastapi",
+      "version": "0.115.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fasteners",
+      "version": "0.20",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fastmcp",
+      "version": "3.4.7",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fastmcp-slim",
+      "version": "3.4.7",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "fingerprints",
+      "version": "1.3.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ftfy",
+      "version": "6.3.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "gemfileparser2",
+      "version": "0.9.4",
+      "licenses": [
+        {
+          "license": {
+            "name": "GPL-3.0-or-later OR MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "glob2",
+      "version": "0.7",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "glom",
+      "version": "25.12.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "googleapis-common-protos",
+      "version": "1.75.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "griffelib",
+      "version": "2.2.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "grimp",
+      "version": "3.16",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "h11",
+      "version": "0.16.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "html5lib",
+      "version": "1.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "httpx",
+      "version": "0.27.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "httpx-sse",
+      "version": "0.4.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "idna",
+      "version": "3.19",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "igraph",
+      "version": "1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU General Public License (GPL)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "import-linter",
+      "version": "1.12.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "importlib_metadata",
+      "version": "8.7.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "iniconfig",
+      "version": "2.3.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "intbitset",
+      "version": "4.1.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU Lesser General Public License v3 or later (LGPLv3+)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jaraco.classes",
+      "version": "3.4.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jaraco.context",
+      "version": "6.1.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jaraco.functools",
+      "version": "4.6.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "javaproperties",
+      "version": "0.8.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "joserfc",
+      "version": "1.7.5",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jsonref",
+      "version": "1.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jsonschema",
+      "version": "4.25.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jsonschema-path",
+      "version": "0.5.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "jsonstreams",
+      "version": "0.6.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "junit-xml",
+      "version": "1.9",
+      "licenses": [
+        {
+          "license": {
+            "name": "Freely Distributable; MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "keyring",
+      "version": "25.7.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "librt",
+      "version": "0.15.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "license-expression",
+      "version": "30.4.4",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "lxml",
+      "version": "6.1.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "mando",
+      "version": "0.7.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "markdown-it-py",
+      "version": "4.2.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "mcp",
+      "version": "1.29.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "mdurl",
+      "version": "0.1.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "more-itertools",
+      "version": "11.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "mutmut",
+      "version": "2.5.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "mypy",
+      "version": "1.19.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "mypy_extensions",
+      "version": "1.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "networkx",
+      "version": "3.6.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "nodeenv",
+      "version": "1.10.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "normality",
+      "version": "3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "openapi-pydantic",
+      "version": "0.5.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-api",
+      "version": "1.37.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-exporter-otlp-proto-common",
+      "version": "1.37.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-exporter-otlp-proto-http",
+      "version": "1.37.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-instrumentation",
+      "version": "0.58b0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-instrumentation-requests",
+      "version": "0.58b0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-instrumentation-threading",
+      "version": "0.58b0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-proto",
+      "version": "1.37.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-sdk",
+      "version": "1.37.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-semantic-conventions",
+      "version": "0.58b0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "opentelemetry-util-http",
+      "version": "0.58b0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "packageurl-python",
+      "version": "0.17.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "packaging",
+      "version": "26.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "packvers",
+      "version": "21.5",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License; BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "parameter-expansion-patched",
+      "version": "0.3.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "parso",
+      "version": "0.8.7",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pathable",
+      "version": "0.6.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pathspec",
+      "version": "1.1.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Mozilla Public License 2.0 (MPL 2.0)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pdfminer.six",
+      "version": "20260107",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "peewee",
+      "version": "3.19.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pefile",
+      "version": "2024.8.26",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pip-requirements-parser",
+      "version": "32.0.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pkginfo2",
+      "version": "30.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "platformdirs",
+      "version": "4.11.5",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pluggy",
+      "version": "1.6.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "plugincode",
+      "version": "32.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ply",
+      "version": "3.11",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pony",
+      "version": "0.7.20",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "protobuf",
+      "version": "6.33.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "3-Clause BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "publicsuffix2",
+      "version": "2.20191221",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License; Mozilla Public License 2.0 (MPL 2.0)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "py-cpuinfo",
+      "version": "9.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "py-key-value-aio",
+      "version": "0.4.5",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pyahocorasick",
+      "version": "2.3.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause and Public-Domain"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pycparser",
+      "version": "3.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pydantic",
+      "version": "2.9.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pydantic-settings",
+      "version": "2.15.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pydantic_core",
+      "version": "2.23.4",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pygmars",
+      "version": "1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pyicu",
+      "version": "2.16.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pymaven-patch",
+      "version": "0.3.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pyparsing",
+      "version": "3.3.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pyperclip",
+      "version": "1.11.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pyright",
+      "version": "1.1.409",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pytest",
+      "version": "8.4.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pytest-benchmark",
+      "version": "4.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "pytest-cov",
+      "version": "7.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "python-dotenv",
+      "version": "1.2.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "python-multipart",
+      "version": "0.0.32",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "radon",
+      "version": "6.0.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "rdflib",
+      "version": "7.6.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "referencing",
+      "version": "0.37.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "requests",
+      "version": "2.34.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "rich",
+      "version": "15.0.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "rich-rst",
+      "version": "2.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "rpds-py",
+      "version": "2026.6.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ruamel.yaml",
+      "version": "0.19.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ruamel.yaml.clib",
+      "version": "0.2.15",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ruff",
+      "version": "0.15.13",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "saneyaml",
+      "version": "0.6.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "scancode-toolkit",
+      "version": "32.4.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0 AND CC-BY-4.0 AND LicenseRef-scancode-other-permissive AND LicenseRef-scancode-other-copyleft"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "semantic-version",
+      "version": "2.10.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "semgrep",
+      "version": "1.165.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "six",
+      "version": "1.17.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sniffio",
+      "version": "1.3.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License; MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "soupsieve",
+      "version": "2.9.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "spdx-tools",
+      "version": "0.8.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sse-starlette",
+      "version": "3.4.8",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "starlette",
+      "version": "0.38.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "stevedore",
+      "version": "5.9.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "text-unidecode",
+      "version": "1.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Artistic License; GNU General Public License (GPL); GNU General Public License v2 or later (GPLv2+)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "texttable",
+      "version": "1.7.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "toml",
+      "version": "0.10.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tomli",
+      "version": "2.4.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tree-sitter",
+      "version": "0.25.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tree-sitter-c-sharp",
+      "version": "0.23.5",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tree-sitter-embedded-template",
+      "version": "0.25.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tree-sitter-javascript",
+      "version": "0.25.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tree-sitter-language-pack",
+      "version": "0.13.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tree-sitter-typescript",
+      "version": "0.23.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tree-sitter-yaml",
+      "version": "0.7.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "typecode",
+      "version": "30.2.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "typecode-libmagic",
+      "version": "5.39.210223",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "typing-inspection",
+      "version": "0.4.4",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "typing_extensions",
+      "version": "4.16.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "uncalled-for",
+      "version": "0.4.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "uritools",
+      "version": "6.1.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "urllib3",
+      "version": "2.7.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "urlpy",
+      "version": "0.5",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "uvicorn",
+      "version": "0.32.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "watchdog",
+      "version": "5.0.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache Software License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "watchfiles",
+      "version": "1.2.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "wcmatch",
+      "version": "8.5.2",
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "webencodings",
+      "version": "0.6.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "websockets",
+      "version": "17.1",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "wrapt",
+      "version": "1.17.3",
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "xmltodict",
+      "version": "1.0.4",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "zipp",
+      "version": "4.1.0",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNKNOWN"
+          }
+        }
+      ]
+    }
+  ]
+}

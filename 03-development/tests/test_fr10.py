@@ -54,6 +54,7 @@ from taskq_api.errors import (
     CORRELATION_ID_HEADER,
     CorrelationIdMiddleware,
     _extract_inbound_correlation_id,
+    _forbidden_instance,
 )
 
 # SAB binding — GREEN must wire these module paths on disk:
@@ -679,3 +680,26 @@ def test_correlation_id_middleware_passes_non_http_scope_through():
         f"expected forwarded scope to preserve its 'lifespan' type; "
         f"got {received_scopes[0]!r}"
     )
+
+
+# ----- FR-04 / NFR-02 helper coverage ---------------------------------
+
+
+def test_forbidden_instance_strips_resource_id():
+    """[FR-04 / NFR-02] `_forbidden_instance` masks the trailing path
+    segment so two 403s on different ids produce byte-identical bodies.
+
+    The 403 problem handler calls this helper to redact the requested
+    resource id from the body's `instance` field — a `/v1/tasks/{id}`
+    request becomes `/v1/tasks` in the response. Collection-level
+    requests (`/v1/tasks` with no trailing segment) collapse to the
+    same value.
+    """
+    assert _forbidden_instance("/v1/tasks/11111111-1111-1111-1111-111111111111") == "/v1/tasks"
+    assert _forbidden_instance("/v1/tasks/22222222-2222-2222-2222-222222222222") == "/v1/tasks"
+    assert _forbidden_instance("/v1/tasks") == "/v1/tasks"
+    # Edge: empty path falls back to "/" so the helper is total even
+    # for malformed requests (the production call site passes
+    # `request.url.path` which is always non-empty for HTTP).
+    assert _forbidden_instance("") == "/"
+    assert _forbidden_instance("/") == "/"
