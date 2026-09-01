@@ -87,19 +87,8 @@ class CorrelationIdMiddleware:
         # on `scope["state"]` so `request.state.correlation_id` resolves
         # to the same id downstream (FastAPI populates `request.state`
         # from `scope["state"]`).
-        headers = scope.get("headers", [])
-        cid: Optional[str] = None
-        for raw_name, raw_value in headers:
-            if raw_name.lower() == CORRELATION_ID_HEADER.lower().encode():
-                try:
-                    cid = raw_value.decode("latin-1")
-                except UnicodeDecodeError:
-                    cid = None
-                break
-        if not cid:
-            cid = str(uuid.uuid4())
-        state = scope.setdefault("state", {})
-        state["correlation_id"] = cid
+        cid = _extract_inbound_correlation_id(scope.get("headers", [])) or str(uuid.uuid4())
+        scope.setdefault("state", {})["correlation_id"] = cid
 
         async def send_wrapper(message):
             if message["type"] == "http.response.start":
@@ -121,19 +110,43 @@ class CorrelationIdMiddleware:
         await self.app(scope, receive, send_wrapper)
 
 
+def _extract_inbound_correlation_id(headers: list[tuple[bytes, bytes]]) -> Optional[str]:
+    """Return the inbound X-Correlation-Id header value, or None.
+
+    Decoded as `latin-1` because HTTP/1.1 headers are byte-oriented
+    but Starlette stores them as `bytes`; `latin-1` is the standard
+    1:1 byte→str mapping for ASCII-clean header values and round-trips
+    losslessly when re-encoded on the response side. Returns `None`
+    for missing or non-decodable values so the caller can mint a
+    fresh UUID4 in either case.
+    """
+    key = CORRELATION_ID_HEADER.lower().encode()
+    for raw_name, raw_value in headers:
+        if raw_name.lower() == key:
+            try:
+                return raw_value.decode("latin-1")
+            except UnicodeDecodeError:
+                return None
+    return None
+
+
 class ProblemException(Exception):
     """Base for RFC 7807 error envelope (FR-10).
 
     Subclasses carry the status code + title; detail is supplied by the
     raise site. The type URI defaults to `about:blank` (RFC 7807 §4.2).
+    `_default_detail` is the user-facing string the handler emits when
+    the raise site omits one — co-located with `status_code` so each
+    subclass owns its own error contract.
     """
 
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
     title: str = "Internal Server Error"
     type_uri: str = "about:blank"
+    _default_detail: str = "internal server error"
 
     def __init__(self, detail: str = "") -> None:
-        self.detail = detail or _DEFAULT_DETAIL.get(self.status_code, "")
+        self.detail = detail or self._default_detail
         super().__init__(self.detail)
 
 
@@ -141,30 +154,44 @@ class UnauthorizedError(ProblemException):
     status_code = status.HTTP_401_UNAUTHORIZED
     title = "Unauthorized"
     type_uri = "about:blank"
+    _default_detail = "missing or invalid api key"
 
 
 class ForbiddenError(ProblemException):
     status_code = status.HTTP_403_FORBIDDEN
     title = "Forbidden"
     type_uri = "about:blank"
+    _default_detail = "insufficient scope"
 
 
 class NotFoundError(ProblemException):
     status_code = status.HTTP_404_NOT_FOUND
     title = "Not Found"
     type_uri = "about:blank"
+    _default_detail = "resource not found"
 
 
 class ConflictError(ProblemException):
     status_code = status.HTTP_409_CONFLICT
     title = "Conflict"
     type_uri = "about:blank"
+    _default_detail = "resource conflict"
 
 
 class BadRequestError(ProblemException):
     status_code = status.HTTP_400_BAD_REQUEST
     title = "Bad Request"
     type_uri = "about:blank"
+    _default_detail = "bad request"
+
+
+class ServiceUnavailableError(ProblemException):
+    """[FR-09] 503 — readiness-probe failure (DB down / migration behind head)."""
+
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    title = "Service Unavailable"
+    type_uri = "about:blank"
+    _default_detail = "service unavailable"
 
 
 # [FR-05] 429 — the body is the FR-10 problem+json envelope, the
@@ -175,6 +202,7 @@ class TooManyRequestsError(ProblemException):
     status_code = status.HTTP_429_TOO_MANY_REQUESTS
     title = "Too Many Requests"
     type_uri = "about:blank"
+    _default_detail = "rate limit exceeded"
 
     def __init__(
         self,
@@ -188,50 +216,6 @@ class TooManyRequestsError(ProblemException):
         self.retry_after_seconds: int = max(1, int(retry_after_seconds))
 
 
-_DEFAULT_DETAIL: dict[int, str] = {
-    400: "bad request",
-    401: "missing or invalid api key",
-    403: "insufficient scope",
-    404: "resource not found",
-    409: "resource conflict",
-    422: "request failed validation",
-    429: "rate limit exceeded",
-    500: "internal server error",
-}
-
-
-def _problem_response(
-    status_code: int,
-    title: str,
-    detail: str,
-    correlation_id: str = "",
-    type_uri: str = "about:blank",
-    instance: str = "",
-) -> JSONResponse:
-    """Build an `application/problem+json` response (FR-10 body shape).
-
-    The body has EXACTLY the six FR-10 fields
-    (`type`, `title`, `status`, `detail`, `instance`,
-    `correlation_id`) — AC-10.2 / SPEC.md §3 FR-10 paragraph 1.
-    `correlation_id` is the per-request id from
-    `request.state.correlation_id` so the body is self-describing
-    even when a proxy strips custom headers (AC-10.2).
-    """
-    body: dict[str, Any] = {
-        "type": type_uri,
-        "title": title,
-        "status": status_code,
-        "detail": detail,
-        "instance": instance,
-        "correlation_id": correlation_id,
-    }
-    return JSONResponse(
-        status_code=status_code,
-        content=body,
-        media_type="application/problem+json",
-    )
-
-
 def _correlation_id_for(request: Request) -> str:
     """Return the per-request correlation_id stamped by the middleware.
 
@@ -240,6 +224,73 @@ def _correlation_id_for(request: Request) -> str:
     middleware ahead of the router so every request carries an id).
     """
     return str(getattr(request.state, "correlation_id", "") or "")
+
+
+def _problem_body(
+    request: Request,
+    *,
+    status_code: int,
+    title: str,
+    detail: str,
+    type_uri: str = "about:blank",
+) -> tuple[dict[str, Any], str]:
+    """Build the FR-10 problem+json body dict (AC-10.2).
+
+    The body has EXACTLY the six FR-10 fields
+    (`type`, `title`, `status`, `detail`, `instance`,
+    `correlation_id`) — SPEC.md §3 FR-10 paragraph 1. Returns the
+    body dict AND the correlation_id so callers can stamp the same
+    id on the response header / log line without re-reading it from
+    `request.state`.
+
+    `correlation_id` is taken from `request.state.correlation_id` so
+    the body is self-describing even when a proxy strips custom
+    headers (AC-10.2). `instance` is the request URI per RFC 7807
+    §3.1 — "a URI reference that identifies the specific occurrence
+    of the problem".
+    """
+    correlation_id = _correlation_id_for(request)
+    body: dict[str, Any] = {
+        "type": type_uri,
+        "title": title,
+        "status": status_code,
+        "detail": detail,
+        "instance": str(request.url),
+        "correlation_id": correlation_id,
+    }
+    return body, correlation_id
+
+
+def _problem_response(
+    request: Request,
+    status_code: int,
+    title: str,
+    detail: str,
+    type_uri: str = "about:blank",
+) -> JSONResponse:
+    """Wrap the FR-10 body in an `application/problem+json` JSONResponse.
+
+    The `X-Correlation-Id` response header is stamped directly on the
+    JSONResponse (AC-10.4). The middleware also stamps it on
+    non-exception paths; setting it here covers the exception paths
+    that bypass the middleware's send_wrapper, and the middleware's
+    dedup logic prevents double-stamping when both fire.
+    """
+    body, correlation_id = _problem_body(
+        request,
+        status_code=status_code,
+        title=title,
+        detail=detail,
+        type_uri=type_uri,
+    )
+    resp = JSONResponse(
+        status_code=status_code,
+        content=body,
+        media_type="application/problem+json",
+    )
+    if correlation_id:
+        resp.headers[CORRELATION_ID_HEADER] = correlation_id
+    return resp
 
 
 def install_error_handlers(app: FastAPI) -> None:
@@ -266,21 +317,12 @@ def install_error_handlers(app: FastAPI) -> None:
             exc.title,
         )
         resp = _problem_response(
+            request=request,
             status_code=exc.status_code,
             title=exc.title,
             detail=exc.detail,
             type_uri=exc.type_uri,
-            correlation_id=cid,
         )
-        # [FR-10 / AC-10.4] Stamp the X-Correlation-Id response header
-        # directly on the response. The ASGI middleware does the same
-        # for non-exception paths, but exception responses are routed
-        # back through FastAPI's exception handler (which builds a
-        # fresh JSONResponse), bypassing the middleware's send_wrapper
-        # for some ASGI dispatch orders. Setting the header here makes
-        # the contract robust regardless of middleware order.
-        if cid:
-            resp.headers[CORRELATION_ID_HEADER] = cid
         # [FR-05] Copy Retry-After off the exception if present. The
         # attribute only exists on `TooManyRequestsError`; the
         # `getattr(..., None)` default keeps the base handler usable
@@ -299,16 +341,12 @@ def install_error_handlers(app: FastAPI) -> None:
         logger.warning(
             "fr10 validation rejection: correlation_id=%s", cid
         )
-        resp = _problem_response(
+        return _problem_response(
+            request=request,
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             title="Validation Error",
             detail="request body or parameters failed validation",
-            type_uri="about:blank",
-            correlation_id=cid,
         )
-        if cid:
-            resp.headers[CORRELATION_ID_HEADER] = cid
-        return resp
 
     @app.exception_handler(Exception)
     async def _generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
@@ -328,16 +366,12 @@ def install_error_handlers(app: FastAPI) -> None:
         logger.exception(
             "fr10 unhandled exception: correlation_id=%s", cid
         )
-        resp = _problem_response(
+        return _problem_response(
+            request=request,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             title="Internal Server Error",
-            detail=_DEFAULT_DETAIL[500],
-            type_uri="about:blank",
-            correlation_id=cid,
+            detail=ProblemException._default_detail,
         )
-        if cid:
-            resp.headers[CORRELATION_ID_HEADER] = cid
-        return resp
 
 
 class SuppressServerExceptionReraise:
