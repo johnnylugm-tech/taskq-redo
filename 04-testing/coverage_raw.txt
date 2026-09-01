@@ -1,0 +1,218 @@
+........................................................................ [ 30%]
+....................FF.................................................. [ 61%]
+........................................................................ [ 91%]
+....................                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_burst_over_limit_returns_429_with_retry_after ______________
+
+client = <starlette.testclient.TestClient object at 0x10b734150>
+write_api_key = 'fr01-test-write-key-aaaa'
+
+    def test_burst_over_limit_returns_429_with_retry_after(client, write_api_key):
+        """AC-5.1 — exceeding TASKQ_RATE_BURST yields 429 + Retry-After.
+    
+        Sub-assertions: FR05-burst-over-capacity, FR05-status-429,
+        FR05-retry-after-header-present, FR05-burst-capacity-value.
+        # NP-03 (rate limit 429) — the canonical verifier of FR-05 boundary
+        #   behaviour (TEST_SPEC.md FR-05 case 1, Inputs: burst_count=21,
+        #   burst_capacity=20, expected_status=429, expected_header=Retry-After).
+        # NFR-02 security — the 429 body MUST be the fixed RFC 7807
+        #   envelope (TRACEABILITY_MATRIX.md §FR↔NFR row NFR-02:
+        #   cross-references FR-02 / FR-03 / FR-04 / FR-10); `detail`
+        #   MUST NOT echo internal state such as the bucket row id or
+        #   current token count.
+        # NFR-05 documentation — every public symbol under `taskq_api.*`
+        #   carries an `[FR-XX]`/`[NFR-XX]` tag (TRACEABILITY_MATRIX.md
+        #   §FR↔NFR row NFR-05: cross-references FR-01..FR-10); this
+        #   test pins the `rate_limit` dep / `consume` / `take_token`
+        #   contract that the docstrings encode.
+        # NFR-06 layering — `taskq_api.api.deps.rate_limit` is the
+        #   api-layer seam; service and repository layers stay below it
+        #   per `.importlinter` (`api > service > repository > models`).
+        # NFR-10 integration_coverage — full HTTP cycle through ASGITransport
+        #   including the rate-limit decision and problem+json envelope.
+        # SPEC.md §3 FR-05 paragraph 1: "Over limit → HTTP 429 + problem+json
+        #   + Retry-After header (seconds)".
+        # SPEC.md §8 #9 (burst test in acceptance bullets).
+    
+        The TEST_SPEC inputs fix `burst_count=21`, `burst_capacity=20`:
+        exactly one more request than the bucket holds. We send N+1
+        requests against POST /v1/tasks (write scope, single handler) and
+        assert the N+1-th response is 429 with a problem+json body and a
+        `Retry-After` header carrying a positive integer second count.
+    
+        GREEN TODO: the api/router layer must call
+        `taskq_api.service.ratelimit` (via `taskq_api.api.deps`) for every
+        request other than `/healthz` and `/readyz`; the dep returns a
+        429 problem+json response when the bucket cannot grant a token.
+        """
+        burst_capacity = 20
+        over_burst = burst_capacity + 1  # = 21
+    
+        statuses: list[int] = []
+        last_response = None
+        for i in range(over_burst):
+            resp = client.post(
+                "/v1/tasks",
+                headers={"X-API-Key": write_api_key},
+                json={
+                    "command": "echo burst",
+                    "name": f"fr05-burst-{i:02d}",
+                },
+            )
+            statuses.append(resp.status_code)
+            last_response = resp
+    
+        # Exactly one request over the burst — the LAST one — must be 429.
+        # Earlier requests may legitimately 201 (bucket granted) OR fail
+        # for unrelated reasons (e.g. duplicate name in same run); the
+        # binding assertion is the 429 on the over-burst request.
+>       assert statuses[-1] == 429, (
+            f"expected the request over TASKQ_RATE_BURST={burst_capacity} "
+            f"to return 429; got {statuses[-1]}; all statuses={statuses!r}"
+        )
+E       AssertionError: expected the request over TASKQ_RATE_BURST=20 to return 429; got 201; all statuses=[201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201]
+E       assert 201 == 429
+
+03-development/tests/test_fr05.py:153: AssertionError
+____________________ test_rate_limit_recovers_after_refill _____________________
+
+client = <starlette.testclient.TestClient object at 0x10b6e8d10>
+write_api_key = 'fr01-test-write-key-aaaa'
+
+    def test_rate_limit_recovers_after_refill(client, write_api_key):
+        """AC-5.2 — after refill at TASKQ_RATE_PER_SEC, requests succeed.
+    
+        Sub-assertions: none directly (case 2 carries the refill invariant).
+        # NP-03 (rate limit 429) — happy-path complement to AC-5.1: the
+        #   bucket must allow traffic again after the refill window elapses.
+        #   TEST_SPEC.md FR-05 case 2 Inputs: rate_per_sec=5.0, burst=20,
+        #   refill_seconds=4 → 4 seconds of refill repays ≥ 20 tokens (one
+        #   full bucket at the declared rate).
+        # NFR-03 reliability — refill math must live inside the same
+        #   transaction+row-level-lock as the consume (TRACEABILITY_MATRIX.md
+        #   §FR↔NFR row NFR-03: cross-references FR-06 / FR-07 / FR-08 /
+        #   FR-09); a refill computed outside the lock would race the
+        #   consume path and admit stale capacity.
+        # NFR-06 layering — the refill computation lives in
+        #   `taskq_api.service.ratelimit` (service layer) per the
+        #   `.importlinter` contract `api > service > repository > models`.
+        # SPEC.md §3 FR-05 paragraph 1: "After the bucket refills at
+        #   TASKQ_RATE_PER_SEC, requests succeed again".
+    
+        Strategy:
+          1. Exhaust the bucket (burst + 1 requests → final 429 captured).
+          2. Sleep for the refill window declared by TEST_SPEC (`refill_seconds=4`).
+          3. Issue one more request; it MUST NOT be 429 (i.e. the bucket
+             has refilled enough to admit at least one new token).
+    
+        GREEN TODO: `taskq_api.service.ratelimit.TokenBucket` must derive
+        `retry_after = ceil((tokens_requested - available) / RATE_PER_SEC)`;
+        `RateRepo.consume` must compute the new bucket level as
+        `min(capacity, old_level + (now - last_refill_at) * RATE_PER_SEC)`
+        inside the same `with_for_update` transaction that subtracts the
+        consumed token(s).
+        """
+        import time as _time
+    
+        burst_capacity = 20
+    
+        # 1. Exhaust the bucket.
+        final_status: int | None = None
+        for i in range(burst_capacity + 1):
+            resp = client.post(
+                "/v1/tasks",
+                headers={"X-API-Key": write_api_key},
+                json={
+                    "command": "echo refill",
+                    "name": f"fr05-refill-{i:02d}",
+                },
+            )
+            final_status = resp.status_code
+    
+>       assert final_status == 429, (
+            f"precondition failed: burst-exhaustion phase must end with a "
+            f"429; got {final_status}"
+        )
+E       AssertionError: precondition failed: burst-exhaustion phase must end with a 429; got 201
+E       assert 201 == 429
+
+03-development/tests/test_fr05.py:234: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+03-development/tests/test_fr10.py::test_non_2xx_content_type_is_problem_json
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x108af27a0>
+  
+  Traceback (most recent call last):
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
+      self.close()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 104, in close
+      proto.pipe.close()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/unix_events.py", line 566, in close
+      self._close(None)
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/unix_events.py", line 590, in _close
+      self._loop.call_soon(self._call_connection_lost, exc)
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+      self._check_closed()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import ALL as RULE_ALL
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import FRAME as RULE_FRAME
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import HEADER as RULE_HEADER
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import NONE as RULE_NONE
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+______________ coverage: platform darwin, python 3.11.15-final-0 _______________
+
+Name                                                     Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                     0      0   100%
+03-development/src/taskq_api/api/__init__.py                 0      0   100%
+03-development/src/taskq_api/api/deps.py                    36      0   100%
+03-development/src/taskq_api/api/health.py                  23      0   100%
+03-development/src/taskq_api/api/tasks.py                   48      0   100%
+03-development/src/taskq_api/app.py                         28      0   100%
+03-development/src/taskq_api/config.py                       1      0   100%
+03-development/src/taskq_api/errors.py                     139      0   100%
+03-development/src/taskq_api/models/__init__.py              0      0   100%
+03-development/src/taskq_api/models/orm.py                  30      0   100%
+03-development/src/taskq_api/models/schemas.py              37      0   100%
+03-development/src/taskq_api/repository/__init__.py          0      0   100%
+03-development/src/taskq_api/repository/health_repo.py      44      0   100%
+03-development/src/taskq_api/repository/key_repo.py         31      0   100%
+03-development/src/taskq_api/repository/rate_repo.py        53      0   100%
+03-development/src/taskq_api/repository/session.py          48      0   100%
+03-development/src/taskq_api/repository/task_repo.py       106      0   100%
+03-development/src/taskq_api/service/__init__.py             0      0   100%
+03-development/src/taskq_api/service/auth.py                 7      0   100%
+03-development/src/taskq_api/service/health.py              47      0   100%
+03-development/src/taskq_api/service/ratelimit.py           11      0   100%
+03-development/src/taskq_api/service/runner.py             135      0   100%
+03-development/src/taskq_api/service/tasks.py               48      0   100%
+--------------------------------------------------------------------------------------
+TOTAL                                                      872      0   100%
+=========================== short test summary info ============================
+FAILED 03-development/tests/test_fr05.py::test_burst_over_limit_returns_429_with_retry_after
+FAILED 03-development/tests/test_fr05.py::test_rate_limit_recovers_after_refill
+2 failed, 234 passed, 6 warnings in 112.15s (0:01:52)
