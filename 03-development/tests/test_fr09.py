@@ -515,3 +515,160 @@ def test_transaction_rolls_back_on_exception():
         with transaction() as session:
             session.execute(text("SELECT 1"))
             raise RuntimeError("test rollback")
+
+
+# ---------------------------------------------------------------------------
+# repository/health_repo.py coverage tests — exercise the SQL-touching helpers
+# the api-level tests reach only via `service/health` stubs. These tests call
+# the underlying repository helpers directly so the FR-09 readiness /
+# metrics logic is covered end-to-end (TEST_SPEC.md FR-09 cross-cut + FR-06
+# layer-hygiene cross-check: repository is the only layer that may hold the
+# SQL surface, so the SQL statements live here and must be covered here).
+# ---------------------------------------------------------------------------
+
+
+# ----- repository/health_repo.py : db_reachable exception path (lines 51-52)
+
+
+def test_db_reachable_returns_failure_when_select_raises():
+    """AC-9.2 — `db_reachable` returns `(False, "database unreachable: <Exc>")`
+    when `target.connect()` raises (SPEC.md §3 FR-09 row 2 + §8 #10:
+    `database unreachable: <ExcClass>` is the operator-visible detail; the
+    exception class name is safe to expose — exception args / traceback are
+    not, per NFR-04 no-internal-detail-leakage).
+
+    The path is the in-process seam the `/readyz` 503 path is wired to via
+    `taskq_api.service.health.check_db → health_repo.db_reachable`.
+    """
+    from taskq_api.repository.health_repo import db_reachable
+
+    class _BrokenTarget:
+        """Stand-in engine whose `connect()` raises — exercises the
+        `except Exception` branch on line 51-52 (no real DB needed)."""
+
+        def connect(self):
+            raise RuntimeError("DB is down")
+
+    ok, detail = db_reachable(_BrokenTarget())
+    assert ok is False
+    assert "database unreachable" in detail
+    assert "RuntimeError" in detail
+
+
+def test_db_reachable_returns_true_when_select_succeeds():
+    """AC-9.4 — `db_reachable` returns `(True, "database reachable")` when
+    the engine answers `SELECT 1` (the happy path; covers lines 47-50).
+    """
+    from taskq_api.repository.health_repo import db_reachable
+
+    ok, detail = db_reachable()
+    assert ok is True
+    assert detail == "database reachable"
+
+
+# ----- repository/health_repo.py : alembic_current_revision (lines 57-62)
+
+
+def test_alembic_current_revision_returns_none_when_no_version_table():
+    """AC-9.3 / AC-9.4 — `alembic_current_revision(engine)` returns `None`
+    when the alembic_version table is absent (the test SQLite DB never
+    runs `alembic upgrade head`, so `MigrationContext.get_current_revision()`
+    returns `None`). The function swallows `Exception` per line 61-62 so
+    the probe never raises — NFR-03 reliability (SPEC.md §3 FR-09 row 2:
+    readiness probe must never raise).
+    """
+    from taskq_api.repository.health_repo import alembic_current_revision
+
+    result = alembic_current_revision()
+    assert result is None
+
+
+def test_alembic_current_revision_swallows_exceptions():
+    """AC-9.3 — `alembic_current_revision` swallows any exception raised
+    by the migration context and returns `None` (lines 61-62). The probe
+    must never raise so a flaky DB read cannot crash the `/readyz` handler.
+    """
+    from taskq_api.repository import health_repo
+
+    class _BoomTarget:
+        """Engine stand-in whose `connect()` raises — exercises the
+        `except Exception: return None` branch (lines 61-62)."""
+
+        def connect(self):
+            raise RuntimeError("connect exploded")
+
+    result = health_repo.alembic_current_revision(_BoomTarget())
+    assert result is None
+
+
+# ----- repository/health_repo.py : alembic_head_revision (lines 67-72)
+
+
+def test_alembic_head_revision_returns_head_from_alembic_ini(tmp_path):
+    """AC-9.4 — `alembic_head_revision(alembic.ini)` returns the head
+    revision declared by the script directory (line 70). The real
+    `alembic.ini` shipped by SPEC §3 FR-07 points at
+    `migrations/versions/`, whose head is `v3`.
+    """
+    from taskq_api.repository.health_repo import alembic_head_revision
+
+    head = alembic_head_revision(Path("alembic.ini"))
+    assert head == "v3"
+
+
+def test_alembic_head_revision_returns_none_when_alembic_ini_missing(tmp_path):
+    """AC-9.4 — `alembic_head_revision` swallows `Exception` raised when
+    the alembic config is unreadable and returns `None` (lines 71-72).
+    Operators get a soft-pass at `/readyz` so a missing config does not
+    take the whole fleet offline.
+    """
+    from taskq_api.repository.health_repo import alembic_head_revision
+
+    head = alembic_head_revision(tmp_path / "alembic.ini")
+    assert head is None
+
+
+# ----- repository/health_repo.py : task_counts_by_status iteration (line 88)
+
+
+def test_task_counts_by_status_iterates_rows():
+    """AC-9.5 — `task_counts_by_status` returns `{status: count}` for every
+    persisted task row (SPEC.md §3 FR-09 row 3 series 1). The for-loop body
+    on line 88 (`counts[str_status_value] = int(count)`) only fires when
+    rows exist; the `_reset_rate_buckets` autouse fixture guarantees a
+    clean DB, so insert a row before calling.
+    """
+    from taskq_api.models.orm import Task
+    from taskq_api.repository.health_repo import task_counts_by_status
+    from taskq_api.repository.session import transaction
+
+    with transaction() as session:
+        session.add(
+            Task(id="t-coverage-1", name="coverage-task-1", command="true",
+                 status="pending"),
+        )
+        session.add(
+            Task(id="t-coverage-2", name="coverage-task-2", command="true",
+                 status="running"),
+        )
+
+    counts = task_counts_by_status()
+    assert counts.get("pending", 0) >= 1
+    assert counts.get("running", 0) >= 1
+
+
+# ----- repository/health_repo.py : task_result_durations_ms (lines 92-104)
+
+
+def test_task_result_durations_ms_returns_list_of_ints():
+    """AC-9.5 — `task_result_durations_ms()` returns the raw
+    `duration_ms` column for every `task_results` row as `list[int]`
+    (SPEC.md §3 FR-09 row 3 series 2 raw collector; ordering is the
+    caller's job — see `service/health._latency_percentiles`).
+    """
+    from taskq_api.repository.health_repo import task_result_durations_ms
+
+    durations = task_result_durations_ms()
+    assert isinstance(durations, list)
+    for value in durations:
+        assert isinstance(value, int)
