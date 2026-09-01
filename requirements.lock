@@ -21,3 +21,6 @@ import-linter==1.12.1
 pip-licenses==4.3.4
 mutmut==2.5.1
 pytest-benchmark==4.0.0
+hypothesis==6.112.1
+attrs==26.1.0
+sortedcontainers==2.4.0

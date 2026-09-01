@@ -1,7 +1,7 @@
 {
   "schema": "harness/traceability/attestation/v1",
-  "git_sha": "e4df06a772ab7acd3ad81e43a21bfa1f290dc7de",
-  "content_sha256": "296d4046e7d8a0773a275798cdd5a89679b3abfc915e1ab9ecd1b5e0d97a6b7f",
+  "git_sha": "fbf9f5c799a780ab2dc018c307276a137249c537",
+  "content_sha256": "6bb3a81cf08ac593e77592269880af67cfd6462c8f32c58f8b25ce31314ce9c2",
   "tool": "scripts/build_trace_attestation.py",
   "overlay_used": null,
   "overlay_errors": [],
@@ -13,7 +13,7 @@
       "srs_coverage": "100.0%",
       "code_coverage": "100.0%",
       "test_coverage": "100.0%",
-      "verification_rate": "90.0%",
+      "verification_rate": "100.0%",
       "total_links": 69,
       "missing_mappings": {
         "fr_without_srs": [],
@@ -90,7 +90,7 @@
       },
       "FR-04": {
         "fr_id": "FR-04",
-        "status": "in_progress",
+        "status": "verified",
         "srs_section": "SAD.md",
         "code_files": [
           "03-development/src/taskq_api/api/deps.py"

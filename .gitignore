@@ -20,3 +20,6 @@ htmlcov/
 .mutmut-cache/
 .code-review-graph/
 .claude/worktrees/
+
+# hypothesis property-test database (FR-07 property test)
+.hypothesis/

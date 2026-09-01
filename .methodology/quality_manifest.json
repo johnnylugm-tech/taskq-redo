@@ -265,14 +265,15 @@
     },
     "gate2": {
       "score": 98.04,
-      "quality_complete": true,
+      "quality_complete": false,
       "rounds_used": 4,
       "open_critical": 0,
       "open_high": 0,
       "phase": 3,
       "gate": 2,
       "fr_scope": "all",
-      "overall_score": 98.04
+      "overall_score": 98.04,
+      "commit_landed": false
     },
     "gate3": null,
     "gate4": null

@@ -8,7 +8,8 @@
     "BSD-3-Clause",
     "Apache-2.0",
     "PSF",
-    "Python-2.0"
+    "Python-2.0",
+    "MPL-2.0"
   ],
   "dependencies": [
     {"name": "fastapi", "version": "0.115.0", "license": "MIT", "direct": true},
@@ -20,6 +21,9 @@
     {"name": "import-linter", "version": "1.12.2", "license": "MIT", "direct": true},
     {"name": "pip-licenses", "version": "4.3.4", "license": "MIT", "direct": true},
     {"name": "mutmut", "version": "2.5.1", "license": "MIT", "direct": true},
-    {"name": "pytest-benchmark", "version": "4.0.0", "license": "MIT", "direct": true}
+    {"name": "pytest-benchmark", "version": "4.0.0", "license": "MIT", "direct": true},
+    {"name": "hypothesis", "version": "6.112.1", "license": "MPL-2.0", "direct": true},
+    {"name": "attrs", "version": "26.1.0", "license": "MIT", "direct": false},
+    {"name": "sortedcontainers", "version": "2.4.0", "license": "Apache-2.0", "direct": false}
   ]
 }

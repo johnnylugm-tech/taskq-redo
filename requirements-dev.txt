@@ -11,3 +11,6 @@ mutmut
 pytest-benchmark
 # NFR-10: httpx ASGITransport for end-to-end integration coverage
 httpx
+# FR-07: hypothesis — executes the declared property invariant
+# FR07-round-trip-byte-identical (TEST_SPEC.md FR-07 **Properties**)
+hypothesis

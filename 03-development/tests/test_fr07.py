@@ -45,15 +45,20 @@ Citations:
 
 from __future__ import annotations
 
+import itertools
 import json
 import os
 import re
 import sqlite3
+import string
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import pytest
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 
 
 # ----- Shared paths / helpers --------------------------------------------
@@ -114,6 +119,23 @@ def _fresh_db(tmp_path: Path) -> Path:
     """Return a non-existent SQLite path under `tmp_path` (alembic
     creates it on first upgrade)."""
     return tmp_path / "fr07.db"
+
+
+# Columns of the v3 `task_results` table, in the order the byte-identical
+# comparison uses them (SPEC.md §5.2).
+_RESULT_COLUMNS = (
+    "id", "task_id", "exit_code", "stdout_tail", "stderr_tail",
+    "duration_ms", "finished_at",
+)
+
+# Printable-ASCII + a few non-ASCII code points; NUL is excluded because
+# SQLite truncates C-strings at it, which would be a storage artefact
+# rather than a migration defect.
+_SAFE_TEXT = string.printable.replace("\x00", "") + "é☃漢"
+
+# Distinct DB filename per hypothesis example (tmp_path is function-scoped
+# and therefore reused across the examples of one test).
+_PROP_DB_COUNTER = itertools.count()
 
 
 # ----- AC-7.1 — upgrade head + downgrade base both exit 0 -----------------
@@ -570,4 +592,83 @@ def test_v2_unique_index_survives_round_trip(tmp_path):
         f"v2's unique index on tasks.name changed across the round-trip "
         f"(AC-7.5 / SPEC.md §3 FR-07 v2 row); before={before}, "
         f"after={after}"
+    )
+
+
+# ----- Declared property invariant — FR07-round-trip-byte-identical -------
+
+
+# TEST_SPEC.md FR-07 **Properties** table declares the universal invariant
+#   `result_after_downgrade == sample_before`  (applies_to case 2).
+# Case 2 above pins ONE hand-written sample; this hypothesis @given test
+# executes the invariant over arbitrary payloads so the round-trip is
+# verified as a universal property, not a single example.
+@settings(max_examples=15, deadline=None,
+          suppress_health_check=[HealthCheck.function_scoped_fixture])
+@given(
+    payloads=st.lists(
+        st.tuples(
+            st.integers(min_value=0, max_value=255),          # exit_code
+            st.text(_SAFE_TEXT, max_size=40),                 # stdout_tail
+            st.text(_SAFE_TEXT, max_size=40),                 # stderr_tail
+            st.integers(min_value=0, max_value=10**9),        # duration_ms
+            st.datetimes(min_value=datetime(2000, 1, 1),
+                         max_value=datetime(2099, 12, 31)),   # finished_at
+        ),
+        min_size=1,
+        max_size=6,
+    )
+)
+def test_fr07_property_round_trip_byte_identical(tmp_path, payloads):
+    """FR-07 property `FR07-round-trip-byte-identical` —
+    `result_after_downgrade == sample_before` for ARBITRARY task_results
+    rows, not just the case-2 sample.
+
+    SPEC.md §3 FR-07 "往返可逆性驗收" + §8 #12: after
+    `upgrade head` → write sample → `downgrade -1` → `upgrade head`,
+    every column of every row must be byte-identical.
+    """
+    # Unique DB file per hypothesis example (tmp_path is function-scoped
+    # and therefore shared across examples).
+    db_path = tmp_path / f"fr07_prop_{next(_PROP_DB_COUNTER)}.db"
+
+    sample_before = [
+        {
+            "id": f"prop-{i:03d}",
+            "task_id": f"prop-task-{i:03d}",
+            "exit_code": exit_code,
+            "stdout_tail": stdout_tail,
+            "stderr_tail": stderr_tail,
+            "duration_ms": duration_ms,
+            "finished_at": finished_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for i, (exit_code, stdout_tail, stderr_tail, duration_ms, finished_at)
+        in enumerate(payloads)
+    ]
+
+    assert _run_alembic(db_path, "upgrade", "head").returncode == 0
+
+    with sqlite3.connect(db_path) as conn:
+        conn.executemany(
+            "INSERT INTO task_results (id, task_id, exit_code, stdout_tail, "
+            "stderr_tail, duration_ms, finished_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [tuple(row[c] for c in _RESULT_COLUMNS) for row in sample_before],
+        )
+        conn.commit()
+
+    assert _run_alembic(db_path, "downgrade", "-1").returncode == 0
+    assert _run_alembic(db_path, "upgrade", "head").returncode == 0
+
+    with sqlite3.connect(db_path) as conn:
+        result_after_downgrade = [
+            dict(zip(_RESULT_COLUMNS, row))
+            for row in conn.execute(
+                f"SELECT {', '.join(_RESULT_COLUMNS)} FROM task_results ORDER BY id"
+            ).fetchall()
+        ]
+
+    assert result_after_downgrade == sample_before, (
+        "FR-07 property FR07-round-trip-byte-identical violated: the v3 "
+        "data migration is not byte-identical-reversible for these rows "
+        "(SPEC.md §3 FR-07 往返可逆性驗收 / §8 #12)"
     )
