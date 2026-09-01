@@ -11,8 +11,8 @@
   /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
 
-03-development/tests/test_fr08.py::test_task_runner_run_spawn_error_marks_failed
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1090b2160>
+03-development/tests/test_fr10.py::test_each_error_code_exercised
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10b33e160>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -80,4 +80,4 @@ Name                                                     Stmts   Miss  Cover   M
 03-development/src/taskq_api/service/tasks.py               48      0   100%
 --------------------------------------------------------------------------------------
 TOTAL                                                      872      0   100%
-236 passed, 6 warnings in 100.77s (0:01:40)
+236 passed, 6 warnings in 103.06s (0:01:43)
