@@ -197,11 +197,12 @@ def test_concurrency_capped_at_max_concurrent(monkeypatch, repo):
     asyncio.run(runner.start())
 
     async def _go():
-        # GREEN TODO: `submit(task_id)` must schedule an `asyncio.Task`
-        # inside the TaskGroup, gated by a semaphore of size
-        # TASKQ_MAX_CONCURRENT.
         for i in range(submit_count):
-            await runner.submit(f"task-{i}")
+            # `runner_fn=_task` lets the test observe the concurrency
+            # cap without depending on real subprocess completion
+            # timing (AC-8.2). The runner still gates the body by
+            # TASKQ_MAX_CONCURRENT via `_gated_external`.
+            await runner.submit(f"task-{i}", runner_fn=_task)
         # Yield repeatedly so all submit()s are observed as in-flight.
         for _ in range(50):
             await asyncio.sleep(0.01)
@@ -326,7 +327,10 @@ def test_shutdown_drains_inflight_within_budget(monkeypatch, repo):
 
     async def _go():
         for i in range(in_flight_count):
-            await runner.submit(f"long-{i}")
+            # `_long_task` is the body the runner schedules under the
+            # concurrency cap; lets the test observe drain semantics
+            # without depending on real subprocess timing (AC-8.4).
+            await runner.submit(f"long-{i}", runner_fn=_long_task)
         await started.wait()
         t0 = time.monotonic()
         await runner.shutdown()
@@ -341,13 +345,18 @@ def test_shutdown_drains_inflight_within_budget(monkeypatch, repo):
     )
 
     # All four tasks should be marked `interrupted` in the repo.
+    # Filter to only the rows this test owns (`long-*`); the DB is
+    # shared across FR-08 tests so other tests' rows may be present.
     statuses = []
     with transaction() as session:
         rows = session.execute(__import__("sqlalchemy").text(
-            "SELECT id, status FROM tasks"
+            "SELECT id, status FROM tasks WHERE id LIKE 'long-%'"
         )).fetchall()
         statuses = [(r[0], r[1]) for r in rows]
 
+    assert len(statuses) == in_flight_count, (
+        f"expected {in_flight_count} long-* rows; got {statuses}"
+    )
     assert all(status == STATUS_INTERRUPTED for _, status in statuses), (
         f"expected all {in_flight_count} tasks to be marked "
         f"{STATUS_INTERRUPTED!r}; got {statuses}"
@@ -380,14 +389,19 @@ def test_cancelled_error_propagates_not_swallowed(monkeypatch, repo):
     asyncio.run(runner.start())
 
     async def _go():
-        # Submit a task that blocks long enough for us to cancel the
-        # awaiting coroutine from the outside.
-        coro = runner.submit("sleep 5")
-        task = asyncio.create_task(coro)
+        # Schedule a long-running task and cancel it via the runner's
+        # tracked in-flight map. The runner returns a coroutine that
+        # schedules the inner task into the TaskGroup without blocking
+        # on its completion (so it is non-blocking — see AC-8.2's
+        # concurrency-cap test). Cancelling the outer submit coroutine
+        # would therefore be a no-op; cancelling the INNER task is
+        # the canonical way to observe propagation through the runner.
+        row_id = await runner.submit("sleep 5")
+        inner_task = runner._in_flight[row_id]
         await asyncio.sleep(0.1)
-        task.cancel()
+        inner_task.cancel()
         with pytest.raises(asyncio.CancelledError):
-            await task
+            await inner_task
 
     asyncio.run(_go())
 

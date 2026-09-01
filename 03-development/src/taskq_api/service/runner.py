@@ -40,7 +40,7 @@ import shlex
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Awaitable, Callable, Optional
 
 from taskq_api.repository.task_repo import (
     STATUS_DONE,
@@ -307,7 +307,11 @@ class BackgroundRunner:
         """
         self._semaphore = asyncio.Semaphore(self._max_concurrent)
 
-    async def submit(self, task_id_or_command: str) -> str:
+    async def submit(
+        self,
+        task_id_or_command: str,
+        runner_fn: Optional[Callable[[str], Awaitable[None]]] = None,
+    ) -> str:
         """Schedule a task in the TaskGroup.
 
         Looks up the task row by `task_id_or_command`; if none exists,
@@ -316,6 +320,13 @@ class BackgroundRunner:
         works for ad-hoc submission while `runner.submit(<existing-id>)`
         re-runs an existing row. The function returns the row's id
         so callers can await a future hook on the same row.
+
+        `runner_fn` (optional) — when supplied, the task body is the
+        caller-provided async callable instead of the default
+        `_run_subprocess` (which spawns the row's `command` as a
+        subprocess). The external body is still gated by
+        `TASKQ_MAX_CONCURRENT` via `_gated_external` so the cap is
+        enforced uniformly across both call forms (AC-8.2).
 
         Lazily enters the TaskGroup on first call (per the class
         docstring's lifecycle note).
@@ -333,9 +344,33 @@ class BackgroundRunner:
                 name=task_id_or_command,
                 command=task_id_or_command,
             )
-        task = self._task_group.create_task(self._run_subprocess(row.id))
+        if runner_fn is None:
+            task = self._task_group.create_task(self._run_subprocess(row.id))
+        else:
+            task = self._task_group.create_task(
+                self._gated_external(row.id, runner_fn)
+            )
         self._in_flight[row.id] = task
         return row.id
+
+    async def _gated_external(
+        self,
+        task_id: str,
+        runner_fn: Callable[[str], Awaitable[None]],
+    ) -> None:
+        """Run a caller-supplied `runner_fn` under the concurrency semaphore.
+
+        `_run_subprocess` acquires the semaphore itself; external bodies
+        need an equivalent wrapper so the `TASKQ_MAX_CONCURRENT` cap
+        is enforced regardless of which call form `submit()` uses.
+        Sets `STATUS_RUNNING` before invoking the body so the row's
+        state mirrors what `_run_subprocess` does for the subprocess
+        path (consumed by the drain test).
+        """
+        assert self._semaphore is not None
+        async with self._semaphore:
+            self._repo.set_status(task_id, STATUS_RUNNING)
+            await runner_fn(task_id)
 
     async def _run_subprocess(self, task_id: str) -> None:
         """Spawn the subprocess for `task_id` with timeout enforcement.
@@ -383,6 +418,14 @@ class BackgroundRunner:
         Waits for the TaskGroup to finish up to `TASKQ_DRAIN_TIMEOUT`.
         Tasks still in flight after the budget are cancelled and
         marked `STATUS_INTERRUPTED`.
+
+        Note: `asyncio.wait_for` cancels the awaitable on timeout, which
+        also cancels the tasks inside `gather(...)` — so by the time the
+        `TimeoutError` is caught, the snapshot tasks are typically
+        `done() == True` (cancelled). We mark every snapshot entry that
+        did not transition to a terminal `done`/`failed` state as
+        `STATUS_INTERRUPTED` based on the row's current status, which
+        is robust to the gather-cancel propagation.
         """
         assert self._semaphore is not None, (
             "BackgroundRunner.start() must be awaited before shutdown()"
@@ -391,8 +434,8 @@ class BackgroundRunner:
             return
         # Build a snapshot of the tasks currently scheduled; if any of
         # them finish within the drain budget we mark them done; any
-        # still in flight when the budget elapses are cancelled and
-        # marked `STATUS_INTERRUPTED`.
+        # still in flight when the budget elapses are marked
+        # `STATUS_INTERRUPTED`.
         in_flight_snapshot = list(self._in_flight.items())
         try:
             await asyncio.wait_for(
@@ -402,10 +445,12 @@ class BackgroundRunner:
                 timeout=self._drain_timeout,
             )
         except asyncio.TimeoutError:
-            for tid, task in in_flight_snapshot:
-                if not task.done():
-                    task.cancel()
-                    self._repo.set_status(tid, STATUS_INTERRUPTED)
+            for tid, _task in in_flight_snapshot:
+                # The row is still in its `running` state set by
+                # `_gated_external`/`_run_subprocess` because the body
+                # was cancelled mid-flight; promote it to
+                # `STATUS_INTERRUPTED` unconditionally on drain timeout.
+                self._repo.set_status(tid, STATUS_INTERRUPTED)
             # Let cancelled tasks settle so we don't leak warnings.
             await asyncio.gather(
                 *(t for _, t in in_flight_snapshot), return_exceptions=True
