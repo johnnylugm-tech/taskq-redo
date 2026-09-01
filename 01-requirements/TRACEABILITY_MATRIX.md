@@ -15,7 +15,7 @@
 | Code Coverage | 100.0% | 100% |
 | Test Coverage | 100.0% | 100% |
 | Verification Rate | 100.0% | 100% |
-| Total Links | 68 | — |
+| Total Links | 69 | — |
 
 ### ASPICE SWE.3 Compliance
 
@@ -36,7 +36,7 @@
 | FR-05 | verified | 03-development/src/taskq_api/api/deps.py, 03-development/src/taskq_api/errors.py, 03-development/src/taskq_api/models/orm.py (+3) | 03-development/tests/test_fr05.py | — |
 | FR-06 | verified | 03-development/src/taskq_api/models/orm.py, 03-development/src/taskq_api/repository/session.py, 03-development/src/taskq_api/repository/task_repo.py | 03-development/tests/test_fr06.py | — |
 | FR-07 | verified | migrations/env.py, migrations/versions/v1_initial.py, migrations/versions/v3_split_results.py | 03-development/tests/test_fr07.py | — |
-| FR-08 | verified | 03-development/src/taskq_api/repository/task_repo.py, 03-development/src/taskq_api/service/runner.py, 03-development/tests/test_fr08.py | 03-development/tests/test_fr08.py | — |
+| FR-08 | verified | 03-development/src/taskq_api/repository/task_repo.py, 03-development/src/taskq_api/service/runner.py, 03-development/tests/test_fr08.py | 03-development/tests/test_fr08.py, 03-development/tests/test_fr08_coverage.py | — |
 | FR-09 | verified | 03-development/src/taskq_api/api/health.py, 03-development/src/taskq_api/app.py, 03-development/src/taskq_api/errors.py (+3) | 03-development/tests/test_fr09.py | — |
 | FR-10 | verified | 03-development/src/taskq_api/app.py, 03-development/src/taskq_api/errors.py | 03-development/tests/test_fr10.py | — |
 <!-- AUTO-GEN:END -->
@@ -46,7 +46,7 @@
 
 | NFR ID | Test Coverage | Status |
 |--------|--------------|--------|
-| NFR-01 | test_fr01.py, test_fr06.py, test_nfr_deferred.py | VERIFIED |
+| NFR-01 | test_fr01.py, test_fr06.py, test_nfr_deferred.py, test_perf_benchmarks.py | VERIFIED |
 | NFR-02 | test_fr01.py, test_fr02.py, test_fr03.py, test_fr04.py, test_fr05.py, test_fr06.py, test_fr10.py, test_nfr_deferred.py | VERIFIED |
 | NFR-03 | test_fr02.py, test_fr05.py, test_fr08.py, test_fr09.py, test_nfr_deferred.py | VERIFIED |
 | NFR-04 | test_fr03.py, test_fr09.py, test_nfr_deferred.py | VERIFIED |

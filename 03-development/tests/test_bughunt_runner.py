@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from taskq_api.repository.task_repo import STATUS_DONE, STATUS_INTERRUPTED, STATUS_RUNNING, TaskRepo
+from taskq_api.repository.task_repo import STATUS_INTERRUPTED, TaskRepo
 from taskq_api.service.runner import BackgroundRunner
 
 
