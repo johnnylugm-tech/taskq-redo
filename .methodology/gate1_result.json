@@ -1,8 +1,8 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-04",
-  "overall_score": 100.0,
+  "fr_id": "FR-05",
+  "overall_score": 99.0,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788295945422\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.467}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 37,
+      "tests_passed": 45,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "37 passed, 1 warning in 6.80s. FR-owned files coverage: taskq_api/api/deps.py 100% (36/36 stmts), taskq_api/service/auth.py 100% (7/7 stmts). Required tests present: test_read_scope_post_tasks_returns_403, test_write_scope_delete_returns_403_no_resource_leak, test_admin_scope_delete_succeeds, test_single_authz_dependency_used_by_every_v1_route, test_scope_hierarchy_admin_satisfies_write. 5/5 spec tests pass.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
+      "tool_evidence": "Coverage report (TOTAL 98%):\nName                                                   Stmts   Miss  Cover\n03-development/src/taskq_api/api/deps.py                  36      0   100%\n03-development/src/taskq_api/repository/rate_repo.py      53      2    96%\n03-development/src/taskq_api/service/ratelimit.py         11      0   100%\nTOTAL                                                    100      2    98%\nPytest: 2 failed, 45 passed in 5.07s. FAILED test_fr05.py::test_burst_over_limit_returns_429_with_retry_after; FAILED test_fr05.py::test_rate_limit_recovers_after_refill.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-04",
+      "coverage_scope_fr": "FR-05",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 48 files, 92 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)",
+      "tool_evidence": "Contracts: 5 kept, 0 broken. layers KEPT; forbidden-sqlalchemy KEPT; config-and-errors-independent KEPT; root-package-marker-independent KEPT; cli-main-independent KEPT.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,26 +71,26 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f48cd117e8cea52d9c8a1482838d8c84bc7b4a13e39efebe4f931ffd8f00d5f7",
-      "bytes": 115,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
+      "sha256": "8cf0e447a39f58a0ea1041809c433da432d303d336e62998bfc68ed91fb73322",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788295945422\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.467}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5f650ef2bf1a496be8619ca4c2cda2f6096cc85cc7b8c9822e339516c922cb0c",
-      "bytes": 411,
-      "head": "37 passed, 1 warning in 6.80s. FR-owned files coverage: taskq_api/api/deps.py 100% (36/36 stmts), taskq_api/service/auth.py 100% (7/7 stmts). Required tests present: test_read_scope_post_tasks_returns_403, test_write_scope_delete_returns_403_no_resource_leak, test_admin_scope_delete_succeeds, test_single_authz_dependency_used_by_every_v1_route, test_scope_hierarchy_admin_satisfies_write. 5/5 spec tests pass."
+      "sha256": "413ec443181dc7e047924d4025c0935a9595aaff16e017ab9ef9a2c730c96b70",
+      "bytes": 574,
+      "head": "Coverage report (TOTAL 98%):\nName                                                   Stmts   Miss  Cover\n03-development/src/taskq_api/api/deps.py                  36      0   100%\n03-development/src/taskq_api/repository/rate_repo.py      53      2    96%\n03-development/src/taskq_api/service/ratelimit.py         11      0   100%\nTOTAL                                                    100      2    98%\nPytest: 2 failed, 45 passed in 5.07s. FAILED test_fr05.py::test_burst_over_limit_returns_429_with_retry_after; FAILED test_fr05.py::test_rate_limit_recovers_after_refill."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "5336f8f423abf281124167dd6114072bc7a3520c2c6fe7ef4edc968958a65729",
-      "bytes": 206,
-      "head": "Analyzed 48 files, 92 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)"
+      "sha256": "4797c198ab5ef1d31779730ed90f7b0648b8e92ab456bd55de9a6b37968888e1",
+      "bytes": 169,
+      "head": "Contracts: 5 kept, 0 broken. layers KEPT; forbidden-sqlalchemy KEPT; config-and-errors-independent KEPT; root-package-marker-independent KEPT; cli-main-independent KEPT."
     }
   },
-  "composite_score": 100.0,
+  "composite_score": 99.0,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
