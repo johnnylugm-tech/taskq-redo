@@ -12,7 +12,7 @@
     import multipart
 
 03-development/tests/test_fr10.py::test_each_error_code_exercised
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x106aba160>
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10991a160>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -83,4 +83,4 @@ TOTAL                                                      872      0   100%
 =========================== short test summary info ============================
 FAILED 03-development/tests/test_fr05.py::test_burst_over_limit_returns_429_with_retry_after
 FAILED 03-development/tests/test_fr05.py::test_rate_limit_recovers_after_refill
-2 failed, 234 passed, 6 warnings in 103.69s (0:01:43)
+2 failed, 234 passed, 6 warnings in 108.02s (0:01:48)

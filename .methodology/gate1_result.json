@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 4,
-  "fr_id": "FR-08",
+  "fr_id": "FR-09",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.577}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788297829235\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":3.022}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 108,
+      "tests_passed": 58,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "Coverage: 100% (241/241 lines covered). Tests: 108 passed, 0 failed, 0 skipped. test_fr08.py: 39 tests, test_fr01.py: 13, test_fr02.py: 30, test_fr06.py: 26",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.2, hypothesis-6.112.1, benchmark-4.0.0\ncollected 58 items\n\n03-development/tests/test_fr09.py ..........................             [ 44%]\n03-development/tests/test_fr06.py ..........................             [ 89%]\n03-development/tests/test_fr07.py ......                                 [100%]\n\n======================== 58 passed, 1 warning in 23.52s ========================\n\nCoverage: 100% (118/118 statements covered in FR-09 files: api/health.py, service/health.py, repository/session.py)\nAll 5 required AC tests exist and pass: test_healthz_returns_200_when_alive, test_readyz_returns_503_when_db_down, test_readyz_returns_503_when_migration_behind_head, test_readyz_returns_200_when_healthy, test_metrics_returns_required_series",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-08",
+      "coverage_scope_fr": "FR-09",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 48 files, 92 dependencies. Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 92 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,23 +71,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "894d8be2021ca3f2dcf891a6a86cb9134b3fa99e820bf728b065a7a9825790f8",
-      "bytes": 135,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.577}}"
+      "sha256": "e8ae5110997f32887a72f289873a6509c9c3346dff9d54442729c185c1249df4",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788297829235\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":3.022}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "d988d2b2dace7421b739c17103bc5e348a663a11d0db911f025b04df3f88321c",
-      "bytes": 156,
-      "head": "Coverage: 100% (241/241 lines covered). Tests: 108 passed, 0 failed, 0 skipped. test_fr08.py: 39 tests, test_fr01.py: 13, test_fr02.py: 30, test_fr06.py: 26"
+      "sha256": "68b8e26cfb19330fe817b11a09801ae94c7c75fce0c2cea8737826c90736faa6",
+      "bytes": 1155,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.2, hypothesis-6.112.1, benchmark-4.0.0\ncollected 58 items\n\n03-development/tests/test_fr09.py ..........................             [ 44%]\n03-development/tests/test_fr06.py ..........................             [ 89%]\n03-development/tests/test_fr07.py ......                                 [100%]\n\n======================== 58 passed, 1 warning in 23.52s ========================\n\nCoverage: 100% (118/118 statements covered in FR-09 files: api/health.py, service/health.py, repository/session.py)\nAll 5 required AC tests exist and pass: test_healthz_returns_200_when_alive, test_readyz_returns_503_when_db_down, test_readyz_returns_503_when_migration_behind_head, test_readyz_returns_200_when_healthy, test_metrics_returns_required_series"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "7531080298dbefa594a52655e0853d33e5bf318ed752773a9a08f27ddf5532f1",
-      "bytes": 204,
-      "head": "Analyzed 48 files, 92 dependencies. Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT"
+      "sha256": "fe757381671db5a8661c667ca607a7c04e145860d90c1be9cdffaed364989926",
+      "bytes": 312,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 92 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
