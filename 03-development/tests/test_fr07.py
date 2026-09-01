@@ -46,17 +46,14 @@ Citations:
 from __future__ import annotations
 
 import itertools
-import json
 import os
 import re
 import sqlite3
 import string
 import subprocess
-import sys
 from datetime import datetime
 from pathlib import Path
 
-import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
@@ -562,9 +559,9 @@ def test_v2_unique_index_survives_round_trip(tmp_path):
     # ---- step 2: index exists after upgrade head ----
     before = _unique_index_on_tasks_name()
     assert before, (
-        f"v2's unique index on tasks.name MUST exist after upgrade head "
-        f"(AC-7.5 / SPEC.md §3 FR-07 v2 row); no unique index on "
-        f"tasks.name found"
+        "v2's unique index on tasks.name MUST exist after upgrade head "
+        "(AC-7.5 / SPEC.md §3 FR-07 v2 row); no unique index on "
+        "tasks.name found"
     )
 
     # ---- step 3: downgrade -1 (v3 -> v2) ----

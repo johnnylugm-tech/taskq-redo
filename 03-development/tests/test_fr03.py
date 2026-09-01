@@ -179,10 +179,6 @@ def test_api_keys_table_holds_no_plaintext():
     )
 
     # The stored key(s) must be 64-char hex SHA-256 digests.
-    stored_hashes = [
-        k for k in repo.__dict__.values()
-        if isinstance(k, dict) and k
-    ]
     # Flatten any nested dict keys (covers the current `_hash_to_scope`
     # in-memory shape as well as any future table-backed shape).
     hash_strings: list[str] = []

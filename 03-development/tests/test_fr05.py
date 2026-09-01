@@ -39,13 +39,10 @@ Citations:
 # The two `service.ratelimit` and `repository.rate_repo` imports are
 # intentionally NOT wrapped in try/except; a clean ModuleNotFoundError
 # at collection time IS the RED signal (per UNIT TEST CONTRACT).
-from taskq_api.api import deps as api_deps  # noqa: E402
 from taskq_api.app import app  # noqa: E402
-from taskq_api.service import ratelimit  # noqa: E402
 from taskq_api.repository import rate_repo  # noqa: E402
 
 import inspect
-import re
 import threading
 
 import pytest
@@ -460,6 +457,6 @@ def test_health_endpoints_exempt_from_rate_limit(client):
     # Defensive: confirm at least one response was 429-shaped if a
     # regression accidentally re-routes through the bucket.
     assert 429 not in statuses, (
-        f"/healthz returned 429 on at least one request — rate limit "
-        f"applied to a health endpoint (SPEC.md §3 FR-05 violated)"
+        "/healthz returned 429 on at least one request — rate limit "
+        "applied to a health endpoint (SPEC.md §3 FR-05 violated)"
     )

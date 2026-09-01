@@ -307,8 +307,6 @@ def test_fr01_delete_then_404_e2e():
     pytest.importorskip("taskq_api")
     from fastapi.testclient import TestClient
     from taskq_api.app import app
-    from taskq_api.repository.session import transaction
-    from taskq_api.models.orm import Task
     import uuid
 
     suffix = uuid.uuid4().hex[:12]

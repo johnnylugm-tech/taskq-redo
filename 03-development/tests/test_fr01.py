@@ -21,6 +21,8 @@ stubs that would mask the absence of the real implementation.
 
 from fastapi.testclient import TestClient
 
+import pytest
+
 # SAB binding — GREEN must implement this module path on disk:
 #   03-development/src/taskq_api/app.py
 # containing a FastAPI instance named `app`. See SPEC.md §2 and SAD.md §2.5.

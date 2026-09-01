@@ -493,9 +493,9 @@ def test_list_endpoint_sql_count_is_constant():
     # somehow bypass the ORM (e.g. raw `session.execute("SELECT …")`
     # without parameter binding).
     assert count_small > 0, (
-        f"expected at least one SQL statement to fire on GET /v1/tasks; "
-        f"got 0 — the list endpoint must traverse the SQLAlchemy ORM "
-        f"engine, not an in-memory shortcut (AC-6.4)"
+        "expected at least one SQL statement to fire on GET /v1/tasks; "
+        "got 0 — the list endpoint must traverse the SQLAlchemy ORM "
+        "engine, not an in-memory shortcut (AC-6.4)"
     )
 
 
