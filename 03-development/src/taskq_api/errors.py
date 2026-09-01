@@ -115,18 +115,16 @@ def _extract_inbound_correlation_id(headers: list[tuple[bytes, bytes]]) -> Optio
 
     Decoded as `latin-1` because HTTP/1.1 headers are byte-oriented
     but Starlette stores them as `bytes`; `latin-1` is the standard
-    1:1 byte→str mapping for ASCII-clean header values and round-trips
-    losslessly when re-encoded on the response side. Returns `None`
-    for missing or non-decodable values so the caller can mint a
-    fresh UUID4 in either case.
+    1:1 byte→str mapping for header values and round-trips losslessly
+    when re-encoded on the response side. Latin-1 can decode ANY byte
+    sequence, so a `try/except UnicodeDecodeError` wrapper would be
+    pure dead code (a Python library guarantee). Returns `None` for
+    a missing header so the caller can mint a fresh UUID4.
     """
     key = CORRELATION_ID_HEADER.lower().encode()
     for raw_name, raw_value in headers:
         if raw_name.lower() == key:
-            try:
-                return raw_value.decode("latin-1")
-            except UnicodeDecodeError:
-                return None
+            return raw_value.decode("latin-1")
     return None
 
 

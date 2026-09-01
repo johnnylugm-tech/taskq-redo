@@ -50,6 +50,12 @@ import logging
 import pytest
 from fastapi.testclient import TestClient
 
+from taskq_api.errors import (
+    CORRELATION_ID_HEADER,
+    CorrelationIdMiddleware,
+    _extract_inbound_correlation_id,
+)
+
 # SAB binding — GREEN must wire these module paths on disk:
 #   03-development/src/taskq_api/app.py       (FastAPI instance)
 #   03-development/src/taskq_api/errors.py    (problem+json envelope + 500 handler + correlation_id)
@@ -524,3 +530,152 @@ def test_each_error_code_exercised(client, write_api_key, admin_api_key, monkeyp
     # (len(codes.split(",")) == 8).
     codes = "401,403,404,409,422,429,503,500"
     assert len(codes.split(",")) == 8
+
+
+# ----- AC-10.4 — Inbound X-Correlation-Id is honoured ---------------------
+
+
+# SPEC.md §3 FR-10 paragraph 1 (correlation_id linkage — outbound and inbound).
+# Coverage target: the inbound-decode branch of `_extract_inbound_correlation_id`
+# (errors.py: `return raw_value.decode("latin-1")`) is only reached when the
+# caller actually sends an `X-Correlation-Id` header; the other AC-10.4 test
+# (`test_correlation_id_in_header_and_logs`) intentionally omits it.
+def test_inbound_correlation_id_is_echoed(client):
+    """AC-10.4 — An inbound `X-Correlation-Id` MUST be echoed verbatim on
+    the response.
+
+    The middleware mints a fresh UUID4 when the header is absent, but
+    when the client supplies one (e.g. an upstream load balancer that
+    already has a request id) the SAME id MUST flow through to the
+    response so the upstream can join its own logs to ours by id.
+
+    GREEN TODO: `taskq_api.errors._extract_inbound_correlation_id`
+    must read the header bytes off `scope["headers"]`, decode them
+    with `latin-1`, and propagate that value to `scope["state"]
+    ["correlation_id"]` and the outgoing `X-Correlation-Id` header.
+    """
+    inbound_cid = "inbound-cid-trace-1234567890"
+
+    response = client.get(
+        "/v1/tasks",
+        headers={CORRELATION_ID_HEADER: inbound_cid},  # no API key -> 401
+    )
+    assert response.status_code == 401, (
+        f"expected no API key + inbound cid on /v1/tasks to surface as 401; "
+        f"got {response.status_code}"
+    )
+
+    echoed = (
+        response.headers.get("X-Correlation-Id")
+        or response.headers.get("x-correlation-id")
+    )
+    assert echoed == inbound_cid, (
+        f"expected inbound {CORRELATION_ID_HEADER!r}={inbound_cid!r} to be "
+        f"echoed verbatim on the response (SPEC.md §3 FR-10 paragraph 1); "
+        f"got {echoed!r}"
+    )
+
+
+# ----- _extract_inbound_correlation_id unit tests ------------------------
+
+
+# Coverage target: the full happy-path branch of
+# `_extract_inbound_correlation_id` including the `return raw_value
+# .decode("latin-1")` line that is only reached when an inbound header
+# is present. We exercise it directly to avoid the TestClient indirection.
+def test_extract_inbound_correlation_id_decodes_value():
+    """Direct unit test for `_extract_inbound_correlation_id`.
+
+    The HTTP-level integration test (`test_inbound_correlation_id_is_echoed`)
+    covers the wire contract; this one pins the helper's decode behaviour
+    so a future refactor that breaks the latin-1 decode contract (or
+    loses the case-insensitive header match) fails at the unit boundary
+    instead of only via an integration flake.
+
+    Coverage: errors.py line 127 — the
+    `return raw_value.decode("latin-1")` happy-path return.
+    """
+    raw_headers = [
+        (b"content-type", b"application/json"),
+        (CORRELATION_ID_HEADER.lower().encode(), b"abc-123"),
+        (b"x-api-key", b"some-key"),
+    ]
+    assert _extract_inbound_correlation_id(raw_headers) == "abc-123"
+
+
+def test_extract_inbound_correlation_id_returns_none_when_absent():
+    """No matching header in the raw list -> `None` (caller mints fresh)."""
+    raw_headers = [
+        (b"content-type", b"application/json"),
+        (b"x-api-key", b"some-key"),
+    ]
+    assert _extract_inbound_correlation_id(raw_headers) is None
+
+
+def test_extract_inbound_correlation_id_case_insensitive_on_name():
+    """Header name match is case-insensitive — clients send `X-Correlation-Id`
+    in mixed case per HTTP/1.1 (§4.2 'field names are case-insensitive').
+    The helper must pick up `x-correlation-id` as well as `X-Correlation-Id`.
+    """
+    raw_headers = [
+        (b"x-correlation-id", b"mixed-case-cid"),
+    ]
+    assert _extract_inbound_correlation_id(raw_headers) == "mixed-case-cid"
+
+
+# ----- CorrelationIdMiddleware non-HTTP scope passthrough -----------------
+
+
+# Coverage target: errors.py lines 83-84 — the `if scope["type"] != "http":`
+# branch that simply forwards non-HTTP scopes (lifespan / websocket)
+# without stamping any correlation_id. Real ASGI servers always emit a
+# `lifespan` scope on startup, so this branch IS reachable in production;
+# the TestClient only exercises HTTP, so we drive it directly here.
+import asyncio  # noqa: E402  (kept at module bottom per existing import style)
+
+
+def test_correlation_id_middleware_passes_non_http_scope_through():
+    """CorrelationIdMiddleware MUST forward non-HTTP scopes verbatim.
+
+    `lifespan` / `websocket` scopes bypass the http.response.start
+    message path, so the middleware's `send_wrapper` is never invoked
+    for them. The branch at errors.py lines 82-84 is a direct forward
+    to the wrapped ASGI app — a Starlette/FastAPI lifespan start-up
+    goes through it, so it IS production-reachable and we exercise it
+    here via a hand-rolled ASGI scope.
+
+    Coverage: errors.py lines 83-84 — `await self.app(...)` + `return`
+    inside the `if scope["type"] != "http":` branch.
+    """
+    received_scopes: list[dict] = []
+
+    async def downstream_app(scope, receive, send):
+        received_scopes.append(scope)
+        # Send a no-op lifespan.startup.send so the test driver can
+        # await `middleware(...)` without blocking on an empty receive.
+        await send({"type": "lifespan.startup.complete"})
+
+    middleware = CorrelationIdMiddleware(downstream_app)
+
+    async def _noop_receive():
+        return {"type": "lifespan.startup"}
+
+    async def _collect_send(_message):
+        return None
+
+    async def _driver():
+        await middleware(
+            {"type": "lifespan", "asgi": {"version": "3.0"}},
+            _noop_receive,
+            _collect_send,
+        )
+
+    asyncio.run(_driver())
+
+    assert received_scopes, (
+        "expected the non-HTTP scope to be forwarded to the wrapped app"
+    )
+    assert received_scopes[0]["type"] == "lifespan", (
+        f"expected forwarded scope to preserve its 'lifespan' type; "
+        f"got {received_scopes[0]!r}"
+    )
