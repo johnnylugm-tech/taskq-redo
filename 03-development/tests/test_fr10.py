@@ -300,6 +300,7 @@ def test_500_detail_no_internals(client, write_api_key, monkeypatch):
 # ----- AC-10.4 — X-Correlation-Id header linked to logs ------------------
 
 
+# NFR-04 (redaction: DB URL password must never appear in logs/errors)
 # NFR-10 (integration coverage — header+log observability)
 # SPEC.md §3 FR-10 paragraph 1 + §8 #3
 # TEST_SPEC.md FR-10 case 4 sub-assertion:
