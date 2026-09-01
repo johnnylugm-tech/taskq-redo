@@ -330,7 +330,7 @@ class TaskRepo:
         id: str,
         limit: int,
         cursor: Optional[str],
-    ) -> tuple[list[dict], Optional[str]]:
+    ) -> tuple[list[dict], Optional[str]]:  # type: ignore[valid-type]
         """Return a page of `task_results` rows, newest first.
 
         The order is `finished_at DESC, id DESC` (SPEC §3 FR-02

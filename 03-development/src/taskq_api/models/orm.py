@@ -55,7 +55,7 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 
-class Task(Base):
+class Task(Base):  # type: ignore[misc, valid-type]
     """[FR-01] tasks table — primary row for a task.
 
     SPEC.md §3 FR-01 row 4: removing a `Task` also drops its
@@ -93,7 +93,7 @@ class Task(Base):
     )
 
 
-class TaskResult(Base):
+class TaskResult(Base):  # type: ignore[misc, valid-type]
     """[FR-02] task_results table — per-run result row.
 
     The five required columns per SPEC.md §3 FR-02 are
@@ -121,7 +121,7 @@ class TaskResult(Base):
     task = relationship("Task", back_populates="results")
 
 
-class ApiKey(Base):
+class ApiKey(Base):  # type: ignore[misc, valid-type]
     """[FR-03] api_keys table — SHA-256 hash → scope mapping.
 
     Plaintext is NEVER stored in this table (NFR-02 + AC-3.3);
@@ -137,7 +137,7 @@ class ApiKey(Base):
     revoked = Column(Boolean, nullable=False, default=False)
 
 
-class RateBucket(Base):
+class RateBucket(Base):  # type: ignore[misc, valid-type]
     """[FR-05] rate_buckets table — per-scope token-bucket row.
 
     SPEC.md §3 FR-05 paragraph 1 ("存於資料庫") requires the

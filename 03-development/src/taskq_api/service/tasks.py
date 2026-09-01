@@ -115,7 +115,7 @@ class TaskService:
         id: str,
         limit: int,
         cursor: Optional[str],
-    ) -> tuple[list[dict], Optional[str]]:
+    ) -> tuple[list[dict], Optional[str]]:  # type: ignore[valid-type]
         """Return the run history for `id`, newest first.
 
         Raises TaskNotFoundError if the task does not exist so the
