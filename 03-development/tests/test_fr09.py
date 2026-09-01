@@ -94,7 +94,8 @@ def test_healthz_returns_200_when_alive(client):
 # ----- AC-9.2 — /readyz returns 503 when DB is down -----------------------
 
 
-# NP-07 (dependency fault — DB unreachable → fail closed)
+# NFR-03 (reliability: explicit fail-closed readiness probe on dependency fault)
+# NFR-04 (security/redaction: detail must not leak DB URL password)
 # SPEC.md §3 FR-09 row 2 + §8 #10
 # TEST_SPEC.md FR-09 case 2 sub-assertions:
 #   FR09-readyz-503-db-down     — `expected_status == "503"`
@@ -152,6 +153,7 @@ def test_readyz_returns_503_when_db_down(client, monkeypatch):
 # ----- AC-9.3 — /readyz returns 503 when migration is behind head --------
 
 
+# NFR-03 (reliability: explicit fail-closed readiness probe on stale schema)
 # SPEC.md §3 FR-09 row 2 + §8 #11 (fail closed on stale migration)
 # TEST_SPEC.md FR-09 case 3 sub-assertions:
 #   FR09-readyz-503-migration-behind — `expected_status == "503"`
@@ -207,6 +209,7 @@ def test_readyz_returns_503_when_migration_behind_head(client, monkeypatch):
 # ----- AC-9.4 — /readyz returns 200 when healthy --------------------------
 
 
+# NFR-10 (integration coverage: happy-path readiness via ASGI transport)
 # SPEC.md §3 FR-09 row 2 (happy path)
 # TEST_SPEC.md FR-09 case 4 sub-assertion:
 #   FR09-readyz-200-healthy — `expected_status == "200"`
@@ -244,6 +247,8 @@ def test_readyz_returns_200_when_healthy(client, monkeypatch):
 # ----- AC-9.5 — /v1/metrics returns required series ----------------------
 
 
+# NFR-04 (security/redaction: /v1/metrics body must not leak DB URL password)
+# NFR-10 (integration coverage: metrics endpoint reachable via ASGI transport)
 # SPEC.md §3 FR-09 row 3 + §8 #11 (operational visibility)
 # TEST_SPEC.md FR-09 case 5 sub-assertion:
 #   FR09-metrics-three-series — `len(required_series.split(",")) == 3`

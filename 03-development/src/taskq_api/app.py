@@ -31,7 +31,7 @@ Citations:
 """
 from fastapi import FastAPI
 
-from taskq_api.api.health import router as health_router
+from taskq_api.api.health import metrics_router, router as health_router
 from taskq_api.api.tasks import router as tasks_router
 from taskq_api.config import API_KEY_SEEDS
 from taskq_api.errors import install_error_handlers
@@ -86,6 +86,11 @@ def create_app() -> FastAPI:
     # Mount FR-01 + FR-02 router. Subsequent FRs will add their own
     # routers (e.g. metrics under FR-09) without touching this line.
     app.include_router(tasks_router, prefix="/v1")
+
+    # [FR-09] Mount `/v1/metrics` (admin scope). The metrics router
+    # already carries `prefix="/v1"` so `app.include_router` does NOT
+    # add another one — the route becomes exactly `/v1/metrics`.
+    app.include_router(metrics_router)
 
     return app
 
