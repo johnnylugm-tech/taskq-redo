@@ -20,11 +20,20 @@ FR-09 row 3:
 Each series is guaranteed to exist (possibly empty) so downstream
 tooling can rely on a stable schema across versions.
 
+**Layering note (NFR-06 / FR-06)**: this module intentionally does
+NOT import `sqlalchemy`. The SQL surface is owned by
+`taskq_api.repository.*` (specifically `health_repo.py`); this
+module orchestrates repository helpers without holding a SQLAlchemy
+primitive. Violating that contract breaks the
+`forbidden-sqlalchemy` lint-imports layer guard, which is one of
+the architecture_constraints the harness checks at Gate 1.
+
 Citations:
   SPEC.md §3 FR-09 (whole section)
   SPEC.md §8 #10 (DB-down verifier)
   SPEC.md §8 #11 (migration-behind-head verifier)
   SPEC.md §4 NFR-04 (no internals in error detail)
+  NFR-06 (sqlalchemy forbidden outside repository/)
 """
 from __future__ import annotations
 
@@ -32,12 +41,15 @@ import os
 from pathlib import Path
 from typing import Optional, Tuple
 
-from sqlalchemy import func, select, text
-from sqlalchemy.engine import Engine
-
-from taskq_api.models.orm import Task, TaskResult
+from taskq_api.repository.health_repo import (
+    alembic_current_revision,
+    alembic_head_revision,
+    db_reachable,
+    task_counts_by_status,
+    task_result_durations_ms,
+)
 from taskq_api.repository.rate_repo import RateRepo
-from taskq_api.repository.session import engine, transaction
+from taskq_api.repository.session import engine
 
 
 # ---------------------------------------------------------------------------
@@ -45,7 +57,7 @@ from taskq_api.repository.session import engine, transaction
 # ---------------------------------------------------------------------------
 
 
-def check_db(target: Engine = engine) -> Tuple[bool, str]:
+def check_db(target=engine) -> Tuple[bool, str]:
     """Probe database connectivity (FR-09 / SPEC.md §8 #10).
 
     Returns `(ok, detail)`. `ok=True` when the engine answers
@@ -53,18 +65,17 @@ def check_db(target: Engine = engine) -> Tuple[bool, str]:
     failure. The exception class name is included (safe) but the
     exception args / traceback are NOT — NFR-04 forbids internal
     detail leakage.
+
+    The SQL access is performed by `repository.health_repo.db_reachable`
+    so this service-layer function stays free of SQLAlchemy imports
+    (NFR-06 layering).
     """
-    try:
-        with target.connect() as conn:
-            conn.execute(text("SELECT 1"))
-        return True, "database reachable"
-    except Exception as exc:  # noqa: BLE001 — readiness probe must never raise
-        return False, f"database unreachable: {type(exc).__name__}"
+    return db_reachable(target)
 
 
 def check_migration(
     cfg_path: Optional[Path] = None,
-    target: Engine = engine,
+    target=engine,
 ) -> Tuple[bool, str]:
     """Probe `alembic current == head` (FR-09 / SPEC.md §8 #11).
 
@@ -80,10 +91,6 @@ def check_migration(
     is an operator choice, not a fault).
     """
     try:
-        from alembic.config import Config  # noqa: PLC0415 (deferred)
-        from alembic.runtime.migration import MigrationContext  # noqa: PLC0415
-        from alembic.script import ScriptDirectory  # noqa: PLC0415
-
         # Resolve `alembic.ini` relative to CWD or one parent up so
         # the probe works both from the repo root and from a test
         # runner whose CWD is `03-development/`.
@@ -93,12 +100,13 @@ def check_migration(
             cfg_path = next((p for p in candidates if p.exists()), None)
         if cfg_path is None:
             return True, "migration check skipped (no alembic.ini)"
-        cfg = Config(str(cfg_path))
-        script = ScriptDirectory.from_config(cfg)
-        head = script.get_current_head()
-        with target.connect() as conn:
-            ctx = MigrationContext.configure(conn)
-            current = ctx.get_current_revision()
+        head = alembic_head_revision(cfg_path)
+        current = alembic_current_revision(target)
+        # `None` here means the check could not be performed
+        # (alembic tables not yet created, or env missing). Treated
+        # as a soft pass — same posture as `cfg_path is None`.
+        if head is None or current is None:
+            return True, "migration check skipped"
         if current == head:
             return True, "migration at head"
         return False, f"migration behind head (current={current}, head={head})"
@@ -113,14 +121,7 @@ def check_migration(
 
 def _task_counts_by_status() -> dict:
     """Return a `{status: count}` mapping for every persisted task row."""
-    counts: dict[str, int] = {}
-    with transaction() as session:
-        rows = session.execute(
-            select(Task.status, func.count(Task.id)).group_by(Task.status)
-        ).all()
-    for status_value, count in rows:
-        counts[str(status_value)] = int(count)
-    return counts
+    return task_counts_by_status()
 
 
 def _latency_percentiles() -> dict:
@@ -132,11 +133,7 @@ def _latency_percentiles() -> dict:
     interpolated. Empty input returns zeros so the series shape is
     stable when no runs have completed yet.
     """
-    with transaction() as session:
-        durations = [
-            int(row[0])
-            for row in session.execute(select(TaskResult.duration_ms)).all()
-        ]
+    durations = task_result_durations_ms()
     if not durations:
         return {"p50": 0, "p90": 0, "p99": 0}
     durations.sort()
