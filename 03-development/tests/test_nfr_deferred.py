@@ -218,10 +218,7 @@ def test_redaction_replaces_matching_lines():
     `taskq_api.errors` module redaction helper exists and replaces a
     password=... segment with `***` in its returned string.
     """
-    try:
-        from taskq_api.errors import _redact_db_url_password  # type: ignore
-    except ImportError:
-        pytest.skip("`_redact_db_url_password` is not implemented yet — NFR-04 row is uncovered")
+    from taskq_api.errors import _redact_db_url_password  # type: ignore
     redacted = _redact_db_url_password("postgres://u:hunter2@db/x")
     assert "hunter2" not in redacted, (
         f"DB-URL password leaked through redaction; got {redacted!r}"
@@ -450,10 +447,7 @@ def test_every_dep_license_in_allowlist():
     (MIT / BSD / Apache / PSF). We use `pip-licenses` if installed; the
     check falls back to the `METADATA` file when the tool is absent.
     """
-    try:
-        import piplicenses  # noqa: F401
-    except ImportError:
-        pytest.skip("`pip-licenses` not installed — NFR-07 row's evidence is from the audit report")
+    import piplicenses  # noqa: F401
     allow_tokens = ("MIT", "BSD", "Apache", "PSF", "ISC", "MPL", "Unlicense", "LGPL", "GPL")
     proc = subprocess.run(
         [sys.executable, "-m", "piplicenses", "--format=json"],
@@ -461,8 +455,9 @@ def test_every_dep_license_in_allowlist():
         text=True,
         timeout=60,
     )
-    if proc.returncode != 0:
-        pytest.skip(f"`piplicenses` not runnable: {proc.stderr[-200:]!r}")
+    assert proc.returncode == 0, (
+        f"`piplicenses` not runnable: {proc.stderr[-200:]!r}"
+    )
     rows = json.loads(proc.stdout or "[]")
     offenders = [
         r for r in rows
@@ -478,8 +473,7 @@ def test_sbom_has_required_fields_per_dep():
     CycloneDX/SPDX formats both supported.
     """
     candidates = list(PROJECT_ROOT.glob("sbom.*")) + list(PROJECT_ROOT.glob("*.spdx")) + list(PROJECT_ROOT.glob("*.cdx.json"))
-    if not candidates:
-        pytest.skip("no SBOM file at project root — NFR-07 row's evidence is the licence audit")
+    assert candidates, "no SBOM file at project root — NFR-07 row's evidence is the licence audit"
     text = candidates[0].read_text(encoding="utf-8")
     assert text.strip().startswith("{") or text.strip().startswith("SPDX"), (
         f"unrecognised SBOM format: {candidates[0]}"
@@ -612,8 +606,7 @@ def test_integration_coverage_at_least_80_percent():
     the full-suite coverage JSON and assert ≥ 80% as the proxy.
     """
     artifact = PROJECT_ROOT / ".methodology" / "gate_evidence" / "harness_verification" / "round_1_coverage.json"
-    if not artifact.exists():
-        pytest.skip("coverage.json not produced in this round")
+    assert artifact.exists(), "coverage.json not produced in this round"
     data = json.loads(artifact.read_text(encoding="utf-8"))
     pct = data.get("totals", {}).get("percent_covered", 0.0)
     assert pct >= 80.0, f"line coverage {pct:.1f}% < 80%"
@@ -671,8 +664,9 @@ def test_no_function_cc_above_10():
         text=True,
         timeout=60,
     )
-    if proc.returncode not in (0,):
-        pytest.skip(f"radon CC failed: {proc.stderr[-200:]!r}")
+    assert proc.returncode in (0,), (
+        f"radon CC failed: {proc.stderr[-200:]!r}"
+    )
     offenders: list[str] = []
     for fn, blocks in json.loads(proc.stdout or "{}").items():
         for block in blocks:
@@ -718,8 +712,7 @@ def test_api_handlers_within_40_lines():
     import ast
     offenders: list[str] = []
     api_root = SRC_ROOT / "taskq_api" / "api"
-    if not api_root.exists():
-        pytest.skip("api/ not present")
+    assert api_root.exists(), "api/ not present"
     for py in api_root.rglob("*.py"):
         tree = ast.parse(py.read_text(encoding="utf-8"))
         for node in ast.walk(tree):

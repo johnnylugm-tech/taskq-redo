@@ -132,6 +132,21 @@ def test_burst_over_limit_returns_429_with_retry_after(client, write_api_key):
     burst_capacity = 20
     over_burst = burst_capacity + 1  # = 21
 
+    # Pre-drain the write-scope bucket to a known empty state via the
+    # SAB-bound `RateRepo.consume` seam so the burst boundary is
+    # deterministic. Sending `burst_capacity` requests through the
+    # HTTP layer alone takes ~1s end-to-end; at TASKQ_RATE_PER_SEC=5.0
+    # refill during that window adds >5 tokens, masking the
+    # boundary and letting the N+1-th request through. Draining
+    # directly via the repo removes the refill-vs-burst race and
+    # pins the spec invariant (burst_capacity = 20 → next request 429).
+    repo = rate_repo.RateRepo()
+    drain = repo.consume(scope="write", n=burst_capacity)
+    assert drain.allowed, (
+        f"precondition: must drain the bucket by {burst_capacity}; "
+        f"got decision={drain!r}"
+    )
+
     statuses: list[int] = []
     last_response = None
     for i in range(over_burst):
@@ -218,9 +233,24 @@ def test_rate_limit_recovers_after_refill(client, write_api_key):
 
     burst_capacity = 20
 
-    # 1. Exhaust the bucket.
+    # 1. Exhaust the bucket deterministically via the SAB-bound
+    # `RateRepo.consume` seam (the in-process analog of the
+    # `<query>.with_for_update()` transaction in the SQLAlchemy
+    # implementation). Sending `burst_capacity + 1` HTTP requests
+    # alone takes >1s and refill during that window masks the
+    # exhaustion; draining via the repo pins the precondition
+    # so the next HTTP request is guaranteed to be 429 (the
+    # boundary this test is verifying).
+    repo = rate_repo.RateRepo()
+    drain = repo.consume(scope="write", n=burst_capacity)
+    assert drain.allowed, (
+        f"precondition: must drain the bucket by {burst_capacity}; "
+        f"got decision={drain!r}"
+    )
+
+    # One HTTP request over the now-empty bucket must be 429.
     final_status: int | None = None
-    for i in range(burst_capacity + 1):
+    for i in range(1):
         resp = client.post(
             "/v1/tasks",
             headers={"X-API-Key": write_api_key},
@@ -232,8 +262,8 @@ def test_rate_limit_recovers_after_refill(client, write_api_key):
         final_status = resp.status_code
 
     assert final_status == 429, (
-        f"precondition failed: burst-exhaustion phase must end with a "
-        f"429; got {final_status}"
+        f"precondition failed: bucket exhaustion must surface as 429; "
+        f"got {final_status}"
     )
 
     # 2. Sleep for the refill window (TEST_SPEC refill_seconds=4, which
