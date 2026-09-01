@@ -199,18 +199,18 @@
   },
   "crg_review_context": {
     "status": "ok",
-    "summary": "Review context for 16 changed file(s):\n  - Risk: high\n  - 248 impacted nodes in 30 files",
+    "summary": "Review context for 17 changed file(s):\n  - Risk: high\n  - 196 impacted nodes in 34 files",
     "risk": "high",
-    "changed_file_count": 16,
-    "impacted_file_count": 30,
+    "changed_file_count": 17,
+    "impacted_file_count": 34,
     "key_entities": [
-      "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/errors.py",
-      "BadRequestError",
-      "ConflictError",
-      "CorrelationIdMiddleware",
-      "__call__"
+      "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/models/orm.py",
+      "ApiKey",
+      "RateBucket",
+      "Task",
+      "TaskResult"
     ],
-    "test_gaps": 27,
+    "test_gaps": 21,
     "next_tool_suggestions": [
       "detect_changes",
       "get_affected_flows",
@@ -218,71 +218,63 @@
     ],
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 49664,
+      "saved_tokens": 31862,
       "saved_percent": 100
     }
   },
   "crg_impact_radius": {
     "status": "ok",
-    "summary": "Blast radius for 16 changed file(s):\n  - 118 nodes directly changed\n  - 248 nodes impacted (within 2 hops)\n  - 30 additional files affected",
+    "summary": "Blast radius for 17 changed file(s):\n  - 36 nodes directly changed\n  - 196 nodes impacted (within 2 hops)\n  - 34 additional files affected",
     "risk": "high",
-    "impacted_file_count": 30,
+    "impacted_file_count": 34,
     "key_entities": [
+      "_cmd_key_create",
       "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/api/deps.py",
       "check_scope",
       "get_key_repo",
-      "get_rate_repo",
-      "get_task_service"
+      "get_rate_repo"
     ],
     "truncated": false,
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 49678,
+      "saved_tokens": 31871,
       "saved_percent": 100
     }
   },
   "crg_affected_flows": {
-    "total": 15,
+    "total": 8,
     "flows": [
       {
         "name": "create_app",
         "criticality": 0.66
       },
       {
-        "name": "list_tasks",
-        "criticality": 0.635
+        "name": "add_result",
+        "criticality": 0.6114
       },
       {
-        "name": "require_api_key",
-        "criticality": 0.5967
+        "name": "create",
+        "criticality": 0.6025
       },
       {
-        "name": "rate_limit",
-        "criticality": 0.555
+        "name": "set_status",
+        "criticality": 0.5483
       },
       {
-        "name": "get_task",
-        "criticality": 0.505
+        "name": "reset_all",
+        "criticality": 0.5464
       },
       {
-        "name": "create_task",
-        "criticality": 0.505
+        "name": "list_results",
+        "criticality": 0.5175
       },
       {
-        "name": "delete_task",
-        "criticality": 0.47
+        "name": "schedule_run",
+        "criticality": 0.32
       },
       {
-        "name": "run_task",
-        "criticality": 0.43
-      },
-      {
-        "name": "__init__",
-        "criticality": 0.405
-      },
-      {
-        "name": "_problem_handler",
-        "criticality": 0.37
+        "name": "list_runs",
+        "criticality": 0.24
       }
     ]
   },
