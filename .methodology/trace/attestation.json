@@ -1,7 +1,7 @@
 {
   "schema": "harness/traceability/attestation/v1",
-  "git_sha": "b105a1270bfd1f5c26e91d29fbfad0f40b3127b2",
-  "content_sha256": "333ec83bc003d20538c8695014d843985e488058ba82c1e1c2987b4916c86769",
+  "git_sha": "63330ba177ab357d992141ad824e4f7234da2999",
+  "content_sha256": "6f6da0038373d51e35458cffd84c1266e764415d21ac264820bf110afc6dc56e",
   "tool": "scripts/build_trace_attestation.py",
   "overlay_used": null,
   "overlay_errors": [],
@@ -13,8 +13,8 @@
       "srs_coverage": "100.0%",
       "code_coverage": "100.0%",
       "test_coverage": "100.0%",
-      "verification_rate": "100.0%",
-      "total_links": 68,
+      "verification_rate": "90.0%",
+      "total_links": 69,
       "missing_mappings": {
         "fr_without_srs": [],
         "fr_without_code": [],
@@ -102,7 +102,7 @@
       },
       "FR-05": {
         "fr_id": "FR-05",
-        "status": "verified",
+        "status": "in_progress",
         "srs_section": "SAD.md",
         "code_files": [
           "03-development/src/taskq_api/api/deps.py",
@@ -158,7 +158,8 @@
           "03-development/tests/test_fr08.py"
         ],
         "test_files": [
-          "03-development/tests/test_fr08.py"
+          "03-development/tests/test_fr08.py",
+          "03-development/tests/test_fr08_coverage.py"
         ],
         "sad_module": "—",
         "priority": "HIGH"
