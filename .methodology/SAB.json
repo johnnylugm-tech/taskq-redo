@@ -63,6 +63,9 @@
         {
           "name": "taskq_api.repository.rate_repo"
         },
+        {
+          "name": "taskq_api.repository.health_repo"
+        },
         "taskq_api.repository"
       ],
       "allowed_dependencies": [
@@ -276,7 +279,8 @@
     "FR-09": [
       "taskq_api.api.health",
       "taskq_api.service.health",
-      "taskq_api.repository.session"
+      "taskq_api.repository.session",
+      "taskq_api.repository.health_repo"
     ],
     "FR-10": [
       "taskq_api.errors",
