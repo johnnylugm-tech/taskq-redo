@@ -2,17 +2,18 @@
 # returncode: 0
 # agent_score: 100.0 | threshold: 100.0
 
-........................................................................ [ 30%]
-........................................................................ [ 61%]
-........................................................................ [ 91%]
-....................                                                     [100%]
+........................................................................ [ 29%]
+........................................................................ [ 59%]
+........................................................................ [ 89%]
+..........................                                               [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
 
-03-development/tests/test_fr08.py::test_task_runner_run_spawn_error_marks_failed
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1078d0860>
+03-development/tests/test_bughunt_runner.py::test_background_runner_writes_task_results_row
+03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1092e0ae0>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -50,7 +51,18 @@
     from prettytable import NONE as RULE_NONE
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-236 passed, 6 warnings in 108.80s (0:01:48)
+
+--------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_service_get_by_id_p95_under_30ms     111.1660 (1.0)         524.3330 (1.0)      118.4894 (1.0)         23.3988 (1.0)      115.2500 (1.0)       3.9580 (1.0)         30;66        8.4396 (1.0)        1550           1
+test_service_list_p95_under_80ms          657.5410 (5.91)     42,562.8330 (81.18)    819.0435 (6.91)     1,520.1521 (64.97)    749.4375 (6.50)     60.9590 (15.40)        1;33        1.2209 (0.14)        758           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+242 passed, 7 warnings in 125.86s (0:02:05)
 --- verify-system: service smoke ---
 service smoke: OK
 --- verify-system: PASS ---

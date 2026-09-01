@@ -1,0 +1,57 @@
+........................................................................ [ 29%]
+........................................................................ [ 59%]
+........................................................................ [ 89%]
+..........s..............                                                [100%]
+=============================== warnings summary ===============================
+03-development/tests/integration/test_task_lifecycle_e2e.py::test_app_ready_endpoint_returns_200
+03-development/tests/integration/test_task_lifecycle_e2e.py::test_fr09_readyz_returns_503_when_db_down_e2e
+03-development/tests/test_fr03.py::test_health_endpoints_no_auth_required
+03-development/tests/test_fr03.py::test_health_endpoints_no_auth_required
+03-development/tests/test_fr09.py::test_alembic_head_revision_returns_head_from_alembic_ini
+  /Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+03-development/tests/integration/test_task_lifecycle_e2e.py: 5 warnings
+03-development/tests/test_fr01.py: 4 warnings
+03-development/tests/test_fr10.py: 3 warnings
+  /Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/site-packages/starlette/_exception_handler.py:59: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    response = await handler(conn, exc)
+
+03-development/tests/test_bughunt_runner.py::test_background_runner_writes_task_results_row
+  /Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x107031c60>
+  
+  Traceback (most recent call last):
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
+      self.close()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 104, in close
+      proto.pipe.close()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/unix_events.py", line 566, in close
+      self._close(None)
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/unix_events.py", line 590, in _close
+      self._loop.call_soon(self._call_connection_lost, exc)
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+      self._check_closed()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_service_get_by_id_p95_under_30ms     111.2090 (1.0)         484.8330 (1.0)      120.6173 (1.0)         24.0189 (1.0)      117.0830 (1.0)       3.8965 (1.0)         44;93        8.2907 (1.0)        1832           1
+test_service_list_p95_under_80ms          616.0420 (5.54)     43,192.1660 (89.09)    844.4634 (7.00)     1,951.7373 (81.26)    731.6875 (6.25)     97.3330 (24.98)        2;41        1.1842 (0.14)        822           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+240 passed, 1 skipped, 18 warnings in 99.27s (0:01:39)
+--- verify-system: service smoke ---
+service smoke: OK
+--- verify-system: PASS ---

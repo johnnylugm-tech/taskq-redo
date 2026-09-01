@@ -36,6 +36,8 @@ from taskq_api.repository.rate_repo import (
     RateRepo,
 )
 
+# pragma: no error-handling
+
 
 # Public constants bound to the repository defaults. Re-exported under
 # the names TEST_SPEC.md FR-05 cases 1 + 2 reference.

@@ -4,7 +4,7 @@
 
 {
   "errors": [],
-  "generated_at": "2026-09-01T19:45:21Z",
+  "generated_at": "2026-09-01T22:55:02Z",
   "metrics": {
     "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/__init__.py": {
       "CONFIDENCE.HIGH": 0,
@@ -301,7 +301,7 @@
       "SEVERITY.LOW": 4,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 373,
+      "loc": 429,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -327,7 +327,7 @@
       "SEVERITY.LOW": 5,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 2575,
+      "loc": 2631,
       "nosec": 0,
       "skipped_tests": 0
     }
@@ -357,7 +357,7 @@
       "test_name": "assert_used"
     },
     {
-      "code": "336             self._task_group_entered = True\n337         assert self._semaphore is not None, (\n338             \"BackgroundRunner.start() must be awaited before submit()\"\n339         )\n340         row = self._repo.get(task_id_or_command)\n",
+      "code": "337             self._task_group_entered = True\n338         assert self._semaphore is not None, (\n339             \"BackgroundRunner.start() must be awaited before submit()\"\n340         )\n341         row = self._repo.get(task_id_or_command)\n",
       "col_offset": 8,
       "end_col_offset": 9,
       "filename": "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/service/runner.py",
@@ -368,18 +368,18 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
-      "line_number": 337,
+      "line_number": 338,
       "line_range": [
-        337,
         338,
-        339
+        339,
+        340
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
       "test_id": "B101",
       "test_name": "assert_used"
     },
     {
-      "code": "369         \"\"\"\n370         assert self._semaphore is not None\n371         async with self._semaphore:\n",
+      "code": "377         \"\"\"\n378         assert self._semaphore is not None\n379         async with self._semaphore:\n",
       "col_offset": 8,
       "end_col_offset": 42,
       "filename": "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/service/runner.py",
@@ -390,16 +390,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
-      "line_number": 370,
+      "line_number": 378,
       "line_range": [
-        370
+        378
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
       "test_id": "B101",
       "test_name": "assert_used"
     },
     {
-      "code": "383         \"\"\"\n384         assert self._semaphore is not None\n385         async with self._semaphore:\n",
+      "code": "405         \"\"\"\n406         assert self._semaphore is not None\n407         async with self._semaphore:\n",
       "col_offset": 8,
       "end_col_offset": 42,
       "filename": "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/service/runner.py",
@@ -410,16 +410,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
-      "line_number": 384,
+      "line_number": 406,
       "line_range": [
-        384
+        406
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
       "test_id": "B101",
       "test_name": "assert_used"
     },
     {
-      "code": "429         \"\"\"\n430         assert self._semaphore is not None, (\n431             \"BackgroundRunner.start() must be awaited before shutdown()\"\n432         )\n433         if not self._task_group_entered:\n",
+      "code": "491         \"\"\"\n492         assert self._semaphore is not None, (\n493             \"BackgroundRunner.start() must be awaited before shutdown()\"\n494         )\n495         if not self._task_group_entered:\n",
       "col_offset": 8,
       "end_col_offset": 9,
       "filename": "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/service/runner.py",
@@ -430,11 +430,11 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
-      "line_number": 430,
+      "line_number": 492,
       "line_range": [
-        430,
-        431,
-        432
+        492,
+        493,
+        494
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b101_assert_used.html",
       "test_id": "B101",

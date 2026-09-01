@@ -1,0 +1,70 @@
+[
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 55,
+      "row": 23
+    },
+    "filename": "/Users/johnny/projects/taskq-redo/03-development/tests/test_bughunt_runner.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from taskq_api.repository.task_repo import STATUS_INTERRUPTED, TaskRepo",
+          "end_location": {
+            "column": 101,
+            "row": 23
+          },
+          "location": {
+            "column": 1,
+            "row": 23
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 44,
+      "row": 23
+    },
+    "message": "`taskq_api.repository.task_repo.STATUS_DONE` imported but unused",
+    "noqa_row": 23,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 91,
+      "row": 23
+    },
+    "filename": "/Users/johnny/projects/taskq-redo/03-development/tests/test_bughunt_runner.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from taskq_api.repository.task_repo import STATUS_INTERRUPTED, TaskRepo",
+          "end_location": {
+            "column": 101,
+            "row": 23
+          },
+          "location": {
+            "column": 1,
+            "row": 23
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 77,
+      "row": 23
+    },
+    "message": "`taskq_api.repository.task_repo.STATUS_RUNNING` imported but unused",
+    "noqa_row": 23,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  }
+]

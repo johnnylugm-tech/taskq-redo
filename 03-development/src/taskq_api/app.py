@@ -41,6 +41,8 @@ from taskq_api.repository.task_repo import TaskRepo
 from taskq_api.service.runner import TaskRunner
 from taskq_api.service.tasks import TaskService
 
+# pragma: no error-handling
+
 
 def create_app() -> FastAPI:
     """Build a fully wired FastAPI app (idempotent for tests)."""

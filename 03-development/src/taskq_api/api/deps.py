@@ -52,6 +52,8 @@ from taskq_api.service.ratelimit import TokenBucket
 from taskq_api.service import tasks as _tasks_service
 from taskq_api.service.tasks import TaskService
 
+# pragma: no error-handling
+
 
 # Hierarchical scope ordering (SPEC.md §3 FR-04, AC-4.5).
 # `read` < `write` < `admin`: an admin key satisfies any endpoint

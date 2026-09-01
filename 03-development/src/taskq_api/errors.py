@@ -471,12 +471,14 @@ class SuppressServerExceptionReraise:
     async def __call__(self, scope, receive, send):
         try:
             await self.app(scope, receive, send)
-        except BaseException:
+        except Exception:
             # `ServerErrorMiddleware` has already written the 500
             # response by the time it raises. There is nothing left to
             # do — propagating the exception would only confuse the
             # test client (or any caller) into thinking no response was
-            # produced.
+            # produced. `Exception` (not `BaseException`) so genuine
+            # interrupts (KeyboardInterrupt, SystemExit, asyncio.CancelledError)
+            # still propagate normally.
             return
 
 

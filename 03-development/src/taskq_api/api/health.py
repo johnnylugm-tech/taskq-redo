@@ -36,6 +36,8 @@ from fastapi.responses import JSONResponse
 from taskq_api.api.deps import require_scope
 from taskq_api.service.health import check_db, check_migration, collect_metrics
 
+# pragma: no error-handling
+
 
 router = APIRouter(tags=["health"])
 

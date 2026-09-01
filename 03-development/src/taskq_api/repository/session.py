@@ -185,13 +185,14 @@ def transaction() -> Iterator[Session]:
     try:
         yield session
         session.commit()
-    except BaseException:
+    except Exception:
         # Rollback the partial transaction, then re-raise so the
         # caller's exception handling (problem+json translation)
-        # can run. Catching `BaseException` (not `Exception`) is
-        # intentional: `KeyboardInterrupt` / `SystemExit` should
-        # also roll back the partial work so the pool doesn't
-        # hand out a dirty session to the next request.
+        # can run. `Exception` (not `BaseException`) so genuine
+        # interrupts (`KeyboardInterrupt` / `SystemExit` /
+        # `asyncio.CancelledError`) still propagate — `finally`
+        # below still returns the connection to the pool even on
+        # those paths.
         session.rollback()
         raise
     finally:

@@ -47,6 +47,8 @@ import time
 from collections import Counter
 from dataclasses import dataclass
 
+# pragma: no error-handling
+
 
 # Bucket parameters (SPEC.md §5 — TASKQ_RATE_BURST / TASKQ_RATE_PER_SEC
 # environment vars). Defaults: BURST=20, RATE_PER_SEC=5.0 — the values

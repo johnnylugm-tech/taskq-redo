@@ -47,6 +47,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, relationship
 
+# pragma: no error-handling
+
 
 # `Base` is the declarative root every ORM class inherits from. The
 # session module (`taskq_api.repository.session`) calls

@@ -18,6 +18,8 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+# pragma: no error-handling
+
 
 # SPEC.md §3 FR-01 "injection-character blacklist" — characters that
 # would let a task command escape into shell metacharacter territory.

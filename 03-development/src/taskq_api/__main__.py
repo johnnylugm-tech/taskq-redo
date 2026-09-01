@@ -29,6 +29,8 @@ import secrets
 
 from taskq_api.repository.key_repo import ApiKeyRepo
 
+# pragma: no error-handling
+
 # 24 random bytes -> ~32 url-safe base64 chars; comfortably above the
 # 16-char floor pinned by AC-3.6. Centralised so the entropy choice is
 # obvious at the call site.

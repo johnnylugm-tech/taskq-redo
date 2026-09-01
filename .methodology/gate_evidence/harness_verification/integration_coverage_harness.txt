@@ -1,6 +1,6 @@
 # Harness-executed: pytest-cov-integration
 # returncode: 0
-# agent_score: 63.0 | threshold: 60.0
+# agent_score: 82.0 | threshold: 60.0
 
 ..............................                                           [100%]
 =============================== warnings summary ===============================
@@ -16,27 +16,27 @@ Name                                                     Stmts   Miss  Cover   M
 --------------------------------------------------------------------------------------
 03-development/src/taskq_api/__init__.py                     0      0   100%
 03-development/src/taskq_api/api/__init__.py                 0      0   100%
-03-development/src/taskq_api/api/deps.py                    36      1    97%   180
-03-development/src/taskq_api/api/health.py                  23      3    87%   62, 87, 90
+03-development/src/taskq_api/api/deps.py                    36      1    97%   182
+03-development/src/taskq_api/api/health.py                  23      3    87%   64, 89, 92
 03-development/src/taskq_api/api/tasks.py                   48      0   100%
 03-development/src/taskq_api/app.py                         28      0   100%
 03-development/src/taskq_api/config.py                       1      0   100%
-03-development/src/taskq_api/errors.py                     139     14    90%   83-84, 127, 242, 255, 420-427, 474-480, 493-497
+03-development/src/taskq_api/errors.py                     139     14    90%   83-84, 127, 242, 255, 420-427, 474-482, 495-499
 03-development/src/taskq_api/models/__init__.py              0      0   100%
 03-development/src/taskq_api/models/orm.py                  30      0   100%
-03-development/src/taskq_api/models/schemas.py              37      3    92%   47, 50, 57
+03-development/src/taskq_api/models/schemas.py              37      3    92%   49, 52, 59
 03-development/src/taskq_api/repository/__init__.py          0      0   100%
 03-development/src/taskq_api/repository/health_repo.py      44      7    84%   52-53, 62-63, 81-82, 98
-03-development/src/taskq_api/repository/key_repo.py         31      5    84%   80-86, 103
-03-development/src/taskq_api/repository/rate_repo.py        53      5    91%   201-205
+03-development/src/taskq_api/repository/key_repo.py         31      5    84%   82-88, 105
+03-development/src/taskq_api/repository/rate_repo.py        53      5    91%   203-207
 03-development/src/taskq_api/repository/session.py          48      6    88%   78, 106, 109-110, 114-115
 03-development/src/taskq_api/repository/task_repo.py       106     10    91%   282, 313, 360-367, 396-398
 03-development/src/taskq_api/service/__init__.py             0      0   100%
 03-development/src/taskq_api/service/auth.py                 7      0   100%
 03-development/src/taskq_api/service/health.py              47     15    68%   102, 110-114, 139-140, 154-160
 03-development/src/taskq_api/service/ratelimit.py           11      0   100%
-03-development/src/taskq_api/service/runner.py             135     77    43%   116, 128, 155-157, 169-171, 230-234, 282-298, 308, 334-354, 370-373, 384-413, 430-455, 462-465, 470-473
+03-development/src/taskq_api/service/runner.py             150     91    39%   117, 129, 156-158, 170-172, 231-235, 283-299, 309, 335-355, 378-382, 406-467, 492-521, 528-531, 536-539
 03-development/src/taskq_api/service/tasks.py               48      0   100%
 --------------------------------------------------------------------------------------
-TOTAL                                                      872    146    83%
-30 passed, 1 warning in 2.70s
+TOTAL                                                      887    160    82%
+30 passed, 1 warning in 2.99s

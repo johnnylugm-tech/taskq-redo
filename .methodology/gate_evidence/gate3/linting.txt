@@ -1,0 +1,4 @@
+03-development/tests/test_bughunt_runner.py:23:44: F401 [*] `taskq_api.repository.task_repo.STATUS_DONE` imported but unused
+03-development/tests/test_bughunt_runner.py:23:77: F401 [*] `taskq_api.repository.task_repo.STATUS_RUNNING` imported but unused
+Found 2 errors.
+[*] 2 fixable with the `--fix` option.

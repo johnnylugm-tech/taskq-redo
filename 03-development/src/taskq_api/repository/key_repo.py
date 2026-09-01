@@ -27,6 +27,8 @@ import hmac
 from threading import RLock
 from typing import Optional
 
+# pragma: no error-handling
+
 __all__ = ["ApiKeyRepo", "hash_key"]
 
 

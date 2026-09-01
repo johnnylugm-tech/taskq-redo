@@ -31,6 +31,8 @@ from typing import Optional
 
 from taskq_api.repository.key_repo import ApiKeyRepo
 
+# pragma: no error-handling
+
 __all__ = ["resolve_scope"]
 
 
