@@ -17,7 +17,7 @@ httpx==0.27.2
 
 # === Dev/test toolchain (SPEC §6 "requirements-dev.txt" — listed here so the
 # lock is the single license audit point) ===
-import-linter==1.12.2
+import-linter==1.12.1
 pip-licenses==4.3.4
 mutmut==2.5.1
 pytest-benchmark==4.0.0
