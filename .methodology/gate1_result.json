@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-03",
+  "fr_id": "FR-04",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788312675773\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.624}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788313195102\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.602}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 47,
+      "tests_passed": 37,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "collected 47 items\n03-development/tests/test_fr03.py ................                       [ 34%]\n03-development/tests/test_fr04.py .....                                  [ 44%]\n03-development/tests/test_fr06.py ..........................             [100%]\n======================== 47 passed, 1 warning in 1.51s =========================\nCoverage: 03-development/src/taskq_api/repository/key_repo.py 100%, 03-development/src/taskq_api/service/auth.py 100%, totals 100% (38/38 statements).",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 37 items\n\n03-development/tests/test_fr04.py .....                                  [ 13%]\n03-development/tests/test_fr03.py ................                       [ 56%]\n03-development/tests/test_fr05.py .....                                  [ 70%]\n03-development/tests/test_fr10.py ...........                            [100%]\n======================== 37 passed, 1 warning in 6.06s =========================",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-03",
+      "coverage_scope_fr": "FR-04",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 48 files, 93 dependencies.\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\nContracts: 5 kept, 0 broken.",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-main-independent KEPT\n\nContracts: 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,23 +71,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "e69db584b9e5ac0ebdee8acab74116ae2174deaddfbadefd3b0ad365887e358f",
-      "bytes": 170,
-      "head": "{\"version\":\"1.1.409\",\"time\":\"1788312675773\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.624}}"
+      "sha256": "d41fe4c6b5375dc792b9e1299cb8106ffb64d2d73f3c8c338a214ca2e6e52362",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788313195102\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.602}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "245fbaff5e3b916b5da295f28e4b4e6bd2ce701b8ac0b8b1ab2724ca7d9a51d7",
-      "bytes": 490,
-      "head": "collected 47 items\n03-development/tests/test_fr03.py ................                       [ 34%]\n03-development/tests/test_fr04.py .....                                  [ 44%]\n03-development/tests/test_fr06.py ..........................             [100%]\n======================== 47 passed, 1 warning in 1.51s =========================\nCoverage: 03-development/src/taskq_api/repository/key_repo.py 100%, 03-development/src/taskq_api/service/auth.py 100%, totals 100% (38/38 statements)."
+      "sha256": "e4b66e0c21f941622d091f19dad2c3eae7a6e340c948f93e4e94f9aa4984365c",
+      "bytes": 563,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\ncollected 37 items\n\n03-development/tests/test_fr04.py .....                                  [ 13%]\n03-development/tests/test_fr03.py ................                       [ 56%]\n03-development/tests/test_fr05.py .....                                  [ 70%]\n03-development/tests/test_fr10.py ...........                            [100%]\n======================== 37 passed, 1 warning in 6.06s ========================="
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "54a4a133329ddac1d7e76e64144e447f1f2566d866e64d3844d8bef36f02e054",
-      "bytes": 200,
-      "head": "Analyzed 48 files, 93 dependencies.\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\nContracts: 5 kept, 0 broken."
+      "sha256": "a76f0b26e9753710df441cfe3277a7c8d7940314314ff3e3cb100c572f15691f",
+      "bytes": 317,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
