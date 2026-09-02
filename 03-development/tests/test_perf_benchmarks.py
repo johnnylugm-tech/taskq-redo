@@ -22,7 +22,7 @@ from taskq_api.service.tasks import TaskService
 
 
 @pytest.fixture
-def seeded_service() -> TaskService:
+def seeded_service() -> tuple[TaskService, str | None]:
     """Service pre-seeded with 1k tasks so `get` / `list` exercise a
     realistic repo, not an empty table."""
     # TaskRepo shares a module-level SQLAlchemy engine across
