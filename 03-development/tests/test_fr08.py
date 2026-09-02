@@ -1007,3 +1007,65 @@ def test_read_float_env_parses_value_when_set(monkeypatch):
     monkeypatch.setenv("TASKQ_DRAIN_TIMEOUT", "9.5")
     from taskq_api.service.runner import _read_float_env
     assert _read_float_env("TASKQ_DRAIN_TIMEOUT", 1.25) == 9.5
+
+
+def test_background_runner_cancelled_kill_handles_process_lookup_error(
+    monkeypatch, repo
+):
+    """AC-8.5/NFR-03 — `proc.kill()` raising `ProcessLookupError` is swallowed.
+
+    When the TaskGroup cancels `_run_subprocess`, `asyncio.wait_for` cancels
+    its inner `proc.communicate()` task and re-raises `CancelledError`. The
+    runner then calls `proc.kill()` to prevent an orphan child. If the
+    subprocess has already exited between the cancellation propagation and
+    the `kill()` call (a tight race), `kill()` raises `ProcessLookupError`.
+    The defensive `except ProcessLookupError: pass` swallows it so the
+    `CancelledError` still propagates upward per AC-8.5 / NFR-03.
+
+    We exercise the branch by replacing `asyncio.create_subprocess_exec`
+    with a stub that returns a fake process whose `kill()` raises
+    `ProcessLookupError`, then cancelling the inner TaskGroup task.
+    """
+    from unittest.mock import MagicMock
+
+    TaskRepo.reset_all()
+    monkeypatch.setenv("TASKQ_MAX_CONCURRENT", "4")
+    monkeypatch.setenv("TASKQ_DRAIN_TIMEOUT", "2.0")
+    monkeypatch.setenv("TASKQ_TASK_TIMEOUT", "30.0")
+
+    fake_proc = MagicMock()
+    # The child has already been reaped by the OS — `kill()` raises
+    # `ProcessLookupError`. This is the exact race the defensive branch
+    # in `_run_subprocess` covers.
+    fake_proc.kill = MagicMock(side_effect=ProcessLookupError("already reaped"))
+
+    # `communicate` blocks until cancelled — emulates a long-running child.
+    async def fake_communicate():
+        await asyncio.Event().wait()  # never set; we cancel from outside
+        return b"", b""
+
+    fake_proc.communicate = fake_communicate
+
+    async def fake_create_subprocess_exec(*args, **kwargs):
+        return fake_proc
+
+    monkeypatch.setattr(
+        "asyncio.create_subprocess_exec", fake_create_subprocess_exec
+    )
+
+    runner = BackgroundRunner(repo=repo)
+    asyncio.run(runner.start())
+
+    async def _go():
+        row_id = await runner.submit("anything-cf")
+        inner_task = runner._in_flight[row_id]
+        # Let the inner task enter `asyncio.wait_for(proc.communicate(), ...)`.
+        await asyncio.sleep(0.05)
+        inner_task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await inner_task
+
+    asyncio.run(_go())
+    # `kill()` was attempted; the `except ProcessLookupError: pass` branch
+    # ran and the CancelledError still propagated (assertion above).
+    fake_proc.kill.assert_called_once()
