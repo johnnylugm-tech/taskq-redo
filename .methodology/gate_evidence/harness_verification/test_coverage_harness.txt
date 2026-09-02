@@ -1,6 +1,6 @@
 # Harness-executed: pytest-cov
 # returncode: 0
-# agent_score: 98.0 | threshold: 80.0
+# agent_score: 100.0 | threshold: 80.0
 
 ........................................................................ [ 29%]
 ........................................................................ [ 59%]
@@ -28,7 +28,7 @@
     from prettytable import NONE as RULE_NONE
 
 03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10b0ae3e0>
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10b05e3e0>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -84,11 +84,11 @@ TOTAL                                                      887      0   100%
 --------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
 Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_service_get_by_id_p95_under_30ms     112.7080 (1.0)      11,713.9170 (1.0)      137.1173 (1.0)        324.1303 (1.0)      116.9165 (1.0)       4.0830 (1.0)         18;91        7.2930 (1.0)        1458           1
-test_service_list_p95_under_80ms          623.6250 (5.53)     75,863.5420 (6.48)     983.0275 (7.17)     2,810.4444 (8.67)     773.2500 (6.61)     85.6770 (20.98)        5;60        1.0173 (0.14)        793           1
+test_service_get_by_id_p95_under_30ms     111.9580 (1.0)         779.0420 (1.0)      121.3964 (1.0)         41.2459 (1.0)      116.2910 (1.0)       3.4170 (1.0)         23;62        8.2375 (1.0)        1297           1
+test_service_list_p95_under_80ms          671.7090 (6.00)     55,101.0840 (70.73)    987.0817 (8.13)     2,040.4582 (49.47)    791.8330 (6.81)     83.2917 (24.38)       15;70        1.0131 (0.12)        775           1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-242 passed, 6 warnings in 113.84s (0:01:53)
+242 passed, 6 warnings in 117.98s (0:01:57)
