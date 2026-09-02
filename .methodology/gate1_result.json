@@ -1,8 +1,8 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-02",
-  "overall_score": 99.75,
+  "fr_id": "FR-03",
+  "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
@@ -16,27 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788312675773\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.624}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 108,
+      "tests_passed": 47,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "Name                                                   Stmts   Miss  Cover\n03-development/src/taskq_api/api/tasks.py                 48      0   100%\n03-development/src/taskq_api/repository/task_repo.py     106      0   100%\n03-development/src/taskq_api/service/runner.py           150      2    99%\n03-development/src/taskq_api/service/tasks.py             48      0   100%\nTOTAL                                                    352      2    99%\npytest: 108 passed, 1 warning in 16.15s; spec_coverage=6/6 (100%); tests_failed=0; tests_skipped=0; all required FR-02 tests present and passing",
-      "evidence_file": ".sessi-work/round_1/tools/test_coverage_report.txt",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
+      "tool_evidence": "collected 47 items\n03-development/tests/test_fr03.py ................                       [ 34%]\n03-development/tests/test_fr04.py .....                                  [ 44%]\n03-development/tests/test_fr06.py ..........................             [100%]\n======================== 47 passed, 1 warning in 1.51s =========================\nCoverage: 03-development/src/taskq_api/repository/key_repo.py 100%, 03-development/src/taskq_api/service/auth.py 100%, totals 100% (38/38 statements).",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-02",
+      "coverage_scope_fr": "FR-03",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)",
+      "tool_evidence": "Analyzed 48 files, 93 dependencies.\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\nContracts: 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -72,26 +71,26 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "dd965a75dc505cacc83dc686b40b2d807ee746c9017ffecbb1d60d708217b385",
-      "bytes": 141,
-      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
+      "sha256": "e69db584b9e5ac0ebdee8acab74116ae2174deaddfbadefd3b0ad365887e358f",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788312675773\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.624}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "3b0e7db03a4f11f90a06cc2afe3e79356efe1fbddef9e9b20d0ebb7b82d0de1d",
-      "bytes": 594,
-      "head": "Name                                                   Stmts   Miss  Cover\n03-development/src/taskq_api/api/tasks.py                 48      0   100%\n03-development/src/taskq_api/repository/task_repo.py     106      0   100%\n03-development/src/taskq_api/service/runner.py           150      2    99%\n03-development/src/taskq_api/service/tasks.py             48      0   100%\nTOTAL                                                    352      2    99%\npytest: 108 passed, 1 warning in 16.15s; spec_coverage=6/6 (100%); tests_failed=0; tests_skipped=0; all required FR-02 tests present and passing"
+      "sha256": "245fbaff5e3b916b5da295f28e4b4e6bd2ce701b8ac0b8b1ab2724ca7d9a51d7",
+      "bytes": 490,
+      "head": "collected 47 items\n03-development/tests/test_fr03.py ................                       [ 34%]\n03-development/tests/test_fr04.py .....                                  [ 44%]\n03-development/tests/test_fr06.py ..........................             [100%]\n======================== 47 passed, 1 warning in 1.51s =========================\nCoverage: 03-development/src/taskq_api/repository/key_repo.py 100%, 03-development/src/taskq_api/service/auth.py 100%, totals 100% (38/38 statements)."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9763fc0f41715be0bb7dc7a20d831a9be2a6b79d3b5927907b34eebff5880a32",
-      "bytes": 206,
-      "head": "Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)"
+      "sha256": "54a4a133329ddac1d7e76e64144e447f1f2566d866e64d3844d8bef36f02e054",
+      "bytes": 200,
+      "head": "Analyzed 48 files, 93 dependencies.\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\nContracts: 5 kept, 0 broken."
     }
   },
-  "composite_score": 99.75,
+  "composite_score": 100.0,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
