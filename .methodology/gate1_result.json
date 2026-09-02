@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-06",
+  "fr_id": "FR-07",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!\n",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788327149598\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.296}}\n",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788327699077\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.329}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 161,
+      "tests_passed": 58,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.2, hypothesis-6.112.1, benchmark-4.0.0\ncollected 161 items\n\n03-development/tests/test_fr06.py ..........................             [ 16%]\n03-development/tests/test_fr01.py .............                          [ 24%]\n03-development/tests/test_fr02.py ............................           [ 41%]\n03-development/tests/test_fr03.py ................                       [ 51%]\n03-development/tests/test_fr05.py .....                                  [ 54%]\n03-development/tests/test_fr07.py ......                                 [ 58%]\n03-development/tests/test_fr08.py ...................................... [ 81%]\n03-development/tests/test_fr09.py ..........................             [100%]\n\nFR-06 repository files coverage: session.py 48/48 (100%), task_repo.py 106/106 (100%), key_repo.py 31/31 (100%), rate_repo.py 53/53 (100%)\nSpec coverage: 5/5 required tests present and passing = 100%\nscore = min(coverage_pct=100, spec_cov_pct=100) = 100\n\n======================= 161 passed, 1 warning in 29.73s ========================\n",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-06.txt",
+      "tool_evidence": "collected 58 items\n03-development/tests/test_fr07.py ......                                 [ 10%]\n03-development/tests/test_fr06.py ..........................             [ 55%]\n03-development/tests/test_fr09.py ..........................             [100%]\n======================== 58 passed, 1 warning in 12.87s ========================\nCoverage: 03-development/src/taskq_api/repository/session.py 100% (48/48 statements)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-06",
+      "coverage_scope_fr": "FR-07",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.\n",
+      "tool_evidence": "=============\nImport Linter\n=============\nContracts\n---------\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,23 +71,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "71048fc0b08baeede304b6331bced4d10b89c86638374f05d404812176fcf897",
+      "sha256": "ea262f2cc24ed50487f83a28cced620d0cfe885765085742a1f56ed476b3885a",
       "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1788327149598\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.296}}"
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788327699077\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.329}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "bb8c93742e3dd040bd8ea810e6a473b73f8e2f0f235037e9d1d4b3b99f4ea75d",
-      "bytes": 1292,
-      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.2, hypothesis-6.112.1, benchmark-4.0.0\ncollected 161 items\n\n03-development/tests/test_fr06.py ..........................             [ 16%]\n03-development/tests/test_fr01.py .............                          [ 24%]\n03-development/tests/test_fr02.py ............................           [ 41%]\n03-development/tests/test_fr03.py ................                       [ 51%]\n03-development/tests/test_fr05.py .....                                  [ 54%]\n03-development/tests/test_fr07.py ......                                 [ 58%]\n03-development/tests/test_fr08.py ...................................... [ 81%]\n03-development/tests/test_fr09.py ..........................             [100%]\n\nFR-06 repository files coverage: session.py 48/48 (100%), task_repo.py 106/106 (100%), key_repo.py 31/31 (100%), rate_repo.py 53/53 (100%)\nSpec coverage: 5/5 required tests present and passing = 100%\nscore = min(coverage_pct=100, spec_cov_pct=100) = 100"
+      "sha256": "f6ca14d7f4f11c8213a564b9ea65d7656d74d7f9cecacaa4a1f0109fba5dff00",
+      "bytes": 424,
+      "head": "collected 58 items\n03-development/tests/test_fr07.py ......                                 [ 10%]\n03-development/tests/test_fr06.py ..........................             [ 55%]\n03-development/tests/test_fr09.py ..........................             [100%]\n======================== 58 passed, 1 warning in 12.87s ========================\nCoverage: 03-development/src/taskq_api/repository/session.py 100% (48/48 statements)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "14daa7cd0eb520462df094c57ddfee8d7784cf4aec191f6318e10dd1c3c9966b",
-      "bytes": 312,
-      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
+      "sha256": "eb1c9b3f4c41e960ae408f007fd1d62fabcb8a1bd8f76549991aa63f369d43c4",
+      "bytes": 300,
+      "head": "=============\nImport Linter\n=============\nContracts\n---------\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
