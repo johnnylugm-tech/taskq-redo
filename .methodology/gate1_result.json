@@ -1,8 +1,8 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-08",
-  "overall_score": 99.75,
+  "fr_id": "FR-09",
+  "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788328233331\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.359}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788328776801\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.388}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 108,
+      "tests_passed": 58,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "Name                                                   Stmts   Miss  Cover\n--------------------------------------------------------------------------\n03-development/src/taskq_api/repository/task_repo.py     106      0   100%\n03-development/src/taskq_api/service/runner.py           150      2    99%\n--------------------------------------------------------------------------\nTOTAL                                                    256      2    99%\n======================= 108 passed, 1 warning in 14.10s ========================",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=2 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.0, hypothesis-6.112.1, benchmark-4.0.0\ncollected 58 items\n\n03-development/tests/test_fr09.py ..........................             [ 44%]\n03-development/tests/test_fr06.py ..........................             [ 89%]\n03-development/tests/test_fr07.py ......                                 [100%]\n\n======================== 58 passed, 1 warning in 13.89s ========================\nCoverage: 100% (118/118 statements) on health.py, service/health.py, repository/session.py",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-08",
+      "coverage_scope_fr": "FR-09",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 5 kept, 0 broken.\nexit=0",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n---\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,26 +71,26 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "cab46b9adc500a9b614de26228e5212d5e343d606f788f76faa93e131fab4cde",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1788328233331\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.359}}"
+      "sha256": "31a3a53c3e718af40f7477f098cc62df4c228e97921f22a1bafa52c7f637e604",
+      "bytes": 170,
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788328776801\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.388}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "925b9f7c17ca168236986aee257a29820723a7cb732dc32919286d0b6cdf8dc5",
-      "bytes": 530,
-      "head": "Name                                                   Stmts   Miss  Cover\n--------------------------------------------------------------------------\n03-development/src/taskq_api/repository/task_repo.py     106      0   100%\n03-development/src/taskq_api/service/runner.py           150      2    99%\n--------------------------------------------------------------------------\nTOTAL                                                    256      2    99%\n======================= 108 passed, 1 warning in 14.10s ========================"
+      "sha256": "e5428e2aa6eb1c44be069b9d1aa5864f2823429ee56130bb0792b1987b08d460",
+      "bytes": 886,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=2 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.0, hypothesis-6.112.1, benchmark-4.0.0\ncollected 58 items\n\n03-development/tests/test_fr09.py ..........................             [ 44%]\n03-development/tests/test_fr06.py ..........................             [ 89%]\n03-development/tests/test_fr07.py ......                                 [100%]\n\n======================== 58 passed, 1 warning in 13.89s ========================\nCoverage: 100% (118/118 statements) on health.py, service/health.py, repository/session.py"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "067ff8a3628f20fc8e015e3ec19ab34c1c4910e69303899060caab7b82bcf61b",
-      "bytes": 35,
-      "head": "Contracts: 5 kept, 0 broken.\nexit=0"
+      "sha256": "6541790883ac13846595ce2c5b16ce4cb432033475a1395b40ff2279af75ad92",
+      "bytes": 280,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n---\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
     }
   },
-  "composite_score": 99.75,
+  "composite_score": 100.0,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
