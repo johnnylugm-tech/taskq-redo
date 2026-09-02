@@ -1,41 +1,41 @@
 {
   "gate": 1,
-  "phase": 7,
-  "fr_id": "FR-10",
-  "overall_score": 99.43,
+  "phase": 8,
+  "fr_id": "FR-01",
+  "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 -> All checks passed!",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788329292401\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.411}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788331230318\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.449}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 21,
+      "tests_passed": 108,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "pytest test_fr10.py test_fr04.py test_fr05.py -> 21 passed in 5.38s. coverage.json totals: covered_lines=171/175, percent_covered=97.71 (errors.py 135/139=97.12; api/deps.py 36/36=100). Uncovered: _redact_db_url_password (lines 495-499 of errors.py) — not exercised by FR-10 scoped tests. spec_cov_pct=100% (5/5 required tests present and passing).",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_evidence": "108 passed, 1 warning in 15.36s\n\nCoverage JSON totals: 239/239 statements covered (100.0%) for FR-01 source files (api/tasks.py, service/tasks.py, repository/task_repo.py, models/schemas.py).\n\npytest summary: 03-development/tests/test_fr01.py (13 passed), test_fr02.py (28 passed), test_fr06.py (26 passed), test_fr08.py (41 passed) = 108 passed, 0 failed.\n\nspec_cov_pct = 7/7 required tests (100%) → score capped at 100.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-01",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "lint-imports -> Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent).",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -64,33 +64,33 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "1b21064badd93d14eb36eb9d080103ace2d26d83da4b37a591c24214bef86195",
-      "bytes": 89,
-      "head": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 -> All checks passed!"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "b2451ffeeec8fd68df8d9e1a793c869eb821646033e1ada936005b51b091ef27",
+      "sha256": "88b78f9341185bc1c44d4df6d80be723965d2732c1eeef34e166953ee9688c0e",
       "bytes": 170,
-      "head": "{\"version\":\"1.1.409\",\"time\":\"1788329292401\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.411}}"
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788331230318\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.449}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "6e57cc7c2850d305543c7932905ae2e0ad6b5482c4b862534f3dc220c26ff6c1",
-      "bytes": 350,
-      "head": "pytest test_fr10.py test_fr04.py test_fr05.py -> 21 passed in 5.38s. coverage.json totals: covered_lines=171/175, percent_covered=97.71 (errors.py 135/139=97.12; api/deps.py 36/36=100). Uncovered: _redact_db_url_password (lines 495-499 of errors.py) — not exercised by FR-10 scoped tests. spec_cov_pct=100% (5/5 required tests present and passing)."
+      "sha256": "16b3da2bd620b411b30c2bfdd7e996edb42b0524447a26785a63cce9cda7ff71",
+      "bytes": 423,
+      "head": "108 passed, 1 warning in 15.36s\n\nCoverage JSON totals: 239/239 statements covered (100.0%) for FR-01 source files (api/tasks.py, service/tasks.py, repository/task_repo.py, models/schemas.py).\n\npytest summary: 03-development/tests/test_fr01.py (13 passed), test_fr02.py (28 passed), test_fr06.py (26 passed), test_fr08.py (41 passed) = 108 passed, 0 failed.\n\nspec_cov_pct = 7/7 required tests (100%) → score capped at 100."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "0274db888edc478b11c210916ecfc3efdf311b565d7b9d1631d28675a213197e",
-      "bytes": 197,
-      "head": "lint-imports -> Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)."
+      "sha256": "14daa7cd0eb520462df094c57ddfee8d7784cf4aec191f6318e10dd1c3c9966b",
+      "bytes": 312,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
     }
   },
-  "composite_score": 99.43,
+  "composite_score": 100.0,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
