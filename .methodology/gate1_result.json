@@ -1,41 +1,41 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-04",
-  "overall_score": 100.0,
+  "fr_id": "FR-05",
+  "overall_score": 99.5,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788326262798\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.174}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788326654490\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.269}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 37,
+      "tests_passed": 47,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "37 passed, 1 warning in 5.10s; coverage 100% on 03-development/src/taskq_api/api/deps.py + 03-development/src/taskq_api/service/auth.py; totals percent_covered=100.0",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
+      "tool_evidence": "pytest: 47 passed, 1 warning in 5.34s\nFR-05 tests (test_fr05.py): 5 passed — test_burst_over_limit_returns_429_with_retry_after, test_rate_limit_recovers_after_refill, test_bucket_state_shared_across_workers, test_bucket_update_uses_row_level_lock, test_health_endpoints_exempt_from_rate_limit\ncoverage json totals: covered_lines=98, num_statements=100, percent_covered=98.0 (deps.py 100%, ratelimit.py 100%, rate_repo.py 96.23% — missing 2 statements in RateRepo.reject_counts)\nspec_cov_pct = 100 (5/5 required tests present & pass)\nscore = min(coverage_pct, spec_cov_pct) = min(98, 100) = 98",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-04",
+      "coverage_scope_fr": "FR-05",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT",
+      "tool_evidence": "PYTHONPATH=03-development/src lint-imports\nAnalyzed 48 files, 93 dependencies.\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\nContracts: 5 kept, 0 broken.\nexit=0",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -64,33 +64,33 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
-      "bytes": 18,
-      "head": "All checks passed!"
+      "sha256": "1922c93525a4f61d7e144a76c2a3b2671f4936f653f8fcaea98415210529dbc6",
+      "bytes": 86,
+      "head": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003\nAll checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "b873b39bece8fcad4c525362689f47dabd33ec8ed6523b0dd59ce84aace8a83e",
+      "sha256": "0478e500f9e3c304f356946a799a357255bf08062aedf89eec07c5742d48cd8d",
       "bytes": 170,
-      "head": "{\"version\":\"1.1.409\",\"time\":\"1788326262798\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.174}}"
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788326654490\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.269}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "60f2ffeaddf45fd55bb1f8bdaff4eec5166b1b076b181759e27b384ca72595b9",
-      "bytes": 165,
-      "head": "37 passed, 1 warning in 5.10s; coverage 100% on 03-development/src/taskq_api/api/deps.py + 03-development/src/taskq_api/service/auth.py; totals percent_covered=100.0"
+      "sha256": "c6fb7299d5609e65cec36b758605cb3130473cac9737515338629e864114886e",
+      "bytes": 597,
+      "head": "pytest: 47 passed, 1 warning in 5.34s\nFR-05 tests (test_fr05.py): 5 passed — test_burst_over_limit_returns_429_with_retry_after, test_rate_limit_recovers_after_refill, test_bucket_state_shared_across_workers, test_bucket_update_uses_row_level_lock, test_health_endpoints_exempt_from_rate_limit\ncoverage json totals: covered_lines=98, num_statements=100, percent_covered=98.0 (deps.py 100%, ratelimit.py 100%, rate_repo.py 96.23% — missing 2 statements in RateRepo.reject_counts)\nspec_cov_pct = 100 (5/5 required tests present & pass)\nscore = min(coverage_pct, spec_cov_pct) = min(98, 100) = 98"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "d237fa60b08625701a55cac234ead88fce6dc171a472a9003387a2f98fb2c0b7",
-      "bytes": 168,
-      "head": "Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT"
+      "sha256": "fc1895ea8c857b1b57b02d78a5a08dced02a2dc37bc9a6b8ffad8951b85192e6",
+      "bytes": 250,
+      "head": "PYTHONPATH=03-development/src lint-imports\nAnalyzed 48 files, 93 dependencies.\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\nContracts: 5 kept, 0 broken.\nexit=0"
     }
   },
-  "composite_score": 100.0,
+  "composite_score": 99.5,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
