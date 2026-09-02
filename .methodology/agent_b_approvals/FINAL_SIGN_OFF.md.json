@@ -1,0 +1,18 @@
+{
+  "fr": "FINAL_SIGN_OFF.md",
+  "review_status": "APPROVE",
+  "reason": "Sign-off header facts (release commit, composite 96.73, 10/10 FRs, 0 Critical / 0 High) all reconcile with the manifest and QUALITY_REPORT.md; each of the 16 dimensions carries a concrete evidence path; verification provenance cites VERIFICATION_REPORT.md's PASS precedence ladder, 0 Gate 3 deferred issues and spec_undelivered [] (VERIFICATION_REPORT.md:35), and the P5 baseline figures (97.654 composite, 887/887 stmts, p95 ~0.39 ms) match BASELINE.md:40; architecture-constraint claim correctly references the import-linter 1.12.1 pin from commit 69b9097; verdict APPROVED with orchestrator sign-off explicitly left pending, which is the correct state for a pre-tag release.",
+  "citations": [
+    "FINAL_SIGN_OFF.md:10",
+    "FINAL_SIGN_OFF.md:23",
+    "FINAL_SIGN_OFF.md:59",
+    "05-verification/VERIFICATION_REPORT.md:35"
+  ],
+  "docs_embedded": [
+    "QUALITY_REPORT.md",
+    "RELEASE_NOTES.md",
+    "FINAL_SIGN_OFF.md",
+    "VERIFICATION_REPORT.md"
+  ],
+  "confidence": 0.9
+}

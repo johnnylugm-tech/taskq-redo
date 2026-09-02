@@ -295,7 +295,8 @@
       "phase": 6,
       "gate": 4,
       "fr_scope": "all",
-      "overall_score": 96.73
+      "overall_score": 96.73,
+      "commit_landed": false
     }
   }
 }
