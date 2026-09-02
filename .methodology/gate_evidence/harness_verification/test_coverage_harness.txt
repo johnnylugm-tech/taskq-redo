@@ -2,10 +2,10 @@
 # returncode: 0
 # agent_score: 100.0 | threshold: 80.0
 
-........................................................................ [ 29%]
-........................................................................ [ 59%]
-........................................................................ [ 89%]
-..........................                                               [100%]
+........................................................................ [ 28%]
+........................................................................ [ 56%]
+........................................................................ [ 84%]
+.......................................                                  [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/formparsers.py:12
   /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
@@ -28,7 +28,7 @@
     from prettytable import NONE as RULE_NONE
 
 03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x106f563e0>
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10914e3e0>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -81,14 +81,14 @@ Name                                                     Stmts   Miss  Cover   M
 --------------------------------------------------------------------------------------
 TOTAL                                                      887      0   100%
 
---------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
-Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_service_get_by_id_p95_under_30ms     113.7500 (1.0)         369.1250 (1.0)      119.8655 (1.0)         10.5113 (1.0)      119.0000 (1.0)       3.5000 (1.0)         21;39        8.3427 (1.0)        1268           1
-test_service_list_p95_under_80ms          655.5830 (5.76)     53,200.0830 (144.12)   873.1802 (7.28)     1,828.3237 (173.94)   778.5830 (6.54)     74.5415 (21.30)        2;36        1.1452 (0.14)        829           1
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                              Min                    Max                  Mean                StdDev              Median                 IQR            Outliers         OPS            Rounds  Iterations
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_service_get_by_id_p95_under_30ms     111.2080 (1.0)         433.4160 (1.0)        117.2448 (1.0)         17.1720 (1.0)      115.5000 (1.0)        3.7920 (1.0)         19;40  8,529.1621 (1.0)        1426           1
+test_service_list_p95_under_80ms          646.6250 (5.81)     53,913.1250 (124.39)   1,006.9640 (8.59)     1,885.2845 (109.79)   809.7085 (7.01)     136.9180 (36.11)       8;113    993.0842 (0.12)        830           1
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-242 passed, 6 warnings in 118.46s (0:01:58)
+255 passed, 6 warnings in 118.07s (0:01:58)
