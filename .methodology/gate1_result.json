@@ -1,41 +1,41 @@
 {
   "gate": 1,
   "phase": 8,
-  "fr_id": "FR-07",
-  "overall_score": 100.0,
+  "fr_id": "FR-10",
+  "overall_score": 99.43,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "All checks passed!\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788338395496\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.454}}",
+      "tool_evidence": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788338894782\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 24,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.525\n    }\n}\n\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 70,
+      "tests_passed": 21,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\ncollected 70 items\n03-development/tests/test_fr07.py ..................                     [ 25%]\n03-development/tests/test_fr06.py ..........................             [ 62%]\n03-development/tests/test_fr09.py ..........................             [100%]\n======================== 70 passed, 1 warning in 18.25s ========================\nCoverage: 100% on session.py (48/48 lines)",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-07.txt",
+      "tool_evidence": "  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.\n    import multipart\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n21 passed, 1 warning in 6.19s\n--- coverage json (FR-10 source files) ---\n03-development/src/taskq_api/api/deps.py 100.0 missing: 0\n03-development/src/taskq_api/errors.py 97.12230215827338 missing: 4\nTOTAL 97.71428571428571\n",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-07",
+      "coverage_scope_fr": "FR-10",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.\nEXIT_CODE=0",
+      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.\n",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,26 +71,26 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "e6f5ab625cd59bb36a41a2738a1a565b8aaac51e454401102aa41262adabd74a",
-      "bytes": 186,
-      "head": "{\"version\": \"1.1.409\", \"time\": \"1788338395496\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.454}}"
+      "sha256": "762bd7e8595353dde8e50034dab76743ec1748972c9c8f9d85d581c8ddf0d3d5",
+      "bytes": 250,
+      "head": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788338894782\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 24,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.525\n    }\n}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "452a78384b4ee0d8ad0485e4cdb2b1acc0e0d31da494db5166aec787dd1c0ecb",
-      "bytes": 590,
-      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\ncollected 70 items\n03-development/tests/test_fr07.py ..................                     [ 25%]\n03-development/tests/test_fr06.py ..........................             [ 62%]\n03-development/tests/test_fr09.py ..........................             [100%]\n======================== 70 passed, 1 warning in 18.25s ========================\nCoverage: 100% on session.py (48/48 lines)"
+      "sha256": "43f0799952aeb1c0807d3f50ab25b610b58ac0599e22ef8a21d89a2e58faa556",
+      "bytes": 487,
+      "head": "/Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.\n    import multipart\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n21 passed, 1 warning in 6.19s\n--- coverage json (FR-10 source files) ---\n03-development/src/taskq_api/api/deps.py 100.0 missing: 0\n03-development/src/taskq_api/errors.py 97.12230215827338 missing: 4\nTOTAL 97.71428571428571"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "6068c2eb6f339dc3864d91a586272b4260a83b9339ba552762e10db35005cf42",
-      "bytes": 324,
-      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.\nEXIT_CODE=0"
+      "sha256": "14daa7cd0eb520462df094c57ddfee8d7784cf4aec191f6318e10dd1c3c9966b",
+      "bytes": 312,
+      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n-----------------------------------\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
     }
   },
-  "composite_score": 100.0,
+  "composite_score": 99.43,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
