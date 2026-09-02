@@ -11,24 +11,9 @@
   /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
     import multipart
 
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import ALL as RULE_ALL
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import FRAME as RULE_FRAME
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import HEADER as RULE_HEADER
-
-03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
-    from prettytable import NONE as RULE_NONE
-
+03-development/tests/test_bughunt_runner.py::test_background_runner_writes_task_results_row
 03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10914e3e0>
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1074823e0>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -48,6 +33,22 @@
   Enable tracemalloc to get traceback where the object was allocated.
   See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
     warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import ALL as RULE_ALL
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import FRAME as RULE_FRAME
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import HEADER as RULE_HEADER
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import NONE as RULE_NONE
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 ================================ tests coverage ================================
@@ -81,14 +82,14 @@ Name                                                     Stmts   Miss  Cover   M
 --------------------------------------------------------------------------------------
 TOTAL                                                      887      0   100%
 
----------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
-Name (time in us)                              Min                    Max                  Mean                StdDev              Median                 IQR            Outliers         OPS            Rounds  Iterations
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_service_get_by_id_p95_under_30ms     111.2080 (1.0)         433.4160 (1.0)        117.2448 (1.0)         17.1720 (1.0)      115.5000 (1.0)        3.7920 (1.0)         19;40  8,529.1621 (1.0)        1426           1
-test_service_list_p95_under_80ms          646.6250 (5.81)     53,913.1250 (124.39)   1,006.9640 (8.59)     1,885.2845 (109.79)   809.7085 (7.01)     136.9180 (36.11)       8;113    993.0842 (0.12)        830           1
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_service_get_by_id_p95_under_30ms     109.1670 (1.0)         404.0420 (1.0)      117.5151 (1.0)         19.0623 (1.0)      115.1670 (1.0)       4.0830 (1.0)         26;60        8.5095 (1.0)        1526           1
+test_service_list_p95_under_80ms          616.6660 (5.65)     44,831.2500 (110.96)   819.7266 (6.98)     1,574.1630 (82.58)    750.9170 (6.52)     71.4580 (17.50)        1;41        1.2199 (0.14)        786           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-255 passed, 6 warnings in 118.07s (0:01:58)
+255 passed, 7 warnings in 106.20s (0:01:46)
