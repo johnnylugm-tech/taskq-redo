@@ -53,5 +53,5 @@
   },
   "test_inventory_checksum": "7cc4dc37b5a1d9de0b9261384453b0c451571cb3c1ec89de7a83a4310f0a8131",
   "phase_truth_passed": true,
-  "last_milestone_command": "advance-phase --completed-phase 4"
+  "last_milestone_command": "push-milestone --type p5-baseline"
 }
