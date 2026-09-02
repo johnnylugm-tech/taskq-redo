@@ -141,15 +141,15 @@
     "mutation_testing::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "09ff86dbc6f99ca4a36f918996f8be70d1867c4af336942cffedbffc0995f284",
-      "bytes": 3765,
+      "sha256": "4ad13f99db407c4d3aa09af3f0c238f62379f1bfc9a55466ce22f17a8b23459e",
+      "bytes": 4498,
       "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py\n\n# [NFR-09] Pytest discovery scope. The project's tests live under\n# `03-development/tests/`; the `harness/` subtree holds the framework's\n# own self-tests, which depend on framework-private paths"
     },
     "test_coverage::setup.cfg": {
       "source": "setup.cfg (score-altering exclusions)",
       "kind": "file",
-      "sha256": "09ff86dbc6f99ca4a36f918996f8be70d1867c4af336942cffedbffc0995f284",
-      "bytes": 3765,
+      "sha256": "4ad13f99db407c4d3aa09af3f0c238f62379f1bfc9a55466ce22f17a8b23459e",
+      "bytes": 4498,
       "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py\n\n# [NFR-09] Pytest discovery scope. The project's tests live under\n# `03-development/tests/`; the `harness/` subtree holds the framework's\n# own self-tests, which depend on framework-private paths"
     },
     "linting": {
@@ -260,9 +260,9 @@
   },
   "crg_review_context": {
     "status": "ok",
-    "summary": "Review context for 33 changed file(s):\n  - Risk: high\n  - 305 impacted nodes in 26 files",
+    "summary": "Review context for 64 changed file(s):\n  - Risk: high\n  - 305 impacted nodes in 26 files",
     "risk": "high",
-    "changed_file_count": 33,
+    "changed_file_count": 64,
     "impacted_file_count": 26,
     "key_entities": [
       "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/__main__.py",
@@ -279,13 +279,13 @@
     ],
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 71479,
+      "saved_tokens": 190670,
       "saved_percent": 100
     }
   },
   "crg_impact_radius": {
     "status": "ok",
-    "summary": "Blast radius for 33 changed file(s):\n  - 105 nodes directly changed\n  - 305 nodes impacted (within 2 hops)\n  - 26 additional files affected",
+    "summary": "Blast radius for 64 changed file(s):\n  - 105 nodes directly changed\n  - 305 nodes impacted (within 2 hops)\n  - 26 additional files affected",
     "risk": "high",
     "impacted_file_count": 26,
     "key_entities": [
@@ -298,7 +298,7 @@
     "truncated": false,
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 71508,
+      "saved_tokens": 190699,
       "saved_percent": 100
     }
   },

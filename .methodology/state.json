@@ -3,7 +3,7 @@
   "current_phase": 4,
   "last_gate": 3,
   "last_fr": null,
-  "last_update": "2026-09-01T23:16:47.658613+00:00",
+  "last_update": "2026-09-02T00:27:41.324594+00:00",
   "language": "python",
   "phase_completed": {
     "1": {
@@ -42,5 +42,5 @@
   },
   "test_inventory_checksum": "7cc4dc37b5a1d9de0b9261384453b0c451571cb3c1ec89de7a83a4310f0a8131",
   "phase_truth_passed": true,
-  "last_milestone_command": "push-milestone --type p4-pre-gate3"
+  "last_milestone_command": "advance-phase --completed-phase 3"
 }
