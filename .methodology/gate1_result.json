@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 8,
-  "fr_id": "FR-05",
+  "fr_id": "FR-06",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -9,33 +9,33 @@
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 → exit 0; All checks passed!",
+      "tool_evidence": "All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788333367647\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 24,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.635\n    }\n}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 2.431}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 5,
+      "tests_passed": 161,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "pytest test_fr05.py test_fr04.py test_fr06.py test_fr10.py: 47 passed, 0 failed, 0 skipped. FR-05 specific coverage JSON totals: percent_covered=98.0 (covered_lines=98/num_statements=100 across deps.py 100%, ratelimit.py 100%, rate_repo.py 96%). All 5 required FR-05 tests passed: test_burst_over_limit_returns_429_with_retry_after, test_rate_limit_recovers_after_refill, test_bucket_state_shared_across_workers, test_bucket_update_uses_row_level_lock, test_health_endpoints_exempt_from_rate_limit. spec_cov_pct=100% (5/5 required), score=min(98, 100)=98 → capped at 100 by spec coverage of 100%.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-05.txt",
+      "tool_evidence": "161 passed, 1 warning in 47.02s. Coverage 100% on all 4 FR-06 files (session.py, task_repo.py, key_repo.py, rate_repo.py): TOTAL 238 stmts, 0 miss, 100%.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-06.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-05",
+      "coverage_scope_fr": "FR-06",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "PYTHONPATH=03-development/src lint-imports → exit 0. Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT.",
+      "tool_evidence": "Analyzed 48 files, 93 dependencies. Contracts: layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT — 5 kept, 0 broken.",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -64,30 +64,30 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "fd030ef5ddcc5a90edb3d2aab027660f7cf6c86b4c83a5cc5f5b0c1a152b2209",
-      "bytes": 98,
-      "head": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 → exit 0; All checks passed!"
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "191f1f7c75ed42d072b7535832efe5444dea1f0547a71aa76f1b0ec5457507c1",
-      "bytes": 250,
-      "head": "{\n    \"version\": \"1.1.409\",\n    \"time\": \"1788333367647\",\n    \"generalDiagnostics\": [],\n    \"summary\": {\n        \"filesAnalyzed\": 24,\n        \"errorCount\": 0,\n        \"warningCount\": 0,\n        \"informationCount\": 0,\n        \"timeInSec\": 1.635\n    }\n}"
+      "sha256": "eaed8f38fdc711ac0e5e1c2f670e24000082679346eb71cddb77d7fe8d3d6043",
+      "bytes": 135,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 2.431}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "d02164c2fc5b2097de67263acbc3dc2a2a7e49bbb9d12ce9d8faa054add05cbf",
-      "bytes": 598,
-      "head": "pytest test_fr05.py test_fr04.py test_fr06.py test_fr10.py: 47 passed, 0 failed, 0 skipped. FR-05 specific coverage JSON totals: percent_covered=98.0 (covered_lines=98/num_statements=100 across deps.py 100%, ratelimit.py 100%, rate_repo.py 96%). All 5 required FR-05 tests passed: test_burst_over_limit_returns_429_with_retry_after, test_rate_limit_recovers_after_refill, test_bucket_state_shared_across_workers, test_bucket_update_uses_row_level_lock, test_health_endpoints_exempt_from_rate_limit. spec_cov_pct=100% (5/5 required), score=min(98, 100)=98 → capped at 100 by spec coverage of 100%."
+      "sha256": "f603def0054b8171a8b30dcafa0b2394b65134a3213b21243a1049bce21544a7",
+      "bytes": 153,
+      "head": "161 passed, 1 warning in 47.02s. Coverage 100% on all 4 FR-06 files (session.py, task_repo.py, key_repo.py, rate_repo.py): TOTAL 238 stmts, 0 miss, 100%."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "0c05262b66f4f3cdd0da29e4c1752a49bb3096847a729590a8dcebf5386f65c6",
-      "bytes": 260,
-      "head": "PYTHONPATH=03-development/src lint-imports → exit 0. Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT."
+      "sha256": "7096fbcb4011c4f415ea817424a6e6fa562702974588adec775842f9aa7ce3ea",
+      "bytes": 208,
+      "head": "Analyzed 48 files, 93 dependencies. Contracts: layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT — 5 kept, 0 broken."
     }
   },
   "composite_score": 100.0,
