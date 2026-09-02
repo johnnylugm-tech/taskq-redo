@@ -1,6 +1,6 @@
 # Harness-executed: pytest-cov
 # returncode: 0
-# agent_score: 100.0 | threshold: 80.0
+# agent_score: 99.4 | threshold: 80.0
 
 ........................................................................ [ 29%]
 ........................................................................ [ 59%]
@@ -28,7 +28,7 @@
     from prettytable import NONE as RULE_NONE
 
 03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
-  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x1090be3e0>
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x106aee3e0>
   
   Traceback (most recent call last):
     File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
@@ -81,14 +81,14 @@ Name                                                     Stmts   Miss  Cover   M
 --------------------------------------------------------------------------------------
 TOTAL                                                      887      0   100%
 
---------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
-Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_service_get_by_id_p95_under_30ms     108.7080 (1.0)         466.9590 (1.0)      118.2203 (1.0)         21.8076 (1.0)      114.8330 (1.0)       4.1557 (1.0)         41;87        8.4588 (1.0)        1523           1
-test_service_list_p95_under_80ms          653.1670 (6.01)     47,717.2920 (102.19)   821.6231 (6.95)     1,681.5273 (77.11)    755.7910 (6.58)     69.1882 (16.65)        1;19        1.2171 (0.14)        781           1
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                              Min                    Max                Mean                StdDev              Median                 IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_service_get_by_id_p95_under_30ms     111.0840 (1.0)         463.7500 (1.0)      118.1777 (1.0)         18.1559 (1.0)      116.2080 (1.0)        3.7090 (1.0)         26;54        8.4618 (1.0)        1780           1
+test_service_list_p95_under_80ms          635.6670 (5.72)     45,366.2090 (97.82)    816.4409 (6.91)     1,502.3007 (82.74)    752.2910 (6.47)     106.9478 (28.83)        1;39        1.2248 (0.14)        885           1
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-242 passed, 6 warnings in 104.08s (0:01:44)
+242 passed, 6 warnings in 105.58s (0:01:45)
