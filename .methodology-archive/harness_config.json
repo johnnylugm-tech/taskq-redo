@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "values": {
+    "phase_truth_threshold": 70.0
+  },
+  "features": {
+    "mutation_testing": true
+  },
+  "crg_cohesion_healthy": 0.17,
+  "crg_excludes": [
+    "migrations/*",
+    ".claude/*",
+    "*.mjs",
+    "03-development/tests/*"
+  ]
+}

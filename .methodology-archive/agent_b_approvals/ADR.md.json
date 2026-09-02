@@ -1,0 +1,33 @@
+{
+  "fr": "ADR.md",
+  "review_status": "APPROVE",
+  "reason": "ADR.md (749 lines) is a binding decision ledger that faithfully derives20 ADRs from the approved SAD and SRS. H1 anchor `# Architecture Decision Records (ADR) — taskq-api` matches the Phase-2 loader prefix. Citations to SAD.md §1, §2.1–§2.9, §3.2–§3.4, §4 are line-accurate (verified §2.3 at SAD.md:134–147, §2.4 at 148–160, §2.5 at 162–174, §2.6 at 176–192, §2.7 at 194–208, §2.9 at 223–233, §3.2 at 293–311, §3.3 at 313–331, §3.4 at 333–344, §4 at 346–371). The12 TASKQ_* variables enumerated in ADR-019 match the 12 listed in SAD.md:139 verbatim. CRG 0.4286×E edge-budget and0.3 cohesion threshold match SAD.md:62–66. ADR coverage spans the full decision surface: tech stack (001), layering (002), ORM/dialect (003), Alembic chain (004), async runner (005), API-key auth (006), scope authz (007, 0",
+  "citations": [
+    "02-architecture/adr/ADR.md:1",
+    "02-architecture/adr/ADR.md:10",
+    "02-architecture/adr/ADR.md:27",
+    "02-architecture/adr/ADR.md:34",
+    "02-architecture/adr/ADR.md:44",
+    "02-architecture/adr/ADR.md:56",
+    "02-architecture/adr/ADR.md:96",
+    "02-architecture/adr/ADR.md:137",
+    "02-architecture/adr/ADR.md:177",
+    "02-architecture/adr/ADR.md:221",
+    "02-architecture/adr/ADR.md:259",
+    "02-architecture/adr/ADR.md:297",
+    "02-architecture/adr/ADR.md:336",
+    "02-architecture/adr/ADR.md:372",
+    "02-architecture/adr/ADR.md:407",
+    "02-architecture/adr/ADR.md:441",
+    "02-architecture/adr/ADR.md:474",
+    "02-architecture/adr/ADR.md:513",
+    "02-architecture/adr/ADR.md:547",
+    "02-architecture/adr/ADR.md:580"
+  ],
+  "docs_embedded": [
+    "SRS.md",
+    "SAD.md",
+    "ADR.md"
+  ],
+  "confidence": 0.9
+}

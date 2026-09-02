@@ -1,0 +1,112 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+rootdir: /Users/johnny/projects/taskq-redo
+configfile: setup.cfg
+plugins: cov-7.1.0, anyio-4.14.2, hypothesis-6.112.1, benchmark-4.0.0
+collected 242 items
+
+03-development/tests/integration/test_task_lifecycle_e2e.py ............ [  4%]
+..................                                                       [ 12%]
+03-development/tests/test_bughunt_runner.py ...                          [ 13%]
+03-development/tests/test_fr01.py .............                          [ 19%]
+03-development/tests/test_fr02.py ............................           [ 30%]
+03-development/tests/test_fr03.py ................                       [ 37%]
+03-development/tests/test_fr04.py .....                                  [ 39%]
+03-development/tests/test_fr05.py .....                                  [ 41%]
+03-development/tests/test_fr06.py ..........................             [ 52%]
+03-development/tests/test_fr07.py ......                                 [ 54%]
+03-development/tests/test_fr08.py ...................................... [ 70%]
+...                                                                      [ 71%]
+03-development/tests/test_fr08_coverage.py .                             [ 71%]
+03-development/tests/test_fr09.py ..........................             [ 82%]
+03-development/tests/test_fr10.py ...........                            [ 87%]
+03-development/tests/test_nfr_deferred.py .............................  [ 99%]
+03-development/tests/test_perf_benchmarks.py ..                          [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:45: DeprecationWarning: the 'ALL' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import ALL as RULE_ALL
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:46: DeprecationWarning: the 'FRAME' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import FRAME as RULE_FRAME
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:47: DeprecationWarning: the 'HEADER' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import HEADER as RULE_HEADER
+
+03-development/tests/test_nfr_deferred.py::test_every_dep_license_in_allowlist
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/piplicenses.py:48: DeprecationWarning: the 'NONE' constant is deprecated, use the 'HRuleStyle' and 'VRuleStyle' enums instead
+    from prettytable import NONE as RULE_NONE
+
+03-development/tests/test_perf_benchmarks.py::test_service_list_p95_under_80ms
+  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function BaseSubprocessTransport.__del__ at 0x10b76e8e0>
+  
+  Traceback (most recent call last):
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 126, in __del__
+      self.close()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_subprocess.py", line 104, in close
+      proto.pipe.close()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/unix_events.py", line 566, in close
+      self._close(None)
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/unix_events.py", line 590, in _close
+      self._loop.call_soon(self._call_connection_lost, exc)
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+      self._check_closed()
+    File "/Users/johnny/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+______________ coverage: platform darwin, python 3.11.15-final-0 _______________
+
+Name                                                     Stmts   Miss  Cover
+----------------------------------------------------------------------------
+03-development/src/taskq_api/__init__.py                     0      0   100%
+03-development/src/taskq_api/api/__init__.py                 0      0   100%
+03-development/src/taskq_api/api/deps.py                    36      0   100%
+03-development/src/taskq_api/api/health.py                  23      0   100%
+03-development/src/taskq_api/api/tasks.py                   48      0   100%
+03-development/src/taskq_api/app.py                         28      0   100%
+03-development/src/taskq_api/config.py                       1      0   100%
+03-development/src/taskq_api/errors.py                     139      0   100%
+03-development/src/taskq_api/models/__init__.py              0      0   100%
+03-development/src/taskq_api/models/orm.py                  30      0   100%
+03-development/src/taskq_api/models/schemas.py              37      0   100%
+03-development/src/taskq_api/repository/__init__.py          0      0   100%
+03-development/src/taskq_api/repository/health_repo.py      44      0   100%
+03-development/src/taskq_api/repository/key_repo.py         31      0   100%
+03-development/src/taskq_api/repository/rate_repo.py        53      0   100%
+03-development/src/taskq_api/repository/session.py          48      0   100%
+03-development/src/taskq_api/repository/task_repo.py       106      0   100%
+03-development/src/taskq_api/service/__init__.py             0      0   100%
+03-development/src/taskq_api/service/auth.py                 7      0   100%
+03-development/src/taskq_api/service/health.py              47      0   100%
+03-development/src/taskq_api/service/ratelimit.py           11      0   100%
+03-development/src/taskq_api/service/runner.py             150      0   100%
+03-development/src/taskq_api/service/tasks.py               48      0   100%
+----------------------------------------------------------------------------
+TOTAL                                                      887      0   100%
+
+--------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_service_get_by_id_p95_under_30ms     108.4580 (1.0)         698.5000 (1.0)      118.7205 (1.0)         25.7209 (1.0)      115.1660 (1.0)       4.8333 (1.0)         41;93        8.4231 (1.0)        1773           1
+test_service_list_p95_under_80ms          637.8750 (5.88)     37,317.7090 (53.43)    858.1768 (7.23)     1,587.4273 (61.72)    767.5420 (6.66)     98.0625 (20.29)        2;58        1.1653 (0.14)        923           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+================= 242 passed, 6 warnings in 100.35s (0:01:40) ==================

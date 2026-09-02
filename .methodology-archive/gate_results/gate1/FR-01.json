@@ -1,0 +1,109 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-01",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed!",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 16, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 13,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "coverage report --include=03-development/src/taskq_api/api/tasks.py,03-development/src/taskq_api/service/tasks.py,03-development/src/taskq_api/repository/task_repo.py,03-development/src/taskq_api/models/schemas.py:\nName                                                   Stmts   Miss  Cover\n--------------------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py                 34      0   100%\n03-development/src/taskq_api/models/schemas.py            37      0   100%\n03-development/src/taskq_api/repository/task_repo.py      48      0   100%\n03-development/src/taskq_api/service/tasks.py             32      0   100%\n--------------------------------------------------------------------------\nTOTAL                                                    151      0   100%\n\npytest 03-development/tests/test_fr01.py: 13 passed, 0 failed, 0 skipped. All 7 required test functions present (test_post_task_returns_201_with_id, test_post_task_validation_violations_returns_422, test_get_task_unknown_id_returns_404, test_post_task_duplicate_name_returns_409, test_list_task_limit_above_200_returns_422, test_list_pagination_is_cursor_based, test_delete_task_removes_results_in_same_transaction).",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-01",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "Analyzed 25 files, 39 dependencies. Contracts: 3 kept, 0 broken. (layers: KEPT, forbidden-sqlalchemy: KEPT, config-and-errors-independent: KEPT)",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "bd7f8c288d212ce1ba62a56093c5b24d6920d7dd",
+  "enforcer_surface": {
+    "core/quality_gate": "2f037847f9768da8d05f6caf9209fac73dfb5a5d",
+    "harness/harness_bridge.py": "a2d51fdacdea8b5245b8af5cd208b37c98896140",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "5a98ecd0a59381883b6ee2ab13c69e759190bb2ec251aefcaaf66ad3ac626e9a",
+      "bytes": 115,
+      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 16, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "7d2d4069a8856ffe1fc5acc5f00593727f8e955d3541da209dd4ecd02a8ee487",
+      "bytes": 1232,
+      "head": "coverage report --include=03-development/src/taskq_api/api/tasks.py,03-development/src/taskq_api/service/tasks.py,03-development/src/taskq_api/repository/task_repo.py,03-development/src/taskq_api/models/schemas.py:\nName                                                   Stmts   Miss  Cover\n--------------------------------------------------------------------------\n03-development/src/taskq_api/api/tasks.py                 34      0   100%\n03-development/src/taskq_api/models/schemas.py            37      0   100%\n03-development/src/taskq_api/repository/task_repo.py      48      0   100%\n03-development/src/taskq_api/service/tasks.py             32      0   100%\n--------------------------------------------------------------------------\nTOTAL                                                    151      0   100%\n\npytest 03-development/tests/test_fr01.py: 13 passed, 0 failed, 0 skipped. All 7 required test functions present (test_post_task_returns_201_with_id, test_post_task_validation_violations_returns_422, test_get_task_unknown_id_returns_404, test_post_task_duplicate_name_returns_409, test_list_task_limit_above_200_returns_422, test_list_pagination_is_cursor_based, test_delete_task_removes_results_in_same_transaction)."
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "aed8e742ac8079fb246b39bbdadbc01165bf47e8752bdcf04469f0dbb0a2fed6",
+      "bytes": 144,
+      "head": "Analyzed 25 files, 39 dependencies. Contracts: 3 kept, 0 broken. (layers: KEPT, forbidden-sqlalchemy: KEPT, config-and-errors-independent: KEPT)"
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "weight_artifact_verified": 0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": [],
+    "dimensions_artifact_verified": [],
+    "dimensions_declared_absent": [
+      "documentation",
+      "error_handling",
+      "execute_verification_target",
+      "integration_coverage",
+      "license_compliance",
+      "mutation_testing",
+      "performance",
+      "readability",
+      "security",
+      "test_assertion_quality"
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "community_cohesion": {
+    "score": 100.0,
+    "healthy": 13,
+    "total": 13,
+    "total_all": 40,
+    "excluded_test_communities": 27,
+    "unhealthy": [],
+    "_cohesion_threshold": 0.17,
+    "_community_oversized": 50,
+    "_community_min_size": 5,
+    "_extra_excludes": [
+      "migrations/*",
+      ".claude/*",
+      "*.mjs"
+    ],
+    "excludes_matched": {
+      "migrations/*": 1,
+      ".claude/*": 0,
+      "*.mjs": 0
+    },
+    "excludes_files_matched": {
+      "migrations/*": 1,
+      ".claude/*": 0,
+      "*.mjs": 0
+    }
+  },
+  "large_functions_critical": [],
+  "large_functions_penalty": 0,
+  "architecture_score": 100.0,
+  "_source": "framework-independent",
+  "_graph_files": 41,
+  "_source_files": 42,
+  "_unparsed_files": [
+    "03-development/tests/test_nfr_deferred.py"
+  ],
+  "_build_type": "build"
+}

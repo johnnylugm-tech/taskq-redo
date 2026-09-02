@@ -1,0 +1,41 @@
+{
+  "community_cohesion": {
+    "score": 100.0,
+    "healthy": 13,
+    "total": 13,
+    "total_all": 43,
+    "excluded_test_communities": 30,
+    "unhealthy": [],
+    "_cohesion_threshold": 0.17,
+    "_community_oversized": 50,
+    "_community_min_size": 5,
+    "_extra_excludes": [
+      "migrations/*",
+      ".claude/*",
+      "*.mjs",
+      "03-development/tests/*"
+    ],
+    "excludes_matched": {
+      "migrations/*": 1,
+      ".claude/*": 0,
+      "*.mjs": 0,
+      "03-development/tests/*": 29
+    },
+    "excludes_files_matched": {
+      "migrations/*": 1,
+      ".claude/*": 0,
+      "*.mjs": 0,
+      "03-development/tests/*": 29
+    }
+  },
+  "large_functions_critical": [],
+  "large_functions_penalty": 0,
+  "architecture_score": 100.0,
+  "_source": "framework-independent",
+  "_graph_files": 43,
+  "_source_files": 43,
+  "_unparsed_files": [],
+  "_build_type": "update",
+  "_baseline_sha": "1b380c1a0ced55bb19c3d3021b284dda96cd87a9",
+  "_baseline_phase": 3
+}

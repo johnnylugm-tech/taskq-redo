@@ -1,0 +1,22 @@
+# Harness-executed: import-linter
+# returncode: 0
+# agent_score: 100.0 | threshold: 100.0
+
+=============
+Import Linter
+=============
+
+---------
+Contracts
+---------
+
+Analyzed 48 files, 93 dependencies.
+-----------------------------------
+
+layers KEPT
+forbidden-sqlalchemy KEPT
+config-and-errors-independent KEPT
+root-package-marker-independent KEPT
+cli-main-independent KEPT
+
+Contracts: 5 kept, 0 broken.

@@ -1,0 +1,123 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-03",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed!\n",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788202192921\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 19, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.613}}\n",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 16,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=1 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nplugins: benchmark-5.2.3, cov-7.1.0, anyio-4.14.2\ncollected 16 items\n\n03-development/tests/test_fr03.py ................                       [100%]\n======================== 16 passed, 1 warning in 0.28s =========================",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-03",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "[1m=============[0m\n[1mImport Linter[0m\n[1m=============[0m\n[22m[0m\n[1m---------[0m\n[1mContracts[0m\n[1m---------[0m\n[22m[0m\n[1mAnalyzed 36 files, 55 dependencies.[0m\n[1m-----------------------------------[0m\n[22m[0m\n[22mlayers [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m\n[22mforbidden-sqlalchemy [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m\n[22mconfig-and-errors-independent [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m\n[22m[0m\n[22mContracts: 3 kept, 0 broken.[0m",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "bd7f8c288d212ce1ba62a56093c5b24d6920d7dd",
+  "enforcer_surface": {
+    "core/quality_gate": "2f037847f9768da8d05f6caf9209fac73dfb5a5d",
+    "harness/harness_bridge.py": "a2d51fdacdea8b5245b8af5cd208b37c98896140",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "mutation_testing::setup.cfg": {
+      "source": "setup.cfg (score-altering exclusions)",
+      "kind": "file",
+      "sha256": "0d67edb796d0ce519181ae83a52738e7958510b40c9abf84dd0d1d2b27bbee27",
+      "bytes": 910,
+      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py"
+    },
+    "test_coverage::setup.cfg": {
+      "source": "setup.cfg (score-altering exclusions)",
+      "kind": "file",
+      "sha256": "0d67edb796d0ce519181ae83a52738e7958510b40c9abf84dd0d1d2b27bbee27",
+      "bytes": 910,
+      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py"
+    },
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "a2461cb995d0e739a78057c73d240f734aab15124b1a8fd247ac76d9c27e6dac",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788202192921\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 19, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 0.613}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "1c3687b997fcf9fd901baa0676e535eb1ee869b7118980ede95f6d05f9110e47",
+      "bytes": 592,
+      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=1 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nplugins: benchmark-5.2.3, cov-7.1.0, anyio-4.14.2\ncollected 16 items\n\n03-development/tests/test_fr03.py ................                       [100%]\n======================== 16 passed, 1 warning in 0.28s ========================="
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "e2aa2e48a6dc1a959cade46618dcdd228ce0b82fc9641a2fadd8eafa803ef7a4",
+      "bytes": 440,
+      "head": "[1m=============[0m\n[1mImport Linter[0m\n[1m=============[0m\n[22m[0m\n[1m---------[0m\n[1mContracts[0m\n[1m---------[0m\n[22m[0m\n[1mAnalyzed 36 files, 55 dependencies.[0m\n[1m-----------------------------------[0m\n[22m[0m\n[22mlayers [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m\n[22mforbidden-sqlalchemy [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m\n[22mconfig-and-errors-independent [0m[32m[22mKEPT[0m[33m[22m[0m[22m[0m\n[22m[0m\n[22mContracts: 3 kept, 0 broken.[0m"
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "weight_artifact_verified": 0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": [],
+    "dimensions_artifact_verified": [],
+    "dimensions_declared_absent": [
+      "documentation",
+      "error_handling",
+      "execute_verification_target",
+      "integration_coverage",
+      "license_compliance",
+      "mutation_testing",
+      "performance",
+      "readability",
+      "security",
+      "test_assertion_quality"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "community_cohesion": {
+    "score": 91.7,
+    "healthy": 11,
+    "total": 12,
+    "total_all": 46,
+    "excluded_test_communities": 34,
+    "unhealthy": [
+      {
+        "name": "repository-task",
+        "cohesion": 0.3881,
+        "size": 56,
+        "issues": [
+          "oversized(56)"
+        ]
+      }
+    ],
+    "_cohesion_threshold": 0.17,
+    "_community_oversized": 50,
+    "_community_min_size": 5,
+    "_extra_excludes": [
+      "migrations/*",
+      ".claude/*",
+      "*.mjs",
+      "03-development/tests/*"
+    ],
+    "excludes_matched": {
+      "migrations/*": 1,
+      ".claude/*": 0,
+      "*.mjs": 0,
+      "03-development/tests/*": 33
+    },
+    "excludes_files_matched": {
+      "migrations/*": 1,
+      ".claude/*": 0,
+      "*.mjs": 0,
+      "03-development/tests/*": 33
+    }
+  },
+  "large_functions_critical": [],
+  "large_functions_penalty": 0,
+  "architecture_score": 91.7,
+  "_source": "framework-independent",
+  "_graph_files": 47,
+  "_source_files": 47,
+  "_unparsed_files": [],
+  "_build_type": "update"
+}

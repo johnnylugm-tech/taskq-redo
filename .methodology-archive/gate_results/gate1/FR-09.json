@@ -1,0 +1,123 @@
+{
+  "gate": 1,
+  "phase": 3,
+  "fr_id": "FR-09",
+  "overall_score": 100.0,
+  "quality_complete": true,
+  "rounds_used": 1,
+  "breakdown": {
+    "linting": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "All checks passed!",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
+    },
+    "type_safety": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788258012118\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.102}}",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
+    },
+    "test_coverage": {
+      "score": 100.0,
+      "threshold": 100,
+      "tests_passed": 57,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tool_evidence": "57 passed, 1 warning in 2.76s. FR-09 source files: api/health.py=100% (23/23), service/health.py=100% (47/47), repository/session.py=100% (48/48). All 5 required tests exist and pass.",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
+      "coverage_scope": "per_fr",
+      "coverage_scope_fr": "FR-09",
+      "score_source": "framework"
+    },
+    "architecture_constraints": {
+      "score": 100.0,
+      "threshold": 100,
+      "tool_evidence": "Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT.",
+      "score_source": "framework",
+      "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
+    }
+  },
+  "enforcer_sha": "ba14b606485b3a0bec07c37385c79fd9019b4a39",
+  "enforcer_surface": {
+    "core/quality_gate": "fdb0cd2dd5a64f7f6d61c91a22447ff93dc0b904",
+    "harness/harness_bridge.py": "a2d51fdacdea8b5245b8af5cd208b37c98896140",
+    "harness/gate_configs": "d91e4c3c9409081ea44b75ae3060f3293fa59cab"
+  },
+  "evidence_digest": {
+    "mutation_testing::setup.cfg": {
+      "source": "setup.cfg (score-altering exclusions)",
+      "kind": "file",
+      "sha256": "0d67edb796d0ce519181ae83a52738e7958510b40c9abf84dd0d1d2b27bbee27",
+      "bytes": 910,
+      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py"
+    },
+    "test_coverage::setup.cfg": {
+      "source": "setup.cfg (score-altering exclusions)",
+      "kind": "file",
+      "sha256": "0d67edb796d0ce519181ae83a52738e7958510b40c9abf84dd0d1d2b27bbee27",
+      "bytes": 910,
+      "head": "# Coverage configuration (SPEC.md §5 src-layout; test_coverage dim).\n#\n# `taskq_api.__main__` is the dedicated entry-point module that backs\n# `python -m taskq_api key create --scope <scope>` (SPEC.md §3 FR-03).\n# Its `if __name__ == \"__main__\":` guard (lines 104-105) is unreachable\n# from in-process callers — Python only evaluates it when the module is\n# executed as `__main__`, not when imported. Per the Gate 1\n# coverage-fix ESCAPE HATCH, dedicated entry-point modules are excluded\n# at the file level via [coverage:run] omit rather than annotated with\n# `# pragma: no cover` (which is not a valid target for entry-point\n# guards). The executable body of `__main__.py` is still exercised by\n# in-process tests in 03-development/tests/test_fr03.py — the omit only\n# stops coverage.py from counting the entry-point guard as missing.\n[coverage:run]\nomit =\n    03-development/src/taskq_api/__main__.py"
+    },
+    "linting": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
+      "bytes": 18,
+      "head": "All checks passed!"
+    },
+    "type_safety": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "d292c86a5614e5d237d57b8ec4de91ba856598406624e14200913f626c1f39a5",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788258012118\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.102}}"
+    },
+    "test_coverage": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "e1b28a21ff232916db36443bd0211fd68bb8c1cbb7cc8fa5d690fc92181c9158",
+      "bytes": 183,
+      "head": "57 passed, 1 warning in 2.76s. FR-09 source files: api/health.py=100% (23/23), service/health.py=100% (47/47), repository/session.py=100% (48/48). All 5 required tests exist and pass."
+    },
+    "architecture_constraints": {
+      "source": "tool_evidence (inline)",
+      "kind": "inline",
+      "sha256": "64b1e6a3d67f7e0bfb622979294cd00d53a4d5ff93546bc8093a4bfded76b7ec",
+      "bytes": 169,
+      "head": "Contracts: 5 kept, 0 broken. layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT."
+    }
+  },
+  "composite_score": 100.0,
+  "verdict": "PASS",
+  "passed": true,
+  "spec_undelivered": [],
+  "spec_declared": 0,
+  "measurement_scope": {
+    "weight_covered": 1.0,
+    "weight_total": 1.0,
+    "weight_artifact_verified": 0,
+    "dimensions_scored": [
+      "architecture_constraints",
+      "linting",
+      "test_coverage",
+      "type_safety"
+    ],
+    "dimensions_unscored": [],
+    "dimensions_artifact_verified": [],
+    "dimensions_declared_absent": [
+      "documentation",
+      "error_handling",
+      "execute_verification_target",
+      "integration_coverage",
+      "license_compliance",
+      "mutation_testing",
+      "performance",
+      "readability",
+      "security",
+      "test_assertion_quality"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-09-02T03:35:29.692567+00:00",
+  "tool": "mutmut",
+  "score": 100.0,
+  "killed": 17,
+  "survived": 0,
+  "paths_to_mutate": "03-development/src/taskq_api/repository, 03-development/src/taskq_api/service",
+  "paths_to_exclude": [
+    "__init__.py",
+    "__main__.py,",
+    "auth.py,",
+    "health.py,",
+    "health_repo.py,",
+    "key_repo.py,",
+    "rate_repo.py,",
+    "ratelimit.py",
+    "runner.py,",
+    "session.py,",
+    "task_repo.py,"
+  ],
+  "mutated_files": 12,
+  "cache_sha256": "046971ec93e8ed8d989a5824d656c2666497d5d6511a52cb7656315db4b00d95",
+  "enforcer_sha": "cf8cc0e9e537ea43e98daf6caa3b62ec008e40ce"
+}

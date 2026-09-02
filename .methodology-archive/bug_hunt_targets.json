@@ -1,0 +1,243 @@
+{
+  "generated_at": "2026-09-01T21:41:42.443664+00:00",
+  "git_sha": "3c373d6c0cce618bcdfd93dbf4ebbad15ae8d3c1",
+  "language": "python",
+  "high_risk": [
+    {
+      "path": "03-development/src/taskq_api/api/deps.py",
+      "name": "deps",
+      "reasons": [
+        "threat_model:T-03 elevation_of_privilege",
+        "threat_model:T-09 repudiation"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/api/tasks.py",
+      "name": "tasks",
+      "reasons": [
+        "threat_model:T-02 tampering"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/errors.py",
+      "name": "errors",
+      "reasons": [
+        "threat_model:T-06 information_disclosure",
+        "threat_model:T-07 information_disclosure"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/rate_repo.py",
+      "name": "rate_repo",
+      "reasons": [
+        "threat_model:T-10 tampering"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/task_repo.py",
+      "name": "task_repo",
+      "reasons": [
+        "threat_model:T-04 tampering"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/service/auth.py",
+      "name": "auth",
+      "reasons": [
+        "threat_model:T-01 spoofing"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/service/ratelimit.py",
+      "name": "ratelimit",
+      "reasons": [
+        "threat_model:T-08 denial_of_service"
+      ]
+    },
+    {
+      "path": "03-development/src/taskq_api/service/runner.py",
+      "name": "runner",
+      "reasons": [
+        "threat_model:T-05 elevation_of_privilege"
+      ]
+    },
+    {
+      "path": "migrations.versions.v3_split_results",
+      "name": "migrations.versions",
+      "reasons": [
+        "declared"
+      ]
+    },
+    {
+      "path": "taskq_api.repository.session",
+      "name": "taskq_api.repository",
+      "reasons": [
+        "declared"
+      ]
+    },
+    {
+      "path": "taskq_api.service.auth",
+      "name": "taskq_api.service",
+      "reasons": [
+        "declared"
+      ]
+    },
+    {
+      "path": "taskq_api.service.runner",
+      "name": "taskq_api.service",
+      "reasons": [
+        "declared"
+      ]
+    }
+  ],
+  "standard": [
+    {
+      "path": "03-development/src/taskq_api/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/__main__.py",
+      "name": "__main__"
+    },
+    {
+      "path": "03-development/src/taskq_api/api/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/api/health.py",
+      "name": "health"
+    },
+    {
+      "path": "03-development/src/taskq_api/app.py",
+      "name": "app"
+    },
+    {
+      "path": "03-development/src/taskq_api/config.py",
+      "name": "config"
+    },
+    {
+      "path": "03-development/src/taskq_api/models/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/models/orm.py",
+      "name": "orm"
+    },
+    {
+      "path": "03-development/src/taskq_api/models/schemas.py",
+      "name": "schemas"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/health_repo.py",
+      "name": "health_repo"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/key_repo.py",
+      "name": "key_repo"
+    },
+    {
+      "path": "03-development/src/taskq_api/repository/session.py",
+      "name": "session"
+    },
+    {
+      "path": "03-development/src/taskq_api/service/__init__.py",
+      "name": "__init__"
+    },
+    {
+      "path": "03-development/src/taskq_api/service/health.py",
+      "name": "health"
+    },
+    {
+      "path": "03-development/src/taskq_api/service/tasks.py",
+      "name": "tasks"
+    }
+  ],
+  "mutation_survivors": [],
+  "integration_coverage": {
+    "gate": 2,
+    "score": 83.0
+  },
+  "threat_model": [
+    {
+      "threat_id": "T-01",
+      "category": "spoofing",
+      "description": "attacker presents a guessed/forged X-API-Key to impersonate an authorised client",
+      "owner_module": "taskq_api.service.auth",
+      "boundary": "TB-01"
+    },
+    {
+      "threat_id": "T-02",
+      "category": "tampering",
+      "description": "malformed payload bypasses validation and mutates task state with attacker-controlled content",
+      "owner_module": "taskq_api.api.tasks",
+      "boundary": "TB-01"
+    },
+    {
+      "threat_id": "T-03",
+      "category": "elevation_of_privilege",
+      "description": "read or write token attempts an admin-only operation (e.g. DELETE /v1/tasks/{id})",
+      "owner_module": "taskq_api.api.deps",
+      "boundary": "TB-02"
+    },
+    {
+      "threat_id": "T-04",
+      "category": "tampering",
+      "description": "SQL injection through string-concatenated ORM/SQL in repository layer",
+      "owner_module": "taskq_api.repository.task_repo",
+      "boundary": "TB-03"
+    },
+    {
+      "threat_id": "T-05",
+      "category": "elevation_of_privilege",
+      "description": "shell metacharacters in task command escape sandbox and execute arbitrary host commands",
+      "owner_module": "taskq_api.service.runner",
+      "boundary": "TB-04"
+    },
+    {
+      "threat_id": "T-06",
+      "category": "information_disclosure",
+      "description": "secret / token / DB-URL leaks into stdout_tail, stderr_tail, log lines, error bodies, or /v1/metrics response",
+      "owner_module": "taskq_api.errors",
+      "boundary": "TB-05"
+    },
+    {
+      "threat_id": "T-07",
+      "category": "information_disclosure",
+      "description": "500-class error response leaks stack trace, SQL statement, file path, or schema description in detail field",
+      "owner_module": "taskq_api.errors",
+      "boundary": "TB-05"
+    },
+    {
+      "threat_id": "T-08",
+      "category": "denial_of_service",
+      "description": "attacker floods /v1/* endpoints to exhaust a token's bucket or starve other clients",
+      "owner_module": "taskq_api.service.ratelimit",
+      "boundary": "TB-01"
+    },
+    {
+      "threat_id": "T-09",
+      "category": "repudiation",
+      "description": "operator denies a request happened because no correlation_id ties log line to response",
+      "owner_module": "taskq_api.api.deps",
+      "boundary": "TB-02"
+    },
+    {
+      "threat_id": "T-10",
+      "category": "tampering",
+      "description": "rate-bucket race condition over-admits requests because two workers update the same bucket row without coordination",
+      "owner_module": "taskq_api.repository.rate_repo",
+      "boundary": "TB-03"
+    }
+  ],
+  "sources": {
+    "declared": 4,
+    "crg_hubs": 0,
+    "mutation_survivors": 0,
+    "integration_coverage": true,
+    "threat_model": 10
+  }
+}

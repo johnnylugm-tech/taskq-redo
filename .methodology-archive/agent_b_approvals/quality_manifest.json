@@ -1,0 +1,18 @@
+{
+  "fr": "quality_manifest",
+  "review_status": "APPROVE",
+  "reason": "Gate 4 scoring logic is internally consistent and monotonic across the pipeline: gate1 per-FR 99.5–100.0, gate2 98.04, gate3 97.65, gate4 96.73 with overall_score equal to score, open_critical=0, open_high=0, rounds_used=2, fr_scope 'all'; the gate4 composite is the single value quoted by all three P6 documents, so there is no divergent source of truth; gate3 97.65 matches BASELINE.md's 97.654 rounded; quality_complete/commit_landed remain false because the workflow (not this reviewer) performs the finalisation write, which is the expected pre-finalisation state and not a document defect. One LOW traceability note only: VERIFICATION_REPORT.md:56 quotes the older mutmut cache_sha256 b77ee717 whereas the current mutation_score.json is 046971ec — a P5 historical artefact, outside the P6 deliv",
+  "citations": [
+    ".methodology/quality_manifest.json:290",
+    ".methodology/quality_manifest.json:203",
+    ".methodology/quality_manifest.json:278",
+    "05-verification/BASELINE.md:40"
+  ],
+  "docs_embedded": [
+    "QUALITY_REPORT.md",
+    "RELEASE_NOTES.md",
+    "FINAL_SIGN_OFF.md",
+    "VERIFICATION_REPORT.md"
+  ],
+  "confidence": 0.9
+}

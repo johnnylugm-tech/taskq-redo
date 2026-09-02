@@ -1,0 +1,5 @@
+run-tool  tool=ast-error-handling  project=/Users/johnny/projects/taskq-redo
+  returncode: 0
+  score:      100.0
+  --- output (first 500 chars) ---
+{"total": 8, "with_handler": 8, "no_handler": [], "exempt_count": 10, "exempt_files": ["03-development/src/taskq_api/app.py", "03-development/src/taskq_api/__main__.py", "03-development/src/taskq_api/repository/rate_repo.py", "03-development/src/taskq_api/repository/key_repo.py", "03-development/src/taskq_api/models/orm.py", "03-development/src/taskq_api/models/schemas.py", "03-development/src/taskq_api/api/deps.py", "03-development/src/taskq_api/api/health.py", "03-development/src/taskq_api/ser

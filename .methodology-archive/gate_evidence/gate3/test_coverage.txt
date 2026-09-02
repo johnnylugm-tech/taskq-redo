@@ -1,0 +1,30 @@
+03-development/src/taskq_api/errors.py                     139      0   100%
+03-development/src/taskq_api/models/__init__.py              0      0   100%
+03-development/src/taskq_api/models/orm.py                  30      0   100%
+03-development/src/taskq_api/models/schemas.py              37      0   100%
+03-development/src/taskq_api/repository/__init__.py          0      0   100%
+03-development/src/taskq_api/repository/health_repo.py      44      0   100%
+03-development/src/taskq_api/repository/key_repo.py         31      0   100%
+03-development/src/taskq_api/repository/rate_repo.py        53      0   100%
+03-development/src/taskq_api/repository/session.py          48      0   100%
+03-development/src/taskq_api/repository/task_repo.py       106      0   100%
+03-development/src/taskq_api/service/__init__.py             0      0   100%
+03-development/src/taskq_api/service/auth.py                 7      0   100%
+03-development/src/taskq_api/service/health.py              47      0   100%
+03-development/src/taskq_api/service/ratelimit.py           11      0   100%
+03-development/src/taskq_api/service/runner.py             150      2    99%
+03-development/src/taskq_api/service/tasks.py               48      0   100%
+----------------------------------------------------------------------------
+TOTAL                                                      887      2    99%
+
+--------------------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                              Min                    Max                Mean                StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_service_get_by_id_p95_under_30ms     109.2920 (1.0)         393.2500 (1.0)      118.0101 (1.0)         18.0932 (1.0)      114.8330 (1.0)       4.4160 (1.0)         47;86        8.4738 (1.0)        1708           1
+test_service_list_p95_under_80ms          637.3330 (5.83)     37,687.7090 (95.84)    805.1893 (6.82)     1,361.9153 (75.27)    740.1670 (6.45)     99.2610 (22.48)        1;37        1.2419 (0.15)        739           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+241 passed, 5 warnings in 101.34s (0:01:41)

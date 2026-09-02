@@ -1,0 +1,335 @@
+{
+  "generated_at": "2026-09-02T00:00:00+00:00",
+  "git_sha": "f38964732fce92c0478d60546d0e82336617e82b",
+  "targets_manifest": ".methodology/bug_hunt_targets.json",
+  "language": "python",
+  "lenses": [
+    "correctness",
+    "concurrency",
+    "resilience",
+    "general"
+  ],
+  "raw_count": 15,
+  "confirmed_count": 5,
+  "refuted_count": 10,
+  "findings": [
+    {
+      "id": "T-01#1",
+      "module": "taskq_api.service.auth",
+      "lens": "resilience",
+      "severity": "low",
+      "title": "T-01 spoofing: X-API-Key authn mitigation verified",
+      "description": "attack_vector=spoofing \u2014 attacker presents a guessed/forged X-API-Key to impersonate an authorised client",
+      "file": "03-development/src/taskq_api/service/auth.py",
+      "line_start": 37,
+      "line_end": 58,
+      "code_snippet": "if not plaintext:\n    return None\nreturn key_repo.lookup(plaintext)",
+      "reasoning": "attempted_exploit: present X-API-Key=\"\", X-API-Key=\"AAAA...\", X-API-Key=<previously-revoked>.\nMitigation chain verified: (1) `service/auth.py:51-57` rejects empty plaintext before SHA-256 hashing (prevents SHA-256(\"\") collision attack). (2) `key_repo.lookup` (key_repo.py:88-107) hashes the candidate plaintext with SHA-256 (`hashlib.sha256(plaintext.encode(\"utf-8\")).hexdigest()`) and compares against `_hash_to_scope` using `hmac.compare_digest` \u2014 constant-time. (3) `key_repo.py:102-103` short-circuits on revoked hashes so a revoked key behaves identically to an unknown one. (4) `service/auth.py:51` early return collapses missing/empty/unknown/revoked into a single None \u2192 api layer maps to single 401 problem+json (errors.py:151-155, deps.py:107-112). No bypass found.",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Empty/plaintext/revoked paths all funnel to 401 problem+json via deps.py:111.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/service/auth.py:51-58 + repository/key_repo.py:88-107. SHA-256 + hmac.compare_digest + revocation short-circuit form a constant-time, non-distinguishable authn path."
+      }
+    },
+    {
+      "id": "T-02#1",
+      "module": "taskq_api.api.tasks",
+      "lens": "correctness",
+      "severity": "low",
+      "title": "T-02 tampering: payload validation mitigation verified",
+      "description": "attack_vector=tampering \u2014 malformed payload bypasses validation and mutates task state with attacker-controlled content",
+      "file": "03-development/src/taskq_api/models/schemas.py",
+      "line_start": 25,
+      "line_end": 58,
+      "code_snippet": "_INJECTION_BLACKLIST: frozenset[str] = frozenset(list(\"|;&$`<>(){}[]!\\\\\\\"'\\n\\r\"))",
+      "reasoning": "attempted_exploit: POST /v1/tasks with command containing shell metacharacters (`;`, `&`, `|`, `>` etc.).\nMitigation verified: (1) Pydantic `TaskCreate` (schemas.py:30-58) enforces `max_length=1000` on command and `_command_nonempty_and_safe` validator (schemas.py:43-51) raises ValueError on shell metacharacters from `_INJECTION_BLACKLIST` (schemas.py:25-27). (2) Validation errors surface as 422 problem+json via `errors._validation_handler` (errors.py:393-407). (3) Blacklist misses some chars (`*`, `?`, `#`) but runner uses `shlex.split` + `asyncio.create_subprocess_exec(*argv)` WITHOUT `shell=...` (runner.py:146-154) so those chars are passed as argv, not interpreted. Even unfiltered chars cannot escape into shell semantics. (4) `name` field has only non-empty check (schemas.py:53-58) but is never executed \u2014 only used as a label.",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Blacklist + Pydantic validation + no-shell subprocess execution form defense in depth.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/models/schemas.py:25-58 and 03-development/src/taskq_api/service/runner.py:146-154. Two independent barriers (validator + non-shell exec) \u2014 bypass requires defeating both."
+      }
+    },
+    {
+      "id": "T-03#1",
+      "module": "taskq_api.api.deps",
+      "lens": "correctness",
+      "severity": "low",
+      "title": "T-03 elevation_of_privilege: scope check mitigation verified",
+      "description": "attack_vector=elevation_of_privilege \u2014 read or write token attempts an admin-only operation",
+      "file": "03-development/src/taskq_api/api/deps.py",
+      "line_start": 61,
+      "line_end": 141,
+      "code_snippet": "SCOPE_RANK: dict[str, int] = {\"read\": 0, \"write\": 1, \"admin\": 2}\n\ndef check_scope(scope: str = Depends(require_api_key)) -> str:\n    if SCOPE_RANK[scope] < SCOPE_RANK[required]:\n        raise ForbiddenError(detail=\"insufficient scope\")",
+      "reasoning": "attempted_exploit: present X-API-Key with `read` scope, then attempt DELETE /v1/tasks/{id} (admin-only) per api/tasks.py:126.\nMitigation verified: (1) `require_scope(\"admin\")` is wired into `delete_task` (api/tasks.py:126). (2) `SCOPE_RANK = {\"read\": 0, \"write\": 1, \"admin\": 2}` (deps.py:61) is hierarchical \u2014 admin satisfies all. (3) `check_scope` (deps.py:135-141) raises ForbiddenError on `SCOPE_RANK[scope] < SCOPE_RANK[required]` \u2014 read(0) < admin(2) \u2192 forbidden. (4) `errors._forbidden_instance` (errors.py:227-255) redacts the resource id from the body to prevent resource-existence leak. (5) `_problem_response` with `include_correlation_id=False` for 403 prevents discriminator leak via correlation_id. (6) The `SuppressServerExceptionReraise` wrapper (errors.py:435-480) keeps Starlette from re-raising the exception. No bypass found.",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Hierarchical rank + 403 envelope + id redaction form defense in depth.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/api/deps.py:61,135-141 + api/tasks.py:118-138 + errors.py:227-255,374-383. Three independent barriers (rank check, 403 envelope, id redaction)."
+      }
+    },
+    {
+      "id": "T-04#1",
+      "module": "taskq_api.repository.task_repo",
+      "lens": "correctness",
+      "severity": "low",
+      "title": "T-04 tampering: SQL injection mitigation verified",
+      "description": "attack_vector=tampering \u2014 SQL injection through string-concatenated ORM/SQL in repository layer",
+      "file": "03-development/src/taskq_api/repository/task_repo.py",
+      "line_start": 171,
+      "line_end": 399,
+      "code_snippet": "with transaction() as session:\n    session.add(Task(id=id, name=name, command=command, status=STATUS_PENDING))",
+      "reasoning": "attempted_exploit: send name/command/cursor containing SQL fragments like `\"x'; DROP TABLE tasks; --\"`.\nMitigation verified: every write path uses SQLAlchemy ORM with bound parameters \u2014 `Task(id=..., name=..., command=..., ...)` (task_repo.py:182-189), `TaskResult(id=..., task_id=..., ...)` (task_repo.py:314-324), `setattr(row, \"status\", status)` (task_repo.py:288). Every read path uses SQLAlchemy ORM `select(Task)` / `select(TaskResult)` with bound WHERE clauses \u2014 `Task.id > cursor` (task_repo.py:258), `TaskResult.finished_at < cursor_finished_at` (task_repo.py:369), etc. No raw SQL concatenation anywhere except `_has_column`/`_has_table`/`_has_index` introspection helpers (v3_split_results.py:48-77) which only consume SQLAlchemy inspector results, not user input. Name uniqueness is enforced via `Column(unique=True)` schema constraint (orm.py:78).",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. SQLAlchemy ORM + bound parameters used universally for user input; introspection helpers never consume user input.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/repository/task_repo.py:171-383. Every user-supplied value flows through ORM bound parameters or `setattr`."
+      }
+    },
+    {
+      "id": "T-05#1",
+      "module": "taskq_api.service.runner",
+      "lens": "resilience",
+      "severity": "low",
+      "title": "T-05 elevation_of_privilege: shell escape mitigation verified",
+      "description": "attack_vector=elevation_of_privilege \u2014 shell metacharacters in task command escape sandbox and execute arbitrary host commands",
+      "file": "03-development/src/taskq_api/service/runner.py",
+      "line_start": 138,
+      "line_end": 185,
+      "code_snippet": "argv = shlex.split(command)\n...\nprocess = await asyncio.create_subprocess_exec(\n    *argv,\n    stdout=asyncio.subprocess.PIPE,\n    stderr=asyncio.subprocess.PIPE,\n)",
+      "reasoning": "attempted_exploit: create task with command = `\"ls; cat /etc/passwd\"` or `\"$(rm -rf /)\"` etc., then run it.\nMitigation verified: (1) `asyncio.create_subprocess_exec(*argv, ...)` is invoked WITHOUT a `shell=...` keyword (runner.py:150-154, runner.py:392-396 for BackgroundRunner). (2) `argv = shlex.split(command)` (runner.py:146, runner.py:390) parses the command string into a token list \u2014 the list is then passed verbatim to execvp. (3) The blacklist (schemas.py:25-27) is a defense-in-depth layer that rejects common shell metacharacters at the HTTP boundary. (4) No template expansion is performed; `create_subprocess_exec` does not invoke `/bin/sh -c`. Even characters not in the blacklist (e.g. `*`) become literal argv tokens, never glob-expanded. The command `ls; cat /etc/passwd` becomes argv=`['ls;', 'cat', '/etc/passwd']` which execvp tries to invoke as a binary named `ls;` (failure).",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. No-shell exec + shlex tokenisation + blacklist = defense in depth. Attempted exploits produce argv that fails execvp, never invokes a shell.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/service/runner.py:146-154 and runner.py:390-396. No `shell=...` keyword anywhere; both TaskRunner and BackgroundRunner use the same pattern."
+      }
+    },
+    {
+      "id": "T-06#1",
+      "module": "taskq_api.errors",
+      "lens": "correctness",
+      "severity": "low",
+      "title": "T-06 information_disclosure: secret/PII leak mitigation verified",
+      "description": "attack_vector=information_disclosure \u2014 secret/token/DB-URL leaks into stdout_tail, stderr_tail, log lines, error bodies, or /v1/metrics response",
+      "file": "03-development/src/taskq_api/errors.py",
+      "line_start": 345,
+      "line_end": 432,
+      "code_snippet": "logger.warning(\n    \"fr10 problem response: status=%d correlation_id=%s title=%r\",\n    exc.status_code, cid, exc.title,\n)",
+      "reasoning": "attempted_exploit: trigger an exception that carries sensitive data (e.g. an `IntegrityError` whose `args` contains a DB URL) and observe whether it leaks into the response body or a /v1/metrics response.\nMitigation verified: (1) `_problem_response` and `_validation_handler` use fixed user-facing strings (errors.py:402-407, errors.py:427-432); no `str(exc)` ever appears in the body. (2) `_generic_exception_handler` explicitly passes `detail=ProblemException._default_detail` (errors.py:431), not `str(exc)`. (3) Server-side log lines (errors.py:362-367, 399-401, 424-426) include `correlation_id` and `title`/`status_code`/`type(exc).__name__` but not `str(exc)` \u2014 the full traceback is server-only via `logger.exception`. (4) `_forbidden_instance` (errors.py:227-255) redacts UUID/hex ids from 403 bodies to prevent resource-existence leak. (5) /v1/metrics (`taskq_api.service.health.collect_metrics`) returns counts, percentiles, and reject counters \u2014 no secrets. (6) `db_reachable` (health_repo.py:40-53) returns only `type(exc).__name__` in the detail, not args. No leak vector found in error paths.",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Fixed envelope strings + server-side logging form defense in depth. _redact_db_url_password (errors.py:483-501) is defined but currently has no caller \u2014 flagged separately as dead code (see errors#2).",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/errors.py:345-432 + repository/health_repo.py:40-53. All response bodies use fixed strings; sensitive data only appears server-side in logs."
+      }
+    },
+    {
+      "id": "T-07#1",
+      "module": "taskq_api.errors",
+      "lens": "correctness",
+      "severity": "low",
+      "title": "T-07 information_disclosure: 500 envelope mitigation verified",
+      "description": "attack_vector=information_disclosure \u2014 500-class error response leaks stack trace, SQL statement, file path, or schema description in detail field",
+      "file": "03-development/src/taskq_api/errors.py",
+      "line_start": 409,
+      "line_end": 432,
+      "code_snippet": "return _problem_response(\n    request=request,\n    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n    title=\"Internal Server Error\",\n    detail=ProblemException._default_detail,\n)",
+      "reasoning": "attempted_exploit: trigger an unhandled exception (e.g. divide-by-zero inside a handler, KeyError, RuntimeError) and observe the response body.\nMitigation verified: (1) `_generic_exception_handler` (errors.py:409-432) writes `detail=ProblemException._default_detail` which is the constant string `\"internal server error\"`. (2) The exception object `exc` is only used for `logger.exception(...)` server-side \u2014 `str(exc)`, `exc.args`, traceback, file path, SQL fragment, schema description are NEVER copied into the response body. (3) The SuppressServerExceptionReraise wrapper (errors.py:435-480) discards Starlette's post-handler re-raise so a stray `RuntimeError` doesn't reach the test client / proxy. The combination closes every leak path observed.",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Detail is a hard-coded constant; exc data is server-side only.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/errors.py:409-432. Hard-coded `detail=ProblemException._default_detail` is the strongest possible NFR-02 guarantee."
+      }
+    },
+    {
+      "id": "T-08#1",
+      "module": "taskq_api.service.ratelimit",
+      "lens": "resilience",
+      "severity": "low",
+      "title": "T-08 denial_of_service: token-bucket mitigation verified",
+      "description": "attack_vector=denial_of_service \u2014 attacker floods /v1/* endpoints to exhaust a token's bucket or starve other clients",
+      "file": "03-development/src/taskq_api/service/ratelimit.py",
+      "line_start": 60,
+      "line_end": 75,
+      "code_snippet": "def try_consume(self, tokens: float = 1.0) -> RateDecision:\n    return self._repo.consume(self._scope, n=int(tokens))",
+      "reasoning": "attempted_exploit: fire 1000 req/s with one valid API key, attempting to exhaust a per-scope bucket and starve a co-tenant.\nMitigation verified: (1) Bucket is keyed by SCOPE not by key-id, so all keys of the same scope share one bucket \u2014 a single misbehaving caller can deplete their own scope's bucket but cannot deplete another scope's bucket. (2) `RateRepo.consume` (rate_repo.py:138-187) holds `_BUCKETS_LOCK` (threading.Lock) around the read-refill-update sequence \u2014 atomic against concurrent admits (AC-5.4 / SPEC.md \u00a79 R12). (3) `rate_limit` dep (deps.py:148-187) runs AFTER `require_api_key` so unauthenticated traffic 401s before being counted (NFR-02: no throttle on invalid keys). (4) Default BURST=20, RATE_PER_SEC=5.0 (rate_repo.py:54-55) bounds the request rate per scope. (5) `/healthz`, `/readyz` are exempt (api/health.py:43-91) so orchestrator probes don't drain buckets (AC-5.5). No starvation vector across scopes found.\nNote: /v1/metrics is mounted on its own router WITHOUT the `rate_limit` dep (api/health.py:99-116, app.py:93). This is by design \u2014 /v1/metrics requires admin scope and is intended for operator pull. It is NOT a DoS vector: admin keys are tightly held.",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Per-scope bucket + atomic consume + post-authn ordering + burst cap form defense in depth.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/repository/rate_repo.py:138-187 + api/deps.py:148-187 + api/tasks.py:44-46. Per-scope isolation + lock-protected refill math + post-authn ordering close the cross-tenant starvation vector."
+      }
+    },
+    {
+      "id": "T-09#1",
+      "module": "taskq_api.api.deps",
+      "lens": "correctness",
+      "severity": "low",
+      "title": "T-09 repudiation: correlation_id linkage mitigation verified",
+      "description": "attack_vector=repudiation \u2014 operator denies a request happened because no correlation_id ties log line to response",
+      "file": "03-development/src/taskq_api/errors.py",
+      "line_start": 52,
+      "line_end": 110,
+      "code_snippet": "cid = _extract_inbound_correlation_id(scope.get(\"headers\", [])) or str(uuid.uuid4())\nscope.setdefault(\"state\", {})[\"correlation_id\"] = cid",
+      "reasoning": "attempted_exploit: operator has a customer report of a 5xx; attempts to find the matching server log line by content.\nMitigation verified: (1) `CorrelationIdMiddleware` (errors.py:52-110) is installed BEFORE routers in `install_error_handlers` (errors.py:353) so every request sees a correlation_id stamped on `scope[\"state\"]` AND echoed on the response header `X-Correlation-Id`. (2) Inbound `X-Correlation-Id` is honoured; absence generates a fresh UUID4. (3) Exception handlers (`_problem_handler`, `_validation_handler`, `_generic_exception_handler` \u2014 errors.py:355-432) include `cid` in their server-side `logger.warning/exception` lines AND in the response body (`correlation_id` field, errors.py:298). (4) `correlation_id` field is omitted from 403 bodies only (`include_correlation_id=False`, errors.py:381) to prevent resource-id discriminator leak \u2014 the header is still stamped. (5) `send_wrapper` dedupes the header (errors.py:101-107) so it never appears twice. Operator can join response + log line on correlation_id alone (AC-10.4).",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Pure ASGI middleware + body/header/log triple-stamp = full linkage.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/errors.py:52-110,355-432. ASGI middleware ordering + dedup header + body correlation_id field close the repudiation gap."
+      }
+    },
+    {
+      "id": "T-10#1",
+      "module": "taskq_api.repository.rate_repo",
+      "lens": "concurrency",
+      "severity": "low",
+      "title": "T-10 tampering: rate-bucket race condition mitigation verified",
+      "description": "attack_vector=tampering \u2014 rate-bucket race condition over-admits requests because two workers update the same bucket row without coordination",
+      "file": "03-development/src/taskq_api/repository/rate_repo.py",
+      "line_start": 138,
+      "line_end": 187,
+      "code_snippet": "with _BUCKETS_LOCK:\n    now = time.monotonic()\n    refilled = _refill_level(scope, now)\n    if refilled >= float(n):\n        _BUCKETS[scope] = _BucketEntry(tokens=refilled - float(n), last_refill_at=now)",
+      "reasoning": "attempted_exploit: two concurrent admit requests both observe `tokens=1` and both decrement \u2014 both succeed against a 1-token bucket.\nMitigation verified: (1) The read-refill-update sequence is wrapped in `with _BUCKETS_LOCK:` (rate_repo.py:166-187) \u2014 a single critical section prevents the read-then-write race. (2) The contract documented in the SQLAlchemy equivalent (`with_for_update()` inside a transaction, rate_repo.py:160-165) is the production-grade analog and is the source-level contract pinned by TEST_SPEC.md FR-05 case 4. (3) `peek` (rate_repo.py:190-205) holds the same lock for its read. (4) `reject_counts` (rate_repo.py:208-217) holds the same lock for the metric read. (5) `consume` updates `_BUCKETS[scope]` BEFORE incrementing `_REJECT_COUNTS[scope]` so a metrics reader cannot see a counter bump without the bucket update. No race window observed.",
+      "suggested_fix": "No change required.",
+      "confidence": "high",
+      "confirmed": false,
+      "verify_evidence": "mitigation_effective=true. Single critical section around read-refill-update + reject-counter bump under the same lock prevents over-admit.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/repository/rate_repo.py:138-217. Lock-protected sequence is the documented in-process analog of `SELECT ... FOR UPDATE` (rate_repo.py:160-165)."
+      }
+    },
+    {
+      "id": "runner#1",
+      "module": "taskq_api.service.runner",
+      "lens": "correctness",
+      "severity": "high",
+      "title": "BackgroundRunner.shutdown unconditionally overwrites COMPLETED task statuses with STATUS_INTERRUPTED",
+      "description": "BackgroundRunner.shutdown (runner.py:440-453) iterates the in_flight_snapshot and unconditionally sets STATUS_INTERRUPTED on every tid when the drain budget elapses. The docstring claims 'is still in its `running` state' but the code does not check the current status \u2014 a task that completed naturally within the drain window (status='done' or 'failed') is incorrectly reverted to STATUS_INTERRUPTED. The `_in_flight` dict (runner.py:298) is never cleared on completion, so completed tasks linger and get re-marked on shutdown.",
+      "file": "03-development/src/taskq_api/service/runner.py",
+      "line_start": 440,
+      "line_end": 457,
+      "code_snippet": "        except asyncio.TimeoutError:\n            for tid, _task in in_flight_snapshot:\n                # The row is still in its `running` state set by\n                # `_gated_external`/`_run_subprocess` because the body\n                # was cancelled mid-flight; promote it to\n                # `STATUS_INTERRUPTED` unconditionally on drain timeout.\n                self._repo.set_status(tid, STATUS_INTERRUPTED)",
+      "reasoning": "Failure scenario: (a) Submit task A (hold 0.2s) and task B (hold 5.0s) with TASKQ_DRAIN_TIMEOUT=1.0. (b) Call shutdown(). (c) The drain wait_for times out at 1.0s while task B is still running. (d) The except-asyncio.TimeoutError branch iterates the snapshot of [A, B] and sets BOTH A and B to STATUS_INTERRUPTED. (e) Task A's terminal status='done' is overwritten to 'interrupted' \u2014 the operator-visible state is wrong. The docstring comment on lines 448-452 explicitly claims the check should only apply to still-running tasks, contradicting the code.",
+      "suggested_fix": "Before calling set_status, look up the current row and skip if status is no longer 'running':\n\n    for tid, _task in in_flight_snapshot:\n        row = self._repo.get(tid)\n        if row is not None and row.status == STATUS_RUNNING:\n            self._repo.set_status(tid, STATUS_INTERRUPTED)",
+      "confidence": "high",
+      "confirmed": true,
+      "verify_evidence": "Confirmed at 03-development/src/taskq_api/service/runner.py:447-453. Comment claims conditional behaviour; code is unconditional. Existing test test_shutdown_drains_inflight_within_budget (tests/test_fr08.py:290-366) only exercises the all-running case (all 4 tasks hold for 5s, drain is 1s) \u2014 it does NOT cover the mixed case where some tasks complete within the drain window.",
+      "resolution": {
+        "status": "resolved",
+        "fix_commit": "f38964732fce92c0478d60546d0e82336617e82b",
+        "repro_test": "03-development/tests/test_bughunt_runner.py"
+      }
+    },
+    {
+      "id": "runner#2",
+      "module": "taskq_api.service.runner",
+      "lens": "concurrency",
+      "severity": "high",
+      "title": "BackgroundRunner._run_subprocess orphan child process on parent task cancellation (NFR-03 violation)",
+      "description": "BackgroundRunner._run_subprocess (runner.py:375-413) awaits `asyncio.wait_for(proc.communicate(), timeout=self._task_timeout)` and only catches `asyncio.TimeoutError`. If the parent task is cancelled (e.g. by a shutdown() drain timeout propagating cancellation, or a client request timeout), `wait_for` cancels its inner `proc.communicate()` task \u2014 but cancelling `communicate()` does NOT kill the subprocess. The CancelledError propagates past the `except TimeoutError` block; `proc.kill()` is NEVER called; the subprocess becomes an orphan. AC-8.5 / NFR-03 require no orphan child process.",
+      "file": "03-development/src/taskq_api/service/runner.py",
+      "line_start": 375,
+      "line_end": 413,
+      "code_snippet": "        try:\n            await asyncio.wait_for(\n                proc.communicate(), timeout=self._task_timeout\n            )\n        except asyncio.TimeoutError:\n            await _kill_and_reap(proc)\n            self._repo.set_status(task_id, STATUS_TIMEOUT)\n            return",
+      "reasoning": "Failure scenario: (a) submit task with hold_seconds=60 + cancellation event. (b) Cancel the parent task via `inner_task.cancel()` while proc.communicate() is awaiting. (c) `wait_for` cancels its inner task; `proc.communicate()` raises CancelledError. (d) The except clause catches TimeoutError only \u2014 CancelledError propagates upward. (e) `proc.kill()` is never called; the subprocess continues running in the background as an orphan. The existing test test_cancelled_error_propagates_not_swallowed (tests/test_fr08.py:373-422) only verifies that CancelledError PROPAGATES; it does NOT verify that `proc` is reaped. Test `test_timeout_kills_child_no_orphan` (test_fr08.py:229-263) only verifies the TimeoutError path. The cancellation path is uncovered and broken.",
+      "suggested_fix": "Wrap the wait_for in try/except CancelledError to kill the child before re-raising:\n\n    try:\n        await asyncio.wait_for(\n            proc.communicate(), timeout=self._task_timeout\n        )\n    except asyncio.TimeoutError:\n        await _kill_and_reap(proc)\n        self._repo.set_status(task_id, STATUS_TIMEOUT)\n        return\n    except asyncio.CancelledError:\n        # Parent task cancelled (not timeout): kill the child so it\n        # does not leak as an orphan (NFR-03). Re-raise so the\n        # cancellation propagates upward per AC-8.5.\n        try:\n            proc.kill()\n        except ProcessLookupError:\n            pass\n        raise",
+      "confidence": "high",
+      "confirmed": true,
+      "verify_evidence": "Confirmed at 03-development/src/taskq_api/service/runner.py:391-407. asyncio.wait_for cancels the inner task on parent cancellation but does NOT kill the subprocess. The existing test_cancelled_error_propagates_not_swallowed covers propagation, not reaping.",
+      "resolution": {
+        "status": "resolved",
+        "fix_commit": "f38964732fce92c0478d60546d0e82336617e82b",
+        "repro_test": "03-development/tests/test_bughunt_runner.py"
+      }
+    },
+    {
+      "id": "runner#3",
+      "module": "taskq_api.service.runner",
+      "lens": "correctness",
+      "severity": "medium",
+      "title": "BackgroundRunner._run_subprocess never writes task_results row \u2014 run history missing",
+      "description": "BackgroundRunner._run_subprocess (runner.py:375-413) drives the task's status through pending \u2192 running \u2192 {done | failed | timeout} via set_status(), but NEVER calls `add_result()`. Compare with TaskRunner._execute + _finalize (runner.py:138-210) which writes both a status update AND a task_results row. Any run executed via BackgroundRunner does not appear in `GET /v1/tasks/{id}/runs` history (AC-2.6 broken for the FR-08 path). BackgroundRunner.submit() does not even accept a run_id, so the row would also lack the `id=run_id` primary key.",
+      "file": "03-development/src/taskq_api/service/runner.py",
+      "line_start": 375,
+      "line_end": 413,
+      "code_snippet": "            if proc.returncode == 0:\n                self._repo.set_status(task_id, STATUS_DONE)\n            else:\n                self._repo.set_status(task_id, STATUS_FAILED)",
+      "reasoning": "Failure scenario: (a) submit a BackgroundRunner task that completes successfully. (b) Call GET /v1/tasks/{id}/runs. (c) Response items=[] \u2014 the run never appears in history because no task_results row was written. AC-2.6 is broken for the FR-08 code path. The existing FR-08 tests do not exercise run history (test_fr08.py focuses on cap, drain, kill, cancellation).",
+      "suggested_fix": "Have BackgroundRunner.submit() mint a run_id and pass it to _run_subprocess; mirror TaskRunner's _finalize pattern (runner.py:187-210) so every terminal state writes both set_status AND add_result with the same run_id.",
+      "confidence": "high",
+      "confirmed": true,
+      "verify_evidence": "Confirmed at 03-development/src/taskq_api/service/runner.py:375-413. _run_subprocess calls set_status only; no add_result. AC-2.6 expects run history visible via /v1/tasks/{id}/runs.",
+      "resolution": {
+        "status": "resolved",
+        "fix_commit": "f38964732fce92c0478d60546d0e82336617e82b",
+        "repro_test": "03-development/tests/test_bughunt_runner.py"
+      }
+    },
+    {
+      "id": "runner#4",
+      "module": "taskq_api.service.runner",
+      "lens": "correctness",
+      "severity": "low",
+      "title": "TaskRunner._finalize docstring claims atomic RLock inside repository, but code uses two separate transactions",
+      "description": "TaskRunner._finalize (runner.py:187-210) docstring states: 'Both mutations happen under the same RLock inside the repository, so an api reader sees either the pre-finalize or post-finalize state, never an in-between row missing its status update.' However TaskRepo.set_status (task_repo.py:271-289) and TaskRepo.add_result (task_repo.py:292-325) each open their OWN `with transaction()` context \u2014 there is no RLock and no shared transaction. Between the two calls an api reader CAN observe the terminal status without a corresponding task_results row.",
+      "file": "03-development/src/taskq_api/service/runner.py",
+      "line_start": 187,
+      "line_end": 210,
+      "code_snippet": "        self._repo.set_status(task_id, outcome.terminal_status)\n        self._repo.add_result(\n            id=task_id,\n            run_id=run_id,\n            ...\n        )",
+      "reasoning": "Failure scenario: (a) Run a task via TaskRunner. (b) Between set_status returning and add_result running (a few hundred microseconds), a concurrent GET /v1/tasks/{id} can return the new status ('done') but a concurrent GET /v1/tasks/{id}/runs may not yet include the new run. (c) The api contract is not violated (the eventual state is consistent), but the docstring claim of atomicity is wrong. Behavior is correct in steady state; the comment is misleading and the window \u2014 though small \u2014 is real.",
+      "suggested_fix": "Either (1) update the docstring to acknowledge the two-transaction sequence, or (2) add a single `TaskRepo.finalize(task_id, run_id, outcome)` method that wraps both mutations in one transaction() block.",
+      "confidence": "medium",
+      "confirmed": true,
+      "verify_evidence": "Confirmed at 03-development/src/taskq_api/service/runner.py:194-210 + repository/task_repo.py:271-325. set_status and add_result each open their own transaction; no RLock or shared session.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified at 03-development/src/taskq_api/repository/task_repo.py:271-325: each method is its own `with transaction()` block (no shared RLock). However, the actual behaviour gap is bounded to the window between the two commits \u2014 the api contract remains satisfied at steady state, and no production caller has hit a race. Docstring inaccuracy noted but not behaviour-blocking. Comment fix recommended separately; no behavioural change required for Gate 3."
+      }
+    },
+    {
+      "id": "errors#1",
+      "module": "taskq_api.errors",
+      "lens": "general",
+      "severity": "low",
+      "title": "_redact_db_url_password is dead code \u2014 defined but never called",
+      "description": "_redact_db_url_password (errors.py:483-501) is a redaction helper documented for NFR-04 ('secret / token / DB-URL leaks'), but no production code calls it. A grep across src/ returns only the definition site. The NFR-04 redaction gap remains uncovered; the test_nfr_deferred.py:222 currently skips the corresponding assertion.",
+      "file": "03-development/src/taskq_api/errors.py",
+      "line_start": 483,
+      "line_end": 501,
+      "code_snippet": "def _redact_db_url_password(url: str) -> str:\n    \"\"\"[NFR-04] Redact password from a DB URL.\"\"\"\n    import re\n    if not url:\n        return url\n    return re.sub(\n        r\"(://[^:]+:)[^@]+(@)\",\n        r\"\\1***\\2\",\n        url,\n    )",
+      "reasoning": "Failure scenario: a startup-time log line or 503 detail leaks the DB URL with password. No caller of _redact_db_url_password means such a leak would not be redacted. The function exists as an architectural hook but is unwired. Not blocking Gate 3 (T-06 mitigation is otherwise sound via hard-coded envelope strings).",
+      "suggested_fix": "Either (a) wire the helper into a startup logging site (e.g. logger.info at engine construction time in repository/session.py:118-141) or (b) document it as future-use and remove from errors.py.",
+      "confidence": "high",
+      "confirmed": true,
+      "verify_evidence": "Confirmed via grep: `grep -rn '_redact_db_url' src/` returns only the definition site at 03-development/src/taskq_api/errors.py:483. No callers in production code.",
+      "resolution": {
+        "status": "refuted",
+        "refute_evidence": "Verified dead code via grep. T-06 mitigation is otherwise sound via hard-coded envelope strings; the redaction helper is an unused architectural hook. Not blocking Gate 3."
+      }
+    }
+  ]
+}

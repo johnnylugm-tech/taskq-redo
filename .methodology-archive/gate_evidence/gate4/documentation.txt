@@ -1,0 +1,5 @@
+run-tool  tool=ast-docstrings  project=/Users/johnny/projects/taskq-redo
+  returncode: 0
+  score:      88.5
+  --- output (first 500 chars) ---
+{"total": 87, "with_doc": 77, "missing": ["03-development/src/taskq_api/errors.py::UnauthorizedError", "03-development/src/taskq_api/errors.py::ForbiddenError", "03-development/src/taskq_api/errors.py::NotFoundError", "03-development/src/taskq_api/errors.py::ConflictError", "03-development/src/taskq_api/errors.py::BadRequestError", "03-development/src/taskq_api/repository/task_repo.py::TaskRepo.get", "03-development/src/taskq_api/service/tasks.py::TaskService.create", "03-development/src/taskq_a
