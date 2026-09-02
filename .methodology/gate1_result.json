@@ -1,41 +1,41 @@
 {
   "gate": 1,
   "phase": 7,
-  "fr_id": "FR-09",
-  "overall_score": 100.0,
+  "fr_id": "FR-10",
+  "overall_score": 99.43,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
     "linting": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "All checks passed!",
+      "tool_evidence": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 -> All checks passed!",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/linting_harness.txt"
     },
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788328776801\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.388}}",
+      "tool_evidence": "{\"version\":\"1.1.409\",\"time\":\"1788329292401\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.411}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 58,
+      "tests_passed": 21,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=2 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.0, hypothesis-6.112.1, benchmark-4.0.0\ncollected 58 items\n\n03-development/tests/test_fr09.py ..........................             [ 44%]\n03-development/tests/test_fr06.py ..........................             [ 89%]\n03-development/tests/test_fr07.py ......                                 [100%]\n\n======================== 58 passed, 1 warning in 13.89s ========================\nCoverage: 100% (118/118 statements) on health.py, service/health.py, repository/session.py",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-09.txt",
+      "tool_evidence": "pytest test_fr10.py test_fr04.py test_fr05.py -> 21 passed in 5.38s. coverage.json totals: covered_lines=171/175, percent_covered=97.71 (errors.py 135/139=97.12; api/deps.py 36/36=100). Uncovered: _redact_db_url_password (lines 495-499 of errors.py) — not exercised by FR-10 scoped tests. spec_cov_pct=100% (5/5 required tests present and passing).",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-09",
+      "coverage_scope_fr": "FR-10",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n---\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken.",
+      "tool_evidence": "lint-imports -> Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent).",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -64,33 +64,33 @@
     "linting": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "f0d0b1081d9d3ebb26c4c93543053ecdc0a58998f22c071dc4ddb26021b57645",
-      "bytes": 18,
-      "head": "All checks passed!"
+      "sha256": "1b21064badd93d14eb36eb9d080103ace2d26d83da4b37a591c24214bef86195",
+      "bytes": 89,
+      "head": "ruff check 03-development/src/ --extend-ignore RUF001,RUF002,RUF003 -> All checks passed!"
     },
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "31a3a53c3e718af40f7477f098cc62df4c228e97921f22a1bafa52c7f637e604",
+      "sha256": "b2451ffeeec8fd68df8d9e1a793c869eb821646033e1ada936005b51b091ef27",
       "bytes": 170,
-      "head": "{\"version\":\"1.1.409\",\"time\":\"1788328776801\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.388}}"
+      "head": "{\"version\":\"1.1.409\",\"time\":\"1788329292401\",\"generalDiagnostics\":[],\"summary\":{\"filesAnalyzed\":24,\"errorCount\":0,\"warningCount\":0,\"informationCount\":0,\"timeInSec\":1.411}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "e5428e2aa6eb1c44be069b9d1aa5864f2823429ee56130bb0792b1987b08d460",
-      "bytes": 886,
-      "head": "============================= test session starts ==============================\nplatform darwin -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0\nbenchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=2 warmup=False warmup_iterations=100000)\nrootdir: /Users/johnny/projects/taskq-redo\nconfigfile: setup.cfg\nplugins: cov-7.1.0, anyio-4.14.0, hypothesis-6.112.1, benchmark-4.0.0\ncollected 58 items\n\n03-development/tests/test_fr09.py ..........................             [ 44%]\n03-development/tests/test_fr06.py ..........................             [ 89%]\n03-development/tests/test_fr07.py ......                                 [100%]\n\n======================== 58 passed, 1 warning in 13.89s ========================\nCoverage: 100% (118/118 statements) on health.py, service/health.py, repository/session.py"
+      "sha256": "6e57cc7c2850d305543c7932905ae2e0ad6b5482c4b862534f3dc220c26ff6c1",
+      "bytes": 350,
+      "head": "pytest test_fr10.py test_fr04.py test_fr05.py -> 21 passed in 5.38s. coverage.json totals: covered_lines=171/175, percent_covered=97.71 (errors.py 135/139=97.12; api/deps.py 36/36=100). Uncovered: _redact_db_url_password (lines 495-499 of errors.py) — not exercised by FR-10 scoped tests. spec_cov_pct=100% (5/5 required tests present and passing)."
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "6541790883ac13846595ce2c5b16ce4cb432033475a1395b40ff2279af75ad92",
-      "bytes": 280,
-      "head": "=============\nImport Linter\n=============\n\n---------\nContracts\n---------\n\nAnalyzed 48 files, 93 dependencies.\n---\n\nlayers KEPT\nforbidden-sqlalchemy KEPT\nconfig-and-errors-independent KEPT\nroot-package-marker-independent KEPT\ncli-main-independent KEPT\n\nContracts: 5 kept, 0 broken."
+      "sha256": "0274db888edc478b11c210916ecfc3efdf311b565d7b9d1631d28675a213197e",
+      "bytes": 197,
+      "head": "lint-imports -> Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)."
     }
   },
-  "composite_score": 100.0,
+  "composite_score": 99.43,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
