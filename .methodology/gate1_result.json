@@ -1,7 +1,7 @@
 {
   "gate": 1,
   "phase": 8,
-  "fr_id": "FR-03",
+  "fr_id": "FR-04",
   "overall_score": 100.0,
   "quality_complete": true,
   "rounds_used": 1,
@@ -16,26 +16,26 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.67}}",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"time\": \"1788332854124\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.495}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
     "test_coverage": {
       "score": 100.0,
       "threshold": 100,
-      "tests_passed": 47,
+      "tests_passed": 37,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "47 passed, 1 warning in 1.94s. FR-03 source files coverage: taskq_api/service/auth.py 7/7 stmts 100%, taskq_api/repository/key_repo.py 31/31 stmts 100%. All 7 required tests (test_missing_api_key_returns_401, test_invalid_api_key_returns_401, test_api_keys_table_holds_no_plaintext, test_key_compare_uses_hmac_compare_digest, test_revoked_key_treated_as_invalid, test_key_create_prints_plaintext_once_persists_hash, test_health_endpoints_no_auth_required) present and passing.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-03.txt",
+      "tool_evidence": "======================== 37 passed, 1 warning in 6.00s =========================; coverage 100% on deps.py + auth.py (43/43 lines)",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-04.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-03",
+      "coverage_scope_fr": "FR-04",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)",
+      "tool_evidence": "Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,23 +71,23 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "be73ebba3b3da8444ec978eafaadcb33a91fcc2b7bc5f7edbd52c33fe895face",
-      "bytes": 134,
-      "head": "{\"version\": \"1.1.409\", \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.67}}"
+      "sha256": "013c21a2f65f1195a107ee3c281063f05a6873201dbca8a0bef42bb13086ceab",
+      "bytes": 186,
+      "head": "{\"version\": \"1.1.409\", \"time\": \"1788332854124\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0, \"timeInSec\": 1.495}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "c53a5aa9fe8761614487686f37575987697a7c11248016d616ec00c0c1b499b5",
-      "bytes": 476,
-      "head": "47 passed, 1 warning in 1.94s. FR-03 source files coverage: taskq_api/service/auth.py 7/7 stmts 100%, taskq_api/repository/key_repo.py 31/31 stmts 100%. All 7 required tests (test_missing_api_key_returns_401, test_invalid_api_key_returns_401, test_api_keys_table_holds_no_plaintext, test_key_compare_uses_hmac_compare_digest, test_revoked_key_treated_as_invalid, test_key_create_prints_plaintext_once_persists_hash, test_health_endpoints_no_auth_required) present and passing."
+      "sha256": "372b5d1abc1bac8c8084c4e64198f921b144a6e552b3c2b1104ea586fe6372dd",
+      "bytes": 130,
+      "head": "======================== 37 passed, 1 warning in 6.00s =========================; coverage 100% on deps.py + auth.py (43/43 lines)"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "ca355be7099ed4f98995bd78026ddc6c99dbed03c013efc96a6383a85b868ce9",
-      "bytes": 181,
-      "head": "Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)"
+      "sha256": "1b655c5afa76d434a431ae32cc240d09753b067757db6f65a0c275fd7df1b28c",
+      "bytes": 170,
+      "head": "Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)"
     }
   },
   "composite_score": 100.0,
