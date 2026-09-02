@@ -1,8 +1,8 @@
 {
   "gate": 1,
   "phase": 5,
-  "fr_id": "FR-01",
-  "overall_score": 100.0,
+  "fr_id": "FR-02",
+  "overall_score": 99.75,
   "quality_complete": true,
   "rounds_used": 1,
   "breakdown": {
@@ -16,7 +16,7 @@
     "type_safety": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "0 errors, 0 warnings, 0 informations",
+      "tool_evidence": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/type_safety_harness.txt"
     },
@@ -26,16 +26,17 @@
       "tests_passed": 108,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "tool_evidence": "108 passed, 1 warning in 15.24s. Coverage 100% (239/239 statements covered) across api/tasks.py, service/tasks.py, repository/task_repo.py, models/schemas.py. All 7 required FR-01 tests present and passing.",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-01.txt",
+      "tool_evidence": "Name                                                   Stmts   Miss  Cover\n03-development/src/taskq_api/api/tasks.py                 48      0   100%\n03-development/src/taskq_api/repository/task_repo.py     106      0   100%\n03-development/src/taskq_api/service/runner.py           150      2    99%\n03-development/src/taskq_api/service/tasks.py             48      0   100%\nTOTAL                                                    352      2    99%\npytest: 108 passed, 1 warning in 16.15s; spec_coverage=6/6 (100%); tests_failed=0; tests_skipped=0; all required FR-02 tests present and passing",
+      "evidence_file": ".sessi-work/round_1/tools/test_coverage_report.txt",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-02.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-01",
+      "coverage_scope_fr": "FR-02",
       "score_source": "framework"
     },
     "architecture_constraints": {
       "score": 100.0,
       "threshold": 100,
-      "tool_evidence": "Import Linter: 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)",
+      "tool_evidence": "Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)",
       "score_source": "framework",
       "tool_output": ".methodology/gate_evidence/harness_verification/architecture_constraints_harness.txt"
     }
@@ -71,26 +72,26 @@
     "type_safety": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "ff51dc5df17a5412afc51cce4a97976aaef60860eca153b974775b3ff35f752a",
-      "bytes": 36,
-      "head": "0 errors, 0 warnings, 0 informations"
+      "sha256": "dd965a75dc505cacc83dc686b40b2d807ee746c9017ffecbb1d60d708217b385",
+      "bytes": 141,
+      "head": "{\"version\": \"1.1.409\", \"generalDiagnostics\": [], \"summary\": {\"filesAnalyzed\": 24, \"errorCount\": 0, \"warningCount\": 0, \"informationCount\": 0}}"
     },
     "test_coverage": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "3d48a8af15477c63ddbf04c4df62b4280347225445f8646f209b88e6b4256911",
-      "bytes": 206,
-      "head": "108 passed, 1 warning in 15.24s. Coverage 100% (239/239 statements covered) across api/tasks.py, service/tasks.py, repository/task_repo.py, models/schemas.py. All 7 required FR-01 tests present and passing."
+      "sha256": "3b0e7db03a4f11f90a06cc2afe3e79356efe1fbddef9e9b20d0ebb7b82d0de1d",
+      "bytes": 594,
+      "head": "Name                                                   Stmts   Miss  Cover\n03-development/src/taskq_api/api/tasks.py                 48      0   100%\n03-development/src/taskq_api/repository/task_repo.py     106      0   100%\n03-development/src/taskq_api/service/runner.py           150      2    99%\n03-development/src/taskq_api/service/tasks.py             48      0   100%\nTOTAL                                                    352      2    99%\npytest: 108 passed, 1 warning in 16.15s; spec_coverage=6/6 (100%); tests_failed=0; tests_skipped=0; all required FR-02 tests present and passing"
     },
     "architecture_constraints": {
       "source": "tool_evidence (inline)",
       "kind": "inline",
-      "sha256": "9d4f44266b6053def796fd3dc60aa40ecec702fa48769abdee6c9f4c736ecfbf",
-      "bytes": 187,
-      "head": "Import Linter: 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers, forbidden-sqlalchemy, config-and-errors-independent, root-package-marker-independent, cli-main-independent)"
+      "sha256": "9763fc0f41715be0bb7dc7a20d831a9be2a6b79d3b5927907b34eebff5880a32",
+      "bytes": 206,
+      "head": "Analyzed 48 files, 93 dependencies. Contracts: 5 kept, 0 broken. (layers KEPT, forbidden-sqlalchemy KEPT, config-and-errors-independent KEPT, root-package-marker-independent KEPT, cli-main-independent KEPT)"
     }
   },
-  "composite_score": 100.0,
+  "composite_score": 99.75,
   "verdict": "PASS",
   "passed": true,
   "spec_undelivered": [],
