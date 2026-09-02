@@ -1,10 +1,10 @@
 # Harness-executed: bandit
 # returncode: 0
-# agent_score: 95.0 | threshold: 80.0
+# agent_score: 90.0 | threshold: 80.0
 
 {
   "errors": [],
-  "generated_at": "2026-09-02T00:46:55Z",
+  "generated_at": "2026-09-02T04:08:10Z",
   "metrics": {
     "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/__init__.py": {
       "CONFIDENCE.HIGH": 0,

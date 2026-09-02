@@ -1,0 +1,9 @@
+run-tool  tool=readability-v2  project=/Users/johnny/projects/taskq-redo
+  returncode: 0
+  score:      94.4
+  --- output (first 500 chars) ---
+{
+  "project_score": 94.4,
+  "project_avg_cc": 2.06,
+  "total_lloc": 1126
+}

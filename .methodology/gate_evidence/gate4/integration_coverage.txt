@@ -1,7 +1,3 @@
-# Harness-executed: pytest-cov-integration
-# returncode: 0
-# agent_score: 82.0 | threshold: 75.0
-
 ..............................                                           [100%]
 =============================== warnings summary ===============================
 03-development/tests/integration/test_task_lifecycle_e2e.py::test_taskq_api_imports_cleanly
@@ -39,4 +35,4 @@ Name                                                     Stmts   Miss  Cover   M
 03-development/src/taskq_api/service/tasks.py               48      0   100%
 --------------------------------------------------------------------------------------
 TOTAL                                                      887    160    82%
-30 passed, 1 warning in 2.63s
+30 passed, 1 warning in 2.52s
