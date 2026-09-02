@@ -260,18 +260,12 @@
   },
   "crg_review_context": {
     "status": "ok",
-    "summary": "Review context for 14 changed file(s):\n  - Risk: high\n  - 156 impacted nodes in 24 files",
-    "risk": "high",
-    "changed_file_count": 14,
-    "impacted_file_count": 24,
-    "key_entities": [
-      "/Users/johnny/projects/taskq-redo/03-development/tests/test_perf_benchmarks.py",
-      "_list",
-      "_lookup",
-      "seeded_service",
-      "test_service_get_by_id_p95_under_30ms"
-    ],
-    "test_gaps": 3,
+    "summary": "Review context for 18 changed file(s):\n  - Risk: low\n  - 0 impacted nodes in 0 files",
+    "risk": "low",
+    "changed_file_count": 18,
+    "impacted_file_count": 0,
+    "key_entities": [],
+    "test_gaps": 0,
     "next_tool_suggestions": [
       "detect_changes",
       "get_affected_flows",
@@ -279,26 +273,20 @@
     ],
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 65010,
+      "saved_tokens": 77962,
       "saved_percent": 100
     }
   },
   "crg_impact_radius": {
     "status": "ok",
-    "summary": "Blast radius for 14 changed file(s):\n  - 6 nodes directly changed\n  - 156 nodes impacted (within 2 hops)\n  - 24 additional files affected",
-    "risk": "high",
-    "impacted_file_count": 24,
-    "key_entities": [
-      "rate_limit",
-      "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/api/health.py",
-      "/Users/johnny/projects/taskq-redo/03-development/src/taskq_api/api/tasks.py",
-      "create_task",
-      "get_task"
-    ],
+    "summary": "Blast radius for 18 changed file(s):\n  - 0 nodes directly changed\n  - 0 nodes impacted (within 2 hops)\n  - 0 additional files affected",
+    "risk": "low",
+    "impacted_file_count": 0,
+    "key_entities": [],
     "truncated": false,
     "context_savings": {
       "estimated": true,
-      "saved_tokens": 65013,
+      "saved_tokens": 77975,
       "saved_percent": 100
     }
   },
