@@ -1,12 +1,12 @@
 {
   "phase": 5,
-  "updated_at": "2026-09-02T01:06:43Z",
+  "updated_at": "2026-09-02T01:18:47Z",
   "frs": {
     "FR-01": {
       "status": "gate1_pass",
       "score": 100.0,
-      "phase": 4,
-      "timestamp": "2026-09-01T20:28:14Z"
+      "phase": 5,
+      "timestamp": "2026-09-02T01:18:47Z"
     },
     "FR-02": {
       "status": "gate1_pass",

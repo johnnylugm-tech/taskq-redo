@@ -26,3 +26,4 @@
 {"phase": 4, "gate": 3, "fr_id": "phase", "ts": 1788308861.325918, "iso": "2026-09-02T00:27:41.325919+00:00", "source": "finalize"}
 {"phase": 4, "gate": 3, "fr_id": "phase", "ts": 1788309435.844568, "iso": "2026-09-02T00:37:15.844569+00:00", "source": "finalize"}
 {"phase": 4, "gate": 3, "fr_id": "phase", "ts": 1788310144.832112, "iso": "2026-09-02T00:49:04.832112+00:00", "source": "finalize"}
+{"phase": 5, "gate": 1, "fr_id": "FR-01", "ts": 1788311927.508778, "iso": "2026-09-02T01:18:47.508778+00:00", "source": "finalize"}
