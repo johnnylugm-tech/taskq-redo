@@ -27,9 +27,9 @@
       "tests_failed": 0,
       "tests_skipped": 0,
       "tool_evidence": "  /Users/johnny/projects/taskq-redo/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.\n    import multipart\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n21 passed, 1 warning in 6.19s\n--- coverage json (FR-10 source files) ---\n03-development/src/taskq_api/api/deps.py 100.0 missing: 0\n03-development/src/taskq_api/errors.py 97.12230215827338 missing: 4\nTOTAL 97.71428571428571\n",
-      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-10.txt",
+      "tool_output": ".methodology/gate_evidence/harness_verification/test_coverage_harness_per_fr_FR-08.txt",
       "coverage_scope": "per_fr",
-      "coverage_scope_fr": "FR-10",
+      "coverage_scope_fr": "FR-08",
       "score_source": "framework"
     },
     "architecture_constraints": {
